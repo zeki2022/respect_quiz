@@ -1,54 +1,44 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>瑞思拜考试 | Respect Quiz</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="common/css/style.css">
 </head>
-<body>
 
-    <!-- 1. 顶部 Logo -->
+<!-- ⚠️ 重点：必须加上 class="home-page" -->
+<body class="home-page">
+
     <div class="header">
+        <img src="common/images/logo.png" alt="Logo" class="app-logo">
         <div class="logo-text">Respect Quiz</div>
-        <span class="sub-logo">ALevel 历年真题动画演示题库</span>
+        <div class="sub-logo">A-Level 历年真题动画演示题库</div>
     </div>
 
-    <!-- 2. 考试局 Tab -->
-    <div class="tab-container" style="justify-content: center; margin-top: 10px;">
+    <div class="tab-container">
         <div class="tab-pill active">CAIE</div>
-        <div class="tab-pill disabled">EDEXCEL</div>
-        <div class="tab-pill disabled">AQA</div>
+        <div class="tab-pill" style="opacity:0.5; cursor:not-allowed">EDEXCEL</div>
+        <div class="tab-pill" style="opacity:0.5; cursor:not-allowed">AQA</div>
     </div>
 
-    <div style="height: 1px; background: #eee; margin: 10px 20px;"></div>
-
-    <!-- 3. 科目入口 -->
     <div class="subject-grid">
-        <!-- 只有 Math 和 Economics 是可点的，链接是相对路径 -->
-        <a href="subjects/math/index.html" class="subject-card active">
-            Mathematics
-        </a>
-        <div class="subject-card">Further Mathematics</div>
-        
-        <div class="subject-card disabled">Physics</div>
-        <div class="subject-card disabled">Chemistry</div>
-        <a href="subjects/econ/index.html" class="subject-card active">
-            Economics
-        </a>
-
+        <a href="subjects/math/index.html" class="subject-card active">Mathematics</a>
+        <div class="subject-card">Further Math</div>
+        <div class="subject-card" style="opacity:0.5">Physics</div>
+        <div class="subject-card" style="opacity:0.5">Chemistry</div>
+        <a href="subjects/econ/index.html" class="subject-card active">Economics</a>
         <div class="subject-card">Biology</div>
         <div class="subject-card">Business</div>
         <div class="subject-card">Accounting</div>
-        
-        <div class="subject-card">Computer Science</div>
-        <div class="subject-card">Law</div>
-        <div class="subject-card">Chinese</div>
+        <div class="subject-card">CS</div>
     </div>
 
     <div style="text-align: center; color: #ccc; font-size: 12px; margin-top: 20px;">
-        更多科目开发中...
+        © 2025 Respect Quiz · Made with AI
     </div>
 
+    <script src="common/js/core.js"></script>
 </body>
 </html>
