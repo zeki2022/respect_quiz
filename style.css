@@ -1,0 +1,200 @@
+/* style.css */
+:root {
+    --primary: #7b61ff; /* 紫色主色调 */
+    --bg-color: #f7f8fa;
+    --text-main: #333;
+    --text-sub: #888;
+    --white: #ffffff;
+    --border: #eee;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    max-width: 600px; /* 模拟手机宽度 */
+    margin: 0 auto;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    background: #fff;
+}
+
+/* 顶部导航 */
+.header {
+    background: var(--white);
+    padding: 15px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-main);
+}
+.sub-logo {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: block;
+}
+
+/* 返回按钮 */
+.back-btn {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-decoration: none;
+    font-size: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* 选项卡/标签 */
+.tab-container {
+    display: flex;
+    padding: 10px 15px;
+    gap: 10px;
+    overflow-x: auto;
+    background: #fff;
+}
+
+.tab-pill {
+    padding: 6px 16px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-sub);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tab-pill.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+.tab-pill.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 网格布局 (首页科目) */
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
+
+.subject-card {
+    background: #f9f9f9;
+    padding: 15px 5px;
+    text-align: center;
+    border-radius: 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    text-decoration: none; /* 去掉链接下划线 */
+    transition: all 0.2s;
+}
+
+.subject-card.active {
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(123, 97, 255, 0.15);
+    border: 1px solid rgba(123, 97, 255, 0.2);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.subject-card.disabled {
+    color: #ccc;
+    pointer-events: none;
+}
+
+/* 列表样式 (二级页面) */
+.section-title {
+    padding: 15px 20px 5px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.filter-row {
+    padding: 5px 15px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 10px;
+    /* 隐藏滚动条 */
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+
+.paper-list {
+    padding: 0 15px 40px;
+}
+
+.paper-item {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.paper-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: #fff;
+}
+
+.paper-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.paper-expand-icon {
+    font-size: 12px;
+    color: var(--text-sub);
+    transition: transform 0.3s;
+}
+
+.paper-content {
+    display: none;
+    background: #fbfbfb;
+    border-top: 1px solid var(--border);
+}
+
+.paper-content.show {
+    display: block;
+}
+
+.question-row {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.question-row:last-child {
+    border-bottom: none;
+}
+
+.btn-view {
+    color: var(--primary);
+    background: rgba(123, 97, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 600;
+}

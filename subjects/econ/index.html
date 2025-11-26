@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics - Respect Quiz</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="header">
+        <a href="../../index.html" class="back-btn">‹</a>
+        <div class="logo-text">Economics</div>
+        <span class="sub-logo">经济</span>
+    </div>
+
+    <div class="section-title">真题资料</div>
+
+    <!-- 年份 -->
+    <div class="filter-row">
+        <div class="tab-pill active">2025</div>
+        <div class="tab-pill">2024</div>
+        <div class="tab-pill">2023</div>
+        <div class="tab-pill">2022</div>
+    </div>
+
+    <!-- 阶段选择 -->
+    <div class="filter-row">
+        <div class="tab-pill active">AS</div>
+        <div class="tab-pill">A2</div>
+    </div>
+
+    <div class="paper-list">
+        
+        <!-- 试卷 -->
+        <div class="paper-item">
+            <div class="paper-header" onclick="togglePaper(this)">
+                <div class="paper-title">QP-202505-Economics-P21.pdf</div>
+                <div class="paper-expand-icon">▼</div>
+            </div>
+            <div class="paper-content show">
+                <div class="question-row">
+                    <span>题目 1</span>
+                    <span style="color:#ccc; font-size:12px;">暂无</span>
+                </div>
+                <!-- 题目 3 有动画 -->
+                <div class="question-row">
+                    <span>题目 3</span>
+                    <a href="2025/AS/qp-202505-economics-p21/3.html" class="btn-view">查看动画</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePaper(element) {
+            const content = element.nextElementSibling;
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+            } else {
+                content.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>

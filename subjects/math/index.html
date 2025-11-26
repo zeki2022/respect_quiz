@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematics - Respect Quiz</title>
+    <!-- 注意：引用根目录的CSS需要用 ../../ -->
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <!-- 顶部 -->
+    <div class="header">
+        <!-- 返回首页 -->
+        <a href="../../index.html" class="back-btn">‹</a>
+        <div class="logo-text">Mathematics</div>
+        <span class="sub-logo">数学</span>
+    </div>
+
+    <!-- 真题资料标题 -->
+    <div class="section-title">真题资料</div>
+
+    <!-- 年份选择 -->
+    <div class="filter-row">
+        <div class="tab-pill active">2025</div>
+        <div class="tab-pill">2024</div>
+        <div class="tab-pill">2023</div>
+        <div class="tab-pill">2022</div>
+        <div class="tab-pill">2021</div>
+        <div class="tab-pill">2020</div>
+    </div>
+
+    <!-- Paper 选择 (M是高亮) -->
+    <div class="filter-row">
+        <div class="tab-pill">P1</div>
+        <div class="tab-pill">P3</div>
+        <div class="tab-pill">S1</div>
+        <div class="tab-pill">S2</div>
+        <div class="tab-pill active">M</div>
+        <div class="tab-pill">P2</div>
+    </div>
+
+    <!-- 试卷列表 -->
+    <div class="paper-list">
+        
+        <!-- 试卷 1 (这是一个演示用的具体试卷) -->
+        <div class="paper-item">
+            <div class="paper-header" onclick="togglePaper(this)">
+                <div class="paper-title">QP-202505-Mathematics-P43.pdf</div>
+                <div class="paper-expand-icon">▼</div>
+            </div>
+            <!-- 展开的内容 -->
+            <div class="paper-content show">
+                <div class="question-row">
+                    <span>题目 1</span>
+                    <span style="color:#ccc; font-size:12px;">暂无</span>
+                </div>
+                <div class="question-row">
+                    <span>题目 2</span>
+                    <span style="color:#ccc; font-size:12px;">暂无</span>
+                </div>
+                <!-- 题目 6 有动画 -->
+                <div class="question-row">
+                    <span>题目 6</span>
+                    <!-- 相对路径指向具体的 html 文件 -->
+                    <a href="2025/M/qp-202505-mathematics-p43/6.html" class="btn-view">查看动画</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 装饰用的假试卷，点击不会展开 -->
+        <div class="paper-item" style="opacity: 0.6;">
+            <div class="paper-header">
+                <div class="paper-title">QP-202505-Mathematics-P41.pdf</div>
+                <div class="paper-expand-icon">▼</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 简单的折叠/展开逻辑
+        function togglePaper(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.paper-expand-icon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('show');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+</body>
+</html>
