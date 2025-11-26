@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>M1 Mechanics: Work & Energy</title>
+    <style>
+        /* --- 返回箭头样式 --- */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+
+        /* --- 原版舒适布局 --- */
+        :root { --primary-color: #2c3e50; --accent-color: #3498db; --bg-color: #f4f7f6; --panel-bg: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: #333; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 95%; max-width: 1200px; display: grid; grid-template-columns: 1fr 350px; gap: 20px; margin-top: 20px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+        .card { background: var(--panel-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 20px; overflow: hidden; }
+        h2, h3 { margin-top: 0; color: var(--primary-color); }
+        .problem-box { background: #e8f4fd; border-left: 5px solid var(--accent-color); padding: 15px; margin-bottom: 15px; font-size: 15px; line-height: 1.5; }
+        .canvas-container { position: relative; width: 100%; height: 0; padding-bottom: 60%; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .controls { display: flex; gap: 15px; align-items: center; margin-top: 15px; flex-wrap: wrap; background: #eee; padding: 10px; border-radius: 8px; }
+        button { background-color: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .slider-group { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        input[type=range] { flex-grow: 1; cursor: pointer; }
+        .solution-panel { max-height: 600px; overflow-y: auto; }
+        .step { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; opacity: 0.8; color: #555; transition: all 0.5s; }
+        .step.active { opacity: 1; color: #000; border-left: 4px solid var(--accent-color); padding-left: 10px; background-color: #f0f7ff; }
+        .step-title { font-weight: bold; color: var(--primary-color); margin-bottom: 5px; display: block;}
+        .math { font-family: 'Courier New', monospace; background: #f9f9f9; padding: 4px; border-radius: 4px; display: block; margin-top: 4px; border: 1px solid #eee; }
+        .energy-bar-container { margin-top: 10px; height: 20px; background: #ddd; border-radius: 10px; overflow: hidden; display: flex; }
+        .bar-pe { background: #e74c3c; height: 100%; width: 50%; transition: width 0.1s; }
+        .bar-ke { background: #2ecc71; height: 100%; width: 0%; transition: width 0.1s; }
+        .bar-work { background: #95a5a6; height: 100%; width: 0%; transition: width 0.1s; }
+        .legend { font-size: 12px; display: flex; justify-content: center; gap: 15px; margin-top: 5px; color: #666; }
+        .dot { width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- 【核心修复】使用 history.back() 确保百分百能返回 -->
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <div class="left-col">
+            <div class="card">
+                <h2>M1 Dynamics & Energy Animation</h2>
+                <div class="problem-box">
+                    <strong>Problem Statement:</strong><br>
+                    (a) A man (80kg) slides down slope AB (length 5m, sinθ=0.8). μ=0.1. Starts from rest.<br>
+                    (b) No speed change passing B. Speed at C is 11 m/s. Vertical drop B to C is 2.5m. Find work done against resistance from B to C.
+                </div>
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+                <div class="energy-bar-container">
+                    <div class="bar-pe" id="barPE"></div><div class="bar-ke" id="barKE"></div><div class="bar-work" id="barWork"></div>
+                </div>
+                <div class="legend">
+                    <span><span class="dot" style="background:#e74c3c"></span>Potential Energy (PE)</span>
+                    <span><span class="dot" style="background:#2ecc71"></span>Kinetic Energy (KE)</span>
+                    <span><span class="dot" style="background:#95a5a6"></span>Work vs Resistance</span>
+                </div>
+                <div class="controls">
+                    <button id="btnStart" onclick="startSim()">Start Animation</button>
+                    <button onclick="resetSim()">Reset</button>
+                    <div class="slider-group">
+                        <label>Speed:</label>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5">
+                        <span id="speedVal">0.5x</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px; font-family: monospace; font-size: 14px;">
+                    Current Velocity: <span id="velDisplay">0.00</span> m/s
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="card solution-panel">
+                <h3>Step-by-Step Solution</h3>
+                <div id="step1" class="step">
+                    <span class="step-title">Phase 1: Slope A to B (Dynamics)</span>
+                    Analyze forces on the slope.
+                    <span class="math">R = 80g·cosθ = 480 N</span>
+                    <span class="math">F_friction = μR = 48 N</span>
+                    <span class="math">Net Force = mg·sinθ - F = 592 N</span>
+                    <span class="math">a = F/m = 7.4 m/s²</span>
+                    <span class="math">v² = u² + 2as → v_B ≈ 8.60 m/s</span>
+                </div>
+                <div id="step2" class="step">
+                    <span class="step-title">Phase 2: B to C (Work-Energy)</span>
+                    Identify energies involved.
+                    <span class="math">Mass = 80kg, Drop(h) = 2.5m</span>
+                    <span class="math">v_B = √74, v_C = 11</span>
+                    <span class="math">Equation: PE_loss = KE_gain + Work_res</span>
+                </div>
+                <div id="step3" class="step">
+                    <span class="step-title">Calculating Energy Changes</span>
+                    <span class="math">PE_loss = mgh = 80×10×2.5 = 2000 J</span>
+                    <span class="math">KE_gain = ½m(v_C² - v_B²)</span>
+                    <span class="math">= 40(121 - 74) = 40(47) = 1880 J</span>
+                </div>
+                <div id="step4" class="step">
+                    <span class="step-title">Final Calculation</span>
+                    Find Work done against resistance.
+                    <span class="math">2000 = 1880 + W_res</span>
+                    <span class="math">W_res = 120 J</span>
+                    <strong style="color:green">Answer: 120 Joules</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        if(simState !== 'RUNNING') drawStaticScene();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    const g = 10; const mass = 80;
+    let simState = 'RESET'; let animationId; let currentTime = 0; let timeScale = 0.5;
+    
+    function initPath() {
+        const w = canvas.width, h = canvas.height, padding = w * 0.1;
+        const scale = (h - padding*2) / 6.5;
+        const Ax = padding, Ay = padding;
+        const Bx = Ax + (3 * scale), By = Ay + (4 * scale); 
+        const Cx = w - padding, Cy = By + (2.5 * scale); 
+        return { Ax, Ay, Bx, By, Cx, Cy, scale };
+    }
+
+    let distAB = 5; let accelAB = 7.4; let velB = Math.sqrt(74); let velC = 11;
+    let distBC_Sim = 6; let accelBC = (121 - 74) / (2 * distBC_Sim);
+    let currentDist = 0; let currentVel = 0; let currentPhase = 1; 
+
+    const speedInput = document.getElementById('speedRange');
+    speedInput.addEventListener('input', (e) => {
+        timeScale = parseFloat(e.target.value);
+        document.getElementById('speedVal').innerText = timeScale.toFixed(1) + 'x';
+    });
+
+    function resetSim() {
+        cancelAnimationFrame(animationId); simState = 'RESET';
+        currentTime = 0; currentDist = 0; currentVel = 0; currentPhase = 1;
+        document.getElementById('btnStart').innerText = "Start Animation";
+        document.getElementById('btnStart').disabled = false;
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        updateEnergyBars(); resizeCanvas(); 
+    }
+
+    function startSim() {
+        if (simState === 'RUNNING') return;
+        simState = 'RUNNING';
+        document.getElementById('btnStart').disabled = true;
+        let lastTime = performance.now();
+        function loop(now) {
+            if (simState !== 'RUNNING') return;
+            const dt = Math.min((now - lastTime) / 1000, 0.1); lastTime = now;
+            updatePhysics(dt * timeScale); drawFrame();
+            if (simState === 'RUNNING') animationId = requestAnimationFrame(loop);
+        }
+        animationId = requestAnimationFrame(loop);
+    }
+
+    function updatePhysics(dt) {
+        if (currentPhase === 1) {
+            document.getElementById('step1').classList.add('active');
+            currentVel += accelAB * dt; currentDist += currentVel * dt; 
+            let theoreticalDist = (currentVel * currentVel) / (2 * accelAB);
+            if (theoreticalDist >= distAB) {
+                currentPhase = 2; currentDist = distAB; currentVel = velB;
+                document.getElementById('step1').classList.remove('active');
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('step3').classList.add('active');
+            }
+        } else if (currentPhase === 2) {
+            currentVel += accelBC * dt; currentDist += currentVel * dt;
+            if (currentVel >= velC) {
+                currentVel = velC; simState = 'END';
+                document.getElementById('step4').classList.add('active');
+                document.getElementById('btnStart').innerText = "Finished";
+            }
+        }
+        document.getElementById('velDisplay').innerText = currentVel.toFixed(2);
+        calculateEnergy();
+    }
+
+    function calculateEnergy() {
+        const coords = initPath();
+        let h = 0;
+        if (currentPhase === 1) {
+            let frac = (currentVel * currentVel) / (2 * accelAB) / distAB;
+            if (frac > 1) frac = 1;
+            h = 6.5 - (4 * frac);
+        } else {
+            let vSqDiff = velC*velC - velB*velB;
+            let currVSqDiff = currentVel*currentVel - velB*velB;
+            let frac = currVSqDiff / vSqDiff;
+            if (frac > 1) frac = 1;
+            h = 2.5 - (2.5 * frac);
+        }
+        let pe = mass * g * h;
+        let ke = 0.5 * mass * currentVel * currentVel;
+        let totalStart = mass * g * 6.5; 
+        let workDone = totalStart - pe - ke; if(workDone < 0) workDone = 0; 
+        const maxE = 5200;
+        document.getElementById('barPE').style.width = (pe / maxE * 100) + '%';
+        document.getElementById('barKE').style.width = (ke / maxE * 100) + '%';
+        document.getElementById('barWork').style.width = (workDone / maxE * 100) + '%';
+    }
+
+    function updateEnergyBars() {
+         document.getElementById('barPE').style.width = '100%';
+         document.getElementById('barKE').style.width = '0%';
+         document.getElementById('barWork').style.width = '0%';
+    }
+
+    function drawStaticScene() {
+        const coords = initPath();
+        drawBackground(ctx, coords);
+        drawMan(ctx, coords.Ax, coords.Ay, 0);
+    }
+
+    function drawFrame() {
+        const coords = initPath();
+        const { Ax, Ay, Bx, By, Cx, Cy } = coords;
+        drawBackground(ctx, coords);
+        let manX, manY, angle;
+        if (currentPhase === 1) {
+            let s = (currentVel*currentVel)/(2*accelAB);
+            let t = s / distAB; if(t>1) t=1;
+            manX = Ax + (Bx - Ax) * t; manY = Ay + (By - Ay) * t;
+            angle = Math.atan2(By - Ay, Bx - Ax);
+        } else {
+            let CPx = Bx + (Cx - Bx)*0.3; let CPy = Cy; 
+            let vSqDiff = velC*velC - velB*velB;
+            let currVSqDiff = currentVel*currentVel - velB*velB;
+            let t = currVSqDiff / vSqDiff; if(t>1) t=1; if(t<0) t=0;
+            let invT = 1-t;
+            manX = (invT*invT)*Bx + 2*invT*t*CPx + (t*t)*Cx;
+            manY = (invT*invT)*By + 2*invT*t*CPy + (t*t)*Cy;
+            let dx = 2*invT*(CPx - Bx) + 2*t*(Cx - CPx);
+            let dy = 2*invT*(CPy - By) + 2*t*(Cy - CPy);
+            angle = Math.atan2(dy, dx);
+        }
+        drawMan(ctx, manX, manY, angle);
+    }
+
+    function drawBackground(ctx, c) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ecf0f1"; ctx.strokeStyle = "#7f8c8d"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(c.Ax, c.Ay); ctx.lineTo(c.Bx, c.By); 
+        ctx.quadraticCurveTo(c.Bx + (c.Cx - c.Bx)*0.3, c.Cy, c.Cx, c.Cy);
+        ctx.lineTo(c.Cx, canvas.height); ctx.lineTo(0, canvas.height); ctx.lineTo(0, c.Ay);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#2c3e50"; ctx.font = "bold 16px Arial";
+        ctx.fillText("A", c.Ax - 20, c.Ay); ctx.fillText("B", c.Bx, c.By - 10); ctx.fillText("C", c.Cx - 10, c.Cy - 10);
+        drawDim(ctx, c.Ax - 30, c.Ay, c.Ax - 30, c.By, "4m"); drawDim(ctx, c.Cx + 20, c.By, c.Cx + 20, c.Cy, "2.5m");
+    }
+    
+    function drawDim(ctx, x1, y1, x2, y2, text) {
+        ctx.strokeStyle = "#999";
+        ctx.beginPath(); ctx.moveTo(x1-5, y1); ctx.lineTo(x1+5, y1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x2-5, y2); ctx.lineTo(x2+5, y2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.fillStyle = "#555"; ctx.font = "12px Arial"; ctx.fillText(text, x1 - 25, (y1+y2)/2);
+    }
+
+    function drawMan(ctx, x, y, angle) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+        ctx.fillStyle = "#e67e22"; ctx.fillRect(-10, -20, 20, 20);
+        ctx.strokeStyle = "#d35400"; ctx.lineWidth = 2; ctx.strokeRect(-10, -20, 20, 20);
+        ctx.beginPath(); ctx.arc(0, -25, 6, 0, Math.PI*2);
+        ctx.fillStyle = "#f1c40f"; ctx.fill();
+        ctx.restore();
+    }
+    
+    updateEnergyBars(); resizeCanvas();
+</script>
+</body>
+</html>
