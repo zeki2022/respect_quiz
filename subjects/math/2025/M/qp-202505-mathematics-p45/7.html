@@ -8,17 +8,24 @@
     <!-- 引入公共样式 -->
     <link rel="stylesheet" href="../../../../../common/css/style.css">
     
-    <!-- MathJax 配置 -->
+    <!-- 【核心修复】更换更稳定的 MathJax 源，并配置 $ 符号识别 -->
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-            svg: { fontCache: 'global' }
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
         };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- 换用 unpkg 源，通常在移动端和国内访问更稳定 -->
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* --- 继承 template.html 布局 --- */
+        /* 保持你满意的布局 */
         body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
         
         .container {
@@ -41,12 +48,11 @@
         
         .canvas-container { 
             width: 100%; height: 0; 
-            padding-bottom: 40%; /* PC端扁一点 */
+            padding-bottom: 40%; 
             position: relative; background: #fff; border: 1px solid #ddd; 
             border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
         }
         @media (max-width: 1000px) {
-            /* 手机端稍微高一点，给垂直下落留空间 */
             .canvas-container { padding-bottom: 65%; } 
         }
 
@@ -64,8 +70,9 @@
         }
         .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
+        /* 公式文字样式 */
         .math-eq { 
-            font-family: 'Times New Roman', serif; font-size: 1.05em;
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
             color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
             padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
         }
@@ -89,6 +96,7 @@
             <div class="card">
                 <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q7</h3>
                 
+                <!-- 题目描述 -->
                 <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
                     <strong>Given:</strong> Particle A ($6.5$ kg) on rough slope ($\tan\alpha = \frac{5}{12}$, $\mu=0.4$). Particle B ($m$ kg) hangs vertically.<br>
                     <strong>(a)</strong> Find possible values of $m$ for equilibrium.<br>
@@ -180,6 +188,7 @@
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         
+        // Physics Parameters
         const g = 10;
         const sinA = 5/13;
         const cosA = 12/13;
@@ -221,30 +230,16 @@
             const w = canvas.width;
             const h = canvas.height;
             
-            // 智能计算：根据屏幕宽度动态调整比例尺
-            // 目标：让整个斜坡+滑轮系统占屏幕宽度的 70% 左右
-            // 从而保证移动 0.6m (逻辑距离) 不会超出屏幕
-            
-            const p = w * 0.1; // 边距
-            
-            // 滑轮位置 (左上偏中)
+            // --- 智能计算：自适应比例尺 ---
             const pulley = { x: w * 0.3, y: h * 0.15 };
             
-            // 斜坡计算
-            // 题目中 tan a = 5/12. 
-            // 我们设斜坡水平长度为 Canvas 宽度的 50%
+            // Slope
             const slopeRun = w * 0.5;
             const slopeRise = slopeRun * (5/12);
-            
             const slopeEnd = { x: pulley.x + slopeRun, y: pulley.y + slopeRise };
             
-            // 这里的 scale 是为了把物理世界的 0.6m 映射到像素
-            // 我们希望 0.6m 大概占斜坡总长的 1/3 左右，这样才看得清楚
-            // slopeLengthInPixels = Math.sqrt(slopeRun^2 + slopeRise^2)
             const slopePixelLen = Math.sqrt(slopeRun*slopeRun + slopeRise*slopeRise);
-            
-            // 物理世界斜坡总长假设是 2m (足够长)
-            // 那么 1m = slopePixelLen / 2
+            // 1m = slopePixelLen / 2.5 (visual scaling)
             const visualScale = slopePixelLen / 2.5; 
             
             path = { pulley, slopeEnd, visualScale };
@@ -288,7 +283,6 @@
                 if (p < 0.3) highlightStep(1);
                 else if (p < 0.6) highlightStep(2);
                 else highlightStep(3);
-                
             } else {
                 currentDist = distTotal;
                 currentVel = finalVel;
@@ -312,7 +306,6 @@
             let workDone = friction * currentDist;
             let ke = 0.5 * totalMass * currentVel * currentVel;
             let totalRef = 60; 
-            
             document.getElementById('barPE').style.width = Math.min((netPELoss / totalRef * 100), 100) + '%';
             document.getElementById('barWork').style.width = Math.min((workDone / totalRef * 100), 100) + '%';
             document.getElementById('barKE').style.width = Math.min((ke / totalRef * 100), 100) + '%';
@@ -320,45 +313,35 @@
 
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             const px = path.pulley.x;
             const py = path.pulley.y;
             const ex = path.slopeEnd.x;
             const ey = path.slopeEnd.y;
             const vScale = path.visualScale;
             
-            // Draw Geometry
+            // Geometry
             ctx.beginPath();
-            ctx.moveTo(px, py);
-            ctx.lineTo(ex, ey);
-            ctx.lineTo(px, ey);
-            ctx.closePath();
+            ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.lineTo(px, ey); ctx.closePath();
             ctx.fillStyle = '#ecf0f1'; ctx.fill();
             ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 3; ctx.stroke();
             
-            // Pulley
             ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI*2);
             ctx.fillStyle = '#bdc3c7'; ctx.fill(); ctx.stroke();
 
             const movePx = currentDist * vScale;
             
-            // Block A - Starts down slope, moves UP towards pulley
-            // Start distance from pulley (pixels)
-            const startDistA = 1.0 * vScale; // 1.0 meters away visually
+            // Block A (UP slope)
+            const startDistA = 1.0 * vScale; 
             const currentDistA = startDistA - movePx;
-            
-            const dx = ex - px;
-            const dy = ey - py;
+            const dx = ex - px; const dy = ey - py;
             const len = Math.sqrt(dx*dx + dy*dy);
-            const ux = dx/len; 
-            const uy = dy/len;
-            
+            const ux = dx/len; const uy = dy/len;
             const ax = px + ux * currentDistA;
             const ay = py + uy * currentDistA;
             
-            // Block B - Hangs down
-            const bx = px - 12; // Left side of pulley
-            const startDistB = 0.2 * vScale; // Start 0.2m down visually
+            // Block B (DOWN)
+            const bx = px - 12; 
+            const startDistB = 0.2 * vScale;
             const by = py + startDistB + movePx;
             
             // Strings
@@ -370,8 +353,7 @@
             ctx.save();
             ctx.translate(ax, ay);
             ctx.rotate(Math.atan2(dy, dx));
-            ctx.fillStyle = '#e67e22'; 
-            ctx.fillRect(-15, -30, 30, 30); 
+            ctx.fillStyle = '#e67e22'; ctx.fillRect(-15, -30, 30, 30); 
             ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("A", -5, -10);
             ctx.restore();
             ctx.fillStyle='#333'; ctx.fillText("6.5kg", ax+20, ay);
@@ -379,18 +361,15 @@
             // B
             ctx.save();
             ctx.translate(bx, by);
-            ctx.fillStyle = '#3498db'; 
-            ctx.fillRect(-15, 0, 30, 30); 
+            ctx.fillStyle = '#3498db'; ctx.fillRect(-15, 0, 30, 30); 
             ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("B", -5, 20);
             ctx.restore();
             ctx.fillStyle='#333'; ctx.fillText("m kg", bx+20, by+15);
             
-            // Annotations
-            ctx.fillStyle = '#7f8c8d';
-            ctx.fillText("α", px + 40, py + 15);
+            ctx.fillStyle = '#7f8c8d'; ctx.fillText("α", px + 40, py + 15);
         }
 
-        setTimeout(() => { resize(); updateBars(); }, 200);
+        setTimeout(() => { resize(); updateBars(); }, 500);
     </script>
 </body>
 </html>
