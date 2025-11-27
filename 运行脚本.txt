@@ -1,0 +1,5 @@
+# 方式一：简单运行（默认读取 math.xlsx，输出到 subjects/math/data.js）
+python3 datagen_m.py
+
+# 方式二：指定文件名（符合你的要求）
+python3 datagen_m.py -i math.xlsx -o subjects/math/data.js

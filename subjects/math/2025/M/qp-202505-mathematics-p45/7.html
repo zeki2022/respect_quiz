@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q7: Connected Particles</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- 核心修复：解除公共样式的宽度限制 --- */
+        body { 
+            padding-top: 60px; 
+            padding-bottom: 40px; 
+            background-color: #f4f7f6;
+            /* 【关键】让页面可以撑满电脑屏幕 */
+            max-width: none !important; 
+        }
+        
+        /* 布局容器 */
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* PC端优化：高度设为40%以适应一屏 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) {
+            .canvas-container { padding-bottom: 60%; } 
+        }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.05em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+        
+        .energy-bar-container { height: 18px; background: #eee; border-radius: 10px; overflow: hidden; display: flex; margin-top: 15px; }
+        .bar-pe { background: #e74c3c; width: 0%; transition: width 0.1s; }
+        .bar-ke { background: #2ecc71; width: 0%; transition: width 0.1s; }
+        .bar-work { background: #95a5a6; width: 0%; transition: width 0.1s; }
+        .legend { font-size: 13px; color: #555; margin-top:8px; display:flex; gap:15px; justify-content:center;}
+        .dot { width:10px; height:10px; display:inline-block; border-radius:50%; margin-right:5px;}
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q7</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Given:</strong> Particle A ($6.5$ kg) on rough slope ($\tan\alpha = \frac{5}{12}$, $\mu=0.4$). Particle B ($m$ kg) hangs vertically.<br>
+                    <strong>(a)</strong> Find possible values of $m$ for equilibrium.<br>
+                    <strong>(b)</strong> If $m=12$, released from rest. Find speed after moving $0.6$m using Energy Method.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="energy-bar-container">
+                    <div class="bar-pe" id="barPE"></div>
+                    <div class="bar-ke" id="barKE"></div>
+                    <div class="bar-work" id="barWork"></div>
+                </div>
+                <div class="legend">
+                    <span><span class="dot" style="background:#e74c3c"></span>Net PE Loss</span>
+                    <span><span class="dot" style="background:#2ecc71"></span>KE Gain</span>
+                    <span><span class="dot" style="background:#95a5a6"></span>Work vs Friction</span>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Animation (Part b)</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right;">0.5x</span>
+                    </div>
+                    <div style="width:100%; text-align:right; margin-top:5px; font-weight:bold; color:#2c3e50; font-size:18px;">
+                        v = <span id="velDisplay">0.00</span> m/s
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="step-box" style="border-left-color: #27ae60;">
+                    <strong style="color:#27ae60;">Part (a): Equilibrium (7 marks)</strong><br>
+                    Resolve forces on A:<br>
+                    $\sin\alpha = \frac{5}{13}$, $\cos\alpha = \frac{12}{13}$<br>
+                    $F_{max} = \mu R = 0.4(6.5g \cos\alpha) = 24$ N<br>
+                    Weight component $P = 6.5g \sin\alpha = 25$ N<br>
+                    <hr style="border-top:1px dashed #ddd; margin:10px 0;">
+                    <strong>Case 1: A about to slip DOWN</strong><br>
+                    Friction acts UP slope.<br>
+                    $T + F = P \Rightarrow T = 25 - 24 = 1$ N<br>
+                    $T = mg \Rightarrow \mathbf{m = 0.1}$<br><br>
+                    <strong>Case 2: A about to slip UP</strong><br>
+                    Friction acts DOWN slope.<br>
+                    $T = P + F \Rightarrow T = 25 + 24 = 49$ N<br>
+                    $T = mg \Rightarrow \mathbf{m = 4.9}$<br>
+                    <div style="background:#eafaf1; padding:5px; margin-top:5px; border-radius:4px;">
+                        <strong>Ans:</strong> $0.1 \le m \le 4.9$
+                    </div>
+                </div>
+
+                <div id="step1" class="step-box">
+                    <strong>Part (b) Step 1: Energy Changes</strong><br>
+                    Dist $s = 0.6$, Mass $m = 12$<br>
+                    PE Loss of B: $12g(0.6) = \mathbf{72}$ J<br>
+                    PE Gain of A: $6.5g(0.6) \sin\alpha = \mathbf{15}$ J<br>
+                    <span class="highlight">Net PE Loss = 72 - 15 = 57 J</span>
+                </div>
+
+                <div id="step2" class="step-box">
+                    <strong>2. Work Done against Friction</strong><br>
+                    $WD = F \times s$<br>
+                    $WD = 24 \times 0.6 = \mathbf{14.4}$ J
+                </div>
+
+                <div id="step3" class="step-box">
+                    <strong>3. Conservation of Energy</strong><br>
+                    $Net\ PE\ Loss = KE\ Gain + WD$<br>
+                    $57 = \frac{1}{2}(12+6.5)v^2 + 14.4$<br>
+                    $42.6 = 9.25v^2$<br>
+                    $v = \sqrt{\frac{42.6}{9.25}} \approx \mathbf{2.15}$ m/s
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const g = 10; const sinA = 5/13; const cosA = 12/13;
+        const mA = 6.5; const mB = 12; const mu = 0.4; const distTotal = 0.6; 
+        const weightA_parallel = mA * g * sinA; 
+        const friction = mu * mA * g * cosA; 
+        const weightB = mB * g; 
+        const netForce = weightB - weightA_parallel - friction; 
+        const totalMass = mA + mB; 
+        const acceleration = netForce / totalMass; 
+        const finalVel = Math.sqrt(2 * acceleration * distTotal); 
+        
+        let simState = 'RESET'; let animId; let currentDist = 0; let currentVel = 0; let timeScale = 0.5; let path = {};
+
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1) + "x";
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            initPath();
+            if(simState !== 'RUNNING') drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function initPath() {
+            const w = canvas.width, h = canvas.height, p = w * 0.1; 
+            const pulley = { x: w * 0.3, y: h * 0.15 };
+            const slopeLen = w * 0.6;
+            const slopeH = slopeLen * (5/12); 
+            const slopeEnd = { x: pulley.x + slopeLen, y: pulley.y + slopeH };
+            path = { pulley, slopeEnd };
+        }
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000; lastTime = now;
+                if(dt > 0.1) dt = 0.1;
+                update(dt * timeScale); drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId); simState = 'RESET';
+            currentDist = 0; currentVel = 0;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Animation (Part b)";
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            updateBars(); drawFrame();
+        }
+
+        function update(dt) {
+            if (currentDist < distTotal) {
+                currentVel += acceleration * dt; currentDist += currentVel * dt;
+                let p = currentDist / distTotal;
+                if (p < 0.3) highlightStep(1); else if (p < 0.6) highlightStep(2); else highlightStep(3);
+            } else {
+                currentDist = distTotal; currentVel = finalVel; simState = 'END';
+                document.getElementById('btnStart').innerText = "Finished";
+            }
+            document.getElementById('velDisplay').innerText = currentVel.toFixed(2);
+            updateBars();
+        }
+        
+        function highlightStep(id) {
+            document.querySelectorAll('.step-box').forEach(el => { if(el.id) el.classList.remove('active'); });
+            let step = document.getElementById('step'+id); if(step) step.classList.add('active');
+        }
+
+        function updateBars() {
+            let netPELoss = (mB * g * currentDist) - (mA * g * currentDist * sinA);
+            let workDone = friction * currentDist;
+            let ke = 0.5 * totalMass * currentVel * currentVel;
+            let totalRef = 60; 
+            document.getElementById('barPE').style.width = Math.min((netPELoss / totalRef * 100), 100) + '%';
+            document.getElementById('barWork').style.width = Math.min((workDone / totalRef * 100), 100) + '%';
+            document.getElementById('barKE').style.width = Math.min((ke / totalRef * 100), 100) + '%';
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const px = path.pulley.x, py = path.pulley.y;
+            const ex = path.slopeEnd.x, ey = path.slopeEnd.y;
+            
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.lineTo(px, ey); ctx.closePath();
+            ctx.fillStyle = '#ecf0f1'; ctx.fill();
+            ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 3; ctx.stroke();
+            
+            ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI*2);
+            ctx.fillStyle = '#bdc3c7'; ctx.fill(); ctx.stroke();
+
+            const visualScale = 200; const movePx = currentDist * visualScale;
+            const startDistA = 180;
+            const dx = ex - px, dy = ey - py, len = Math.sqrt(dx*dx + dy*dy);
+            const ux = dx/len, uy = dy/len;
+            const currentDistA = startDistA - movePx;
+            const ax = px + ux * currentDistA, ay = py + uy * currentDistA;
+            const bx = px - 12, startDistB = 80, by = py + startDistB + movePx;
+            
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ax, ay); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(bx, by); ctx.stroke();
+            
+            ctx.save(); ctx.translate(ax, ay); ctx.rotate(Math.atan2(dy, dx));
+            ctx.fillStyle = '#e67e22'; ctx.fillRect(-15, -30, 30, 30); 
+            ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("A", -5, -10);
+            ctx.restore(); ctx.fillStyle='#333'; ctx.fillText("6.5kg", ax+20, ay);
+
+            ctx.save(); ctx.translate(bx, by);
+            ctx.fillStyle = '#3498db'; ctx.fillRect(-15, 0, 30, 30); 
+            ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("B", -5, 20);
+            ctx.restore(); ctx.fillStyle='#333'; ctx.fillText("m kg", bx+20, by+15);
+            
+            ctx.fillStyle = '#7f8c8d'; ctx.fillText("α", px + 40, py + 15);
+        }
+
+        setTimeout(() => { resize(); updateBars(); }, 200);
+    </script>
+</body>
+</html>
