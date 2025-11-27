@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Econ Q5: TOT & Exchange Rate</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- 继承 template.html 布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+            /* 关键：让容器高度固定，为了让内部滚动生效 */
+            height: calc(100vh - 120px); 
+        }
+        @media (max-width: 1000px) { 
+            .container { grid-template-columns: 1fr; height: auto; } 
+        }
+
+        /* 卡片通用 */
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); height: 100%; display: flex; flex-direction: column; }
+        
+        /* 返回箭头 */
+        .back-arrow { position: fixed; top: 15px; left: 15px; z-index: 9999; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; text-decoration: none; color: #333; font-size: 24px; font-weight: bold; font-family: sans-serif; line-height: 1; cursor: pointer; }
+        
+        /* 左侧样式保持不变... */
+        .canvas-container { width: 100%; flex: 1; position: relative; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; overflow:hidden; min-height: 300px;}
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .controls { display: flex; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee; flex-shrink: 0;}
+        button.action-btn { background-color: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        button.action-btn.reset { background-color: #95a5a6; }
+        .q-box { background: #eef7ff; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.5; color:#2c3e50; flex-shrink: 0;}
+
+        /* --- 右侧：核心修复区域 --- */
+        
+        /* 1. 父容器：去掉滚动，改为 Flex 纵向布局 */
+        .answer-section { 
+            padding: 0 !important; /* 覆盖默认padding */
+            overflow: hidden; /* 禁止父级滚动 */
+            display: flex; 
+            flex-direction: column;
+            height: 100%; /* 撑满高度 */
+        }
+
+        /* 2. 头部 Tabs：禁止压缩，固定在顶部 */
+        .tabs { 
+            display: flex; 
+            background: #eee; 
+            border-radius: 12px 12px 0 0; /* 只圆上面 */
+            overflow: hidden; 
+            flex-shrink: 0; /* 关键：禁止被压缩 */
+            border-bottom: 1px solid #ddd;
+        }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; font-weight:600; color:#666; font-size:13px;}
+        .tab.active { background: #fff; border-bottom-color: #3498db; color: #2c3e50; }
+
+        /* 3. 内容区域：自动填充剩余空间，内部滚动 */
+        .content { 
+            padding: 20px; 
+            display: none; 
+            line-height: 1.6; 
+            background: #fff; 
+            border-radius: 0 0 12px 12px; 
+            
+            /* 关键修复：让内容区独立滚动 */
+            flex: 1; 
+            overflow-y: auto; 
+        }
+        .content.active { display: block; }
+        
+        /* 内容样式 */
+        .model-essay p { margin-bottom: 10px; font-size:14px; color:#444;}
+        .model-essay strong { color: #2980b9; }
+        .note { background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px; color: #856404; margin-bottom: 15px; border-left: 4px solid #ffc107;}
+        .mark-point { background-color: #e8f5e9; border-left: 3px solid #4caf50; padding: 5px 10px; margin-bottom: 8px; font-size: 13px; }
+    </style>
+
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左边：动画区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Econ / Q5: Trade & Exchange Rate</h3>
+                
+                <div class="q-box">
+                    <strong>OR 5</strong><br>
+                    (a) With the help of a formula, explain the causes of an improvement in the terms of trade... and consider whether such an improvement can ever be harmful. [8]<br>
+                    (b) Assess whether the depreciation of an exchange rate is always beneficial to an economy. [12]
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="graphCanvas"></canvas>
+                    <!-- 浮动图例 -->
+                    <div style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:8px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                        <div style="color:#e74c3c; font-weight:bold;">— Current Account (J-Curve)</div>
+                        <div style="color:#2980b9; font-weight:bold;">— Time Path</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div style="flex:1; display:flex; align-items:center; gap:10px; min-width:200px;">
+                        <span style="font-weight:bold; font-size:13px;">Time (SR → LR):</span>
+                        <input type="range" id="slider" min="0" max="100" value="0" style="flex:1; cursor:pointer;" oninput="updateTime()">
+                    </div>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="action-btn" onclick="showExamDiagram()">★ Exam J-Curve</button>
+                        <button class="action-btn reset" onclick="resetGraph()">Reset</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top:10px; font-size:14px; color:#555; background:#f9f9f9; padding:8px; border-radius:4px;">
+                    <strong>Status:</strong> <span id="statusText">Depreciation just happened.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右边：文字区 -->
+        <div class="right-col">
+            <div class="card answer-section" style="padding:0;">
+                <div class="tabs">
+                    <div class="tab active" onclick="setTab('a')">Part (a) Analysis</div>
+                    <div class="tab" onclick="setTab('b')">Part (b) Evaluation</div>
+                    <div class="tab" onclick="setTab('c')">Model Answer</div>
+                </div>
+
+                <!-- Part A Content (Detailed MS) -->
+                <div id="tab-a" class="content active">
+                    <h4>AO1: Knowledge (3 marks)</h4>
+                    <div class="mark-point">
+                        <strong>Formula:</strong> Terms of Trade (TOT) = $\frac{\text{Index of Export Prices}}{\text{Index of Import Prices}} \times 100$
+                    </div>
+                    <div class="mark-point">
+                        <strong>Improvement:</strong> Occurs when the value/ratio increases.
+                    </div>
+                    <div class="mark-point">
+                        <strong>Causes:</strong> Export prices rise AND/OR Import prices fall.
+                    </div>
+
+                    <h4>AO2: Analysis (3 marks)</h4>
+                    <div class="mark-point">
+                        <strong>Beneficial:</strong> More imports can be purchased for the same volume of exports.
+                    </div>
+                    <div class="mark-point">
+                        <strong>Harmful Case:</strong> If export prices rise (causing TOT improvement), it may lead to <strong>fewer exports</strong> sold in the long run (Quantity drops).
+                    </div>
+                    <div class="mark-point">
+                        <strong>Result:</strong> This may lead to a <strong>Current Account Deficit</strong> which is considered harmful.
+                    </div>
+
+                    <h4>AO3: Evaluation (2 marks)</h4>
+                    <p>Assessment of whether improvement is <em>always</em> beneficial or can be harmful, justified with a conclusion.</p>
+                </div>
+
+                <!-- Part B Content (Detailed MS) -->
+                <div id="tab-b" class="content">
+                    <div class="note"><strong>Core Question:</strong> Is Depreciation <em>ALWAYS</em> beneficial?</div>
+                    
+                    <h4>AO1 & AO2: Analysis (8 marks)</h4>
+                    <p><strong>1. Definition:</strong> Depreciation is the fall in value of a floating exchange rate.</p>
+                    <p><strong>2. Potential Advantages:</strong></p>
+                    <ul style="padding-left:20px; font-size:14px;">
+                        <li>Exports become cheaper (prices fall) $\rightarrow$ Demand for exports rises.</li>
+                        <li>Reduces <strong>Current Account Deficit</strong>.</li>
+                        <li>Boosts <strong>Aggregate Demand (AD)</strong> and economic growth.</li>
+                    </ul>
+                    <p><strong>3. Potential Disadvantages:</strong></p>
+                    <ul style="padding-left:20px; font-size:14px;">
+                        <li>Imports become more expensive (finished goods & raw materials).</li>
+                        <li><strong>Cost-Push Inflation:</strong> Higher raw material costs for domestic firms.</li>
+                        <li><strong>Imported Inflation:</strong> Higher prices for consumers.</li>
+                    </ul>
+
+                    <h4>AO3: Evaluation (4 marks)</h4>
+                    <div class="mark-point" style="border-left-color:#ff9800; background:#fff3e0;">
+                        <strong>Marshall-Lerner Condition:</strong> Only beneficial if $PED_x + PED_m > 1$.
+                    </div>
+                    <div class="mark-point" style="border-left-color:#ff9800; background:#fff3e0;">
+                        <strong>J-Curve Effect:</strong> In the Short Run, demand is inelastic. Deficit worsens before improving.
+                    </div>
+                </div>
+
+                <!-- Part C Content (Full Essay) -->
+                <div id="tab-c" class="content">
+                    <div class="model-essay">
+                        <p><strong>(a) Causes & Harm of TOT Improvement</strong></p>
+                        <p>The Terms of Trade formula is $\frac{\text{Px}}{\text{Pm}} \times 100$. An improvement means the index rises, caused by rising export prices or falling import prices.</p>
+                        <p>Generally beneficial as it allows a country to buy more imports for the same exports. <strong>However</strong>, it can be harmful. If the improvement is due to <strong>domestic inflation</strong> raising export prices, and demand for exports is <strong>price elastic</strong>, the volume of exports will fall significantly. This leads to a loss of export revenue and a potential <strong>Balance of Payments deficit</strong>, harming the economy.</p>
+                        
+                        <hr style="border-top:1px dashed #ccc; margin:15px 0;">
+                        
+                        <p><strong>(b) Depreciation: Always Beneficial?</strong></p>
+                        <p>A depreciation makes exports cheaper and imports dearer.</p>
+                        <p><strong>Benefits:</strong> It can correct a trade deficit and boost AD (growth) as net exports rise.</p>
+                        <p><strong>Drawbacks:</strong> It causes <strong>Cost-Push Inflation</strong> as imported raw materials become expensive. This reduces real incomes.</p>
+                        <p><strong>Evaluation (The "It Depends" factors):</strong>
+                        <br>1. <strong>Elasticity (Marshall-Lerner):</strong> If demand is inelastic ($PED_x + PED_m < 1$), the trade balance will <strong>worsen</strong>.
+                        <br>2. <strong>Time Lag (J-Curve):</strong> In the short run, contracts are fixed, so the deficit worsens before improving.
+                        <br>3. <strong>Conclusion:</strong> Not <em>always</em> beneficial. It depends on the elasticity of demand and the government's inflation target.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let time = 0; 
+        let isExamMode = false;
+        
+        function resize() {
+            if(!canvas.parentElement) return;
+            width = canvas.parentElement.clientWidth;
+            height = canvas.parentElement.clientHeight;
+            canvas.width = width; canvas.height = height;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function updateTime() {
+            isExamMode = false;
+            time = parseInt(document.getElementById('slider').value);
+            updateStatus(); draw();
+        }
+        
+        function showExamDiagram() {
+            isExamMode = true; time = 100; 
+            document.getElementById('slider').value = 100;
+            updateStatus(); draw();
+        }
+        
+        function resetGraph() {
+            isExamMode = false; time = 0;
+            document.getElementById('slider').value = 0;
+            updateStatus(); draw();
+        }
+        
+        function updateStatus() {
+            const text = document.getElementById('statusText');
+            if (time < 10) text.innerText = "Time 0: Depreciation. Contracts fixed.";
+            else if (time < 40) text.innerText = "Short Run: Deficit Worsens (Inelastic).";
+            else if (time < 70) text.innerText = "Medium Term: Volume adjusts.";
+            else text.innerText = "Long Run: Surplus (Marshall-Lerner met).";
+        }
+
+        function draw() {
+            if (!width) return;
+            ctx.clearRect(0, 0, width, height);
+            
+            const p = 40, originX = p, originY = height / 2;
+            const graphW = width - p * 2, graphH = height - p * 2;
+            
+            // Axes
+            ctx.beginPath(); ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            ctx.moveTo(originX, p); ctx.lineTo(originX, height - p); // Y
+            ctx.moveTo(originX, originY); ctx.lineTo(width - p, originY); // X
+            ctx.stroke();
+            
+            ctx.fillStyle = '#333'; ctx.font = 'bold 12px Arial';
+            ctx.fillText("Current Account (+/-)", 10, 20);
+            ctx.fillText("Time", width - 40, originY + 15);
+            
+            // J-Curve Points
+            const p0 = { x: originX, y: originY }; 
+            const p1 = { x: originX + graphW * 0.3, y: originY + graphH * 0.35 }; // Low point
+            const p2 = { x: originX + graphW * 0.6, y: originY }; // Break even
+            const p3 = { x: originX + graphW * 0.9, y: originY - graphH * 0.3 }; // High point
+            
+            // Reference Dotted Line
+            if (isExamMode || time > 0) {
+                ctx.beginPath(); ctx.strokeStyle = '#ccc'; ctx.setLineDash([5, 5]);
+                ctx.moveTo(p0.x, p0.y);
+                ctx.bezierCurveTo(p0.x + 50, p1.y, p2.x - 50, p3.y, p3.x, p3.y);
+                ctx.stroke(); ctx.setLineDash([]);
+            }
+            
+            // Active Curve
+            ctx.beginPath(); ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 4;
+            ctx.moveTo(p0.x, p0.y);
+            
+            const steps = 100, progress = time;
+            for (let i = 0; i <= progress; i++) {
+                let t = i / 100;
+                // Manual Bezier calc for smooth drawing
+                let cx = 3 * (p0.x + 50) - 3 * p0.x;
+                let bx = 3 * (p2.x - 50) - 6 * (p0.x + 50) + 3 * p0.x;
+                let ax = p3.x - p0.x - cx - bx;
+                let cy = 3 * p1.y - 3 * p0.y;
+                let by = 3 * p3.y - 6 * p1.y + 3 * p0.y;
+                let ay = p3.y - p0.y - cy - by;
+                
+                // Simplified Bezier interpolation
+                // Actually, standard bezier formula:
+                let x = Math.pow(1-t,3)*p0.x + 3*Math.pow(1-t,2)*t*(p0.x+50) + 3*(1-t)*Math.pow(t,2)*(p2.x-50) + Math.pow(t,3)*p3.x;
+                let y = Math.pow(1-t,3)*p0.y + 3*Math.pow(1-t,2)*t*p1.y + 3*(1-t)*Math.pow(t,2)*p3.y + Math.pow(t,3)*p3.y;
+                
+                // Correction for visual style to match J-Shape better without complex control points
+                // Let's use the simple interpolation logic from previous successful version
+                if(t < 0.4) {
+                   let lt = t/0.4; x = p0.x + (p1.x-p0.x)*lt; y = p0.y + (p1.y-p0.y)*Math.sin(lt*Math.PI/2);
+                } else {
+                   let lt = (t-0.4)/0.6; x = p1.x + (p3.x-p1.x)*lt; y = p1.y + (p3.y-p1.y)*lt;
+                }
+                
+                ctx.lineTo(x, y);
+                if (i === progress) { ctx.fillStyle = '#2980b9'; ctx.fillRect(x-4, y-4, 8, 8); }
+            }
+            ctx.stroke();
+            
+            // Areas
+            if (time > 40) {
+                ctx.fillStyle = 'rgba(231, 76, 60, 0.1)'; ctx.fillRect(originX, originY, graphW*0.4, graphH*0.4);
+                ctx.fillStyle = '#c0392b'; ctx.fillText("Deficit (Short Run)", originX + 20, originY + 40);
+            }
+            if (time > 80) {
+                ctx.fillStyle = 'rgba(46, 204, 113, 0.1)'; ctx.fillRect(originX + graphW*0.5, originY - graphH*0.4, graphW*0.4, graphH*0.4);
+                ctx.fillStyle = '#27ae60'; ctx.fillText("Surplus (Long Run)", originX + graphW*0.6, originY - 20);
+            }
+        }
+
+        function setTab(t) {
+            document.querySelectorAll('.content').forEach(el=>el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+            document.getElementById('tab-'+t).classList.add('active');
+            
+            const tabs = document.querySelectorAll('.tab');
+            if(t==='a') tabs[0].classList.add('active');
+            if(t==='b') tabs[1].classList.add('active');
+            if(t==='c') tabs[2].classList.add('active');
+        }
+
+        setTimeout(() => { resize(); }, 200);
+    </script>
+</body>
+</html>
