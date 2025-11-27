@@ -24,5 +24,29 @@ const ECON_DATA = [
                 "url": "2025/AS/qp-202505-economics-p21/3.html"
             }
         ]
+    },
+    {
+        "id": "qp-202505-economics-p24",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P24.PDF",
+        "questions": [
+            {
+                "qNum": "1",
+                "title": "题目暂未录入",
+                "url": ""
+            },
+            {
+                "qNum": "2",
+                "title": "题目暂未录入",
+                "url": ""
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/AS/qp-202505-economics-p24/5.html",
+                "isNew": true
+            }
+        ]
     }
 ];
