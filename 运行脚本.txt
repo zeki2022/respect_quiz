@@ -1,5 +1,11 @@
 # 方式一：简单运行（默认读取 math.xlsx，输出到 subjects/math/data.js）
+python3 datagen.py
 python3 datagen_m.py
 
+它会去列表里找 math.xlsx，如果有，就更新数学。
+它会去找 econ.xlsx，如果有，就更新经济。
+它会去找 physics.xlsx，如果还没创建这个文件，它会自动跳过（显示“⚠️ 跳过”），不会报错。
+
 # 方式二：指定文件名（符合你的要求）
+python3 datagen.py -i math.xlsx -o subjects/math/data.js
 python3 datagen_m.py -i math.xlsx -o subjects/math/data.js

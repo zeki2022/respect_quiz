@@ -49,7 +49,8 @@ const MATH_DATA = [
             {
                 "qNum": "7",
                 "title": "Question 7",
-                "url": "2025/M/qp-202505-mathematics-p45/7.html"
+                "url": "2025/M/qp-202505-mathematics-p45/7.html",
+                "isNew": true
             }
         ]
     },

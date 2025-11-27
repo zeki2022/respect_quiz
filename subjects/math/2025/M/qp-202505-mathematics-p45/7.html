@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Math Q7: Connected Particles</title>
     
+    <!-- 引入公共样式 -->
     <link rel="stylesheet" href="../../../../../common/css/style.css">
     
+    <!-- MathJax 配置 -->
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
@@ -16,16 +18,9 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* --- 核心修复：解除公共样式的宽度限制 --- */
-        body { 
-            padding-top: 60px; 
-            padding-bottom: 40px; 
-            background-color: #f4f7f6;
-            /* 【关键】让页面可以撑满电脑屏幕 */
-            max-width: none !important; 
-        }
+        /* --- 继承 template.html 布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
         
-        /* 布局容器 */
         .container {
             width: 98%; max-width: 1600px; margin: 0 auto;
             display: grid; grid-template-columns: 1fr 400px; 
@@ -44,15 +39,15 @@
             font-family: sans-serif; line-height: 1; cursor: pointer;
         }
         
-        /* PC端优化：高度设为40%以适应一屏 */
         .canvas-container { 
             width: 100%; height: 0; 
-            padding-bottom: 40%; 
+            padding-bottom: 40%; /* PC端扁一点 */
             position: relative; background: #fff; border: 1px solid #ddd; 
             border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
         }
         @media (max-width: 1000px) {
-            .canvas-container { padding-bottom: 60%; } 
+            /* 手机端稍微高一点，给垂直下落留空间 */
+            .canvas-container { padding-bottom: 65%; } 
         }
 
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -89,6 +84,7 @@
     <a href="javascript:history.back()" class="back-arrow">‹</a>
 
     <div class="container">
+        <!-- 左边：动画区 -->
         <div class="left-col">
             <div class="card">
                 <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q7</h3>
@@ -117,11 +113,13 @@
                 <div class="controls">
                     <button class="action-btn" onclick="startSim()" id="btnStart">Start Animation (Part b)</button>
                     <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
                     <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
                         <span style="font-weight:bold; color:#555;">Speed:</span>
                         <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
                         <span id="speedVal" style="width:30px; text-align:right;">0.5x</span>
                     </div>
+                    
                     <div style="width:100%; text-align:right; margin-top:5px; font-weight:bold; color:#2c3e50; font-size:18px;">
                         v = <span id="velDisplay">0.00</span> m/s
                     </div>
@@ -129,8 +127,10 @@
             </div>
         </div>
 
+        <!-- 右边：文字区 -->
         <div class="right-col">
             <div class="card solution-panel">
+                
                 <div class="step-box" style="border-left-color: #27ae60;">
                     <strong style="color:#27ae60;">Part (a): Equilibrium (7 marks)</strong><br>
                     Resolve forces on A:<br>
@@ -180,8 +180,14 @@
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         
-        const g = 10; const sinA = 5/13; const cosA = 12/13;
-        const mA = 6.5; const mB = 12; const mu = 0.4; const distTotal = 0.6; 
+        const g = 10;
+        const sinA = 5/13;
+        const cosA = 12/13;
+        const mA = 6.5;
+        const mB = 12; 
+        const mu = 0.4;
+        const distTotal = 0.6; 
+        
         const weightA_parallel = mA * g * sinA; 
         const friction = mu * mA * g * cosA; 
         const weightB = mB * g; 
@@ -190,7 +196,12 @@
         const acceleration = netForce / totalMass; 
         const finalVel = Math.sqrt(2 * acceleration * distTotal); 
         
-        let simState = 'RESET'; let animId; let currentDist = 0; let currentVel = 0; let timeScale = 0.5; let path = {};
+        let simState = 'RESET';
+        let animId;
+        let currentDist = 0;
+        let currentVel = 0;
+        let timeScale = 0.5; 
+        let path = {};
 
         document.getElementById('speedRange').addEventListener('input', function(e) {
             timeScale = parseFloat(e.target.value);
@@ -207,12 +218,36 @@
         window.addEventListener('resize', resize);
 
         function initPath() {
-            const w = canvas.width, h = canvas.height, p = w * 0.1; 
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // 智能计算：根据屏幕宽度动态调整比例尺
+            // 目标：让整个斜坡+滑轮系统占屏幕宽度的 70% 左右
+            // 从而保证移动 0.6m (逻辑距离) 不会超出屏幕
+            
+            const p = w * 0.1; // 边距
+            
+            // 滑轮位置 (左上偏中)
             const pulley = { x: w * 0.3, y: h * 0.15 };
-            const slopeLen = w * 0.6;
-            const slopeH = slopeLen * (5/12); 
-            const slopeEnd = { x: pulley.x + slopeLen, y: pulley.y + slopeH };
-            path = { pulley, slopeEnd };
+            
+            // 斜坡计算
+            // 题目中 tan a = 5/12. 
+            // 我们设斜坡水平长度为 Canvas 宽度的 50%
+            const slopeRun = w * 0.5;
+            const slopeRise = slopeRun * (5/12);
+            
+            const slopeEnd = { x: pulley.x + slopeRun, y: pulley.y + slopeRise };
+            
+            // 这里的 scale 是为了把物理世界的 0.6m 映射到像素
+            // 我们希望 0.6m 大概占斜坡总长的 1/3 左右，这样才看得清楚
+            // slopeLengthInPixels = Math.sqrt(slopeRun^2 + slopeRise^2)
+            const slopePixelLen = Math.sqrt(slopeRun*slopeRun + slopeRise*slopeRise);
+            
+            // 物理世界斜坡总长假设是 2m (足够长)
+            // 那么 1m = slopePixelLen / 2
+            const visualScale = slopePixelLen / 2.5; 
+            
+            path = { pulley, slopeEnd, visualScale };
         }
 
         function startSim() {
@@ -222,30 +257,42 @@
             let lastTime = performance.now();
             function loop(now) {
                 if(simState !== 'RUNNING') return;
-                let dt = (now - lastTime) / 1000; lastTime = now;
+                let dt = (now - lastTime) / 1000;
+                lastTime = now;
                 if(dt > 0.1) dt = 0.1;
-                update(dt * timeScale); drawFrame();
+                update(dt * timeScale);
+                drawFrame();
                 animId = requestAnimationFrame(loop);
             }
             animId = requestAnimationFrame(loop);
         }
 
         function resetSim() {
-            cancelAnimationFrame(animId); simState = 'RESET';
-            currentDist = 0; currentVel = 0;
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            currentDist = 0;
+            currentVel = 0;
             document.getElementById('btnStart').disabled = false;
             document.getElementById('btnStart').innerText = "Start Animation (Part b)";
             document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
-            updateBars(); drawFrame();
+            updateBars();
+            drawFrame();
         }
 
         function update(dt) {
             if (currentDist < distTotal) {
-                currentVel += acceleration * dt; currentDist += currentVel * dt;
+                currentVel += acceleration * dt;
+                currentDist += currentVel * dt;
+                
                 let p = currentDist / distTotal;
-                if (p < 0.3) highlightStep(1); else if (p < 0.6) highlightStep(2); else highlightStep(3);
+                if (p < 0.3) highlightStep(1);
+                else if (p < 0.6) highlightStep(2);
+                else highlightStep(3);
+                
             } else {
-                currentDist = distTotal; currentVel = finalVel; simState = 'END';
+                currentDist = distTotal;
+                currentVel = finalVel;
+                simState = 'END';
                 document.getElementById('btnStart').innerText = "Finished";
             }
             document.getElementById('velDisplay').innerText = currentVel.toFixed(2);
@@ -253,8 +300,11 @@
         }
         
         function highlightStep(id) {
-            document.querySelectorAll('.step-box').forEach(el => { if(el.id) el.classList.remove('active'); });
-            let step = document.getElementById('step'+id); if(step) step.classList.add('active');
+            document.querySelectorAll('.step-box').forEach(el => {
+                if(el.id) el.classList.remove('active');
+            });
+            let step = document.getElementById('step'+id);
+            if(step) step.classList.add('active');
         }
 
         function updateBars() {
@@ -262,6 +312,7 @@
             let workDone = friction * currentDist;
             let ke = 0.5 * totalMass * currentVel * currentVel;
             let totalRef = 60; 
+            
             document.getElementById('barPE').style.width = Math.min((netPELoss / totalRef * 100), 100) + '%';
             document.getElementById('barWork').style.width = Math.min((workDone / totalRef * 100), 100) + '%';
             document.getElementById('barKE').style.width = Math.min((ke / totalRef * 100), 100) + '%';
@@ -269,39 +320,74 @@
 
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const px = path.pulley.x, py = path.pulley.y;
-            const ex = path.slopeEnd.x, ey = path.slopeEnd.y;
             
-            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.lineTo(px, ey); ctx.closePath();
+            const px = path.pulley.x;
+            const py = path.pulley.y;
+            const ex = path.slopeEnd.x;
+            const ey = path.slopeEnd.y;
+            const vScale = path.visualScale;
+            
+            // Draw Geometry
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(ex, ey);
+            ctx.lineTo(px, ey);
+            ctx.closePath();
             ctx.fillStyle = '#ecf0f1'; ctx.fill();
             ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 3; ctx.stroke();
             
+            // Pulley
             ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI*2);
             ctx.fillStyle = '#bdc3c7'; ctx.fill(); ctx.stroke();
 
-            const visualScale = 200; const movePx = currentDist * visualScale;
-            const startDistA = 180;
-            const dx = ex - px, dy = ey - py, len = Math.sqrt(dx*dx + dy*dy);
-            const ux = dx/len, uy = dy/len;
-            const currentDistA = startDistA - movePx;
-            const ax = px + ux * currentDistA, ay = py + uy * currentDistA;
-            const bx = px - 12, startDistB = 80, by = py + startDistB + movePx;
+            const movePx = currentDist * vScale;
             
+            // Block A - Starts down slope, moves UP towards pulley
+            // Start distance from pulley (pixels)
+            const startDistA = 1.0 * vScale; // 1.0 meters away visually
+            const currentDistA = startDistA - movePx;
+            
+            const dx = ex - px;
+            const dy = ey - py;
+            const len = Math.sqrt(dx*dx + dy*dy);
+            const ux = dx/len; 
+            const uy = dy/len;
+            
+            const ax = px + ux * currentDistA;
+            const ay = py + uy * currentDistA;
+            
+            // Block B - Hangs down
+            const bx = px - 12; // Left side of pulley
+            const startDistB = 0.2 * vScale; // Start 0.2m down visually
+            const by = py + startDistB + movePx;
+            
+            // Strings
             ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
             ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ax, ay); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(bx, by); ctx.stroke();
             
-            ctx.save(); ctx.translate(ax, ay); ctx.rotate(Math.atan2(dy, dx));
-            ctx.fillStyle = '#e67e22'; ctx.fillRect(-15, -30, 30, 30); 
+            // A
+            ctx.save();
+            ctx.translate(ax, ay);
+            ctx.rotate(Math.atan2(dy, dx));
+            ctx.fillStyle = '#e67e22'; 
+            ctx.fillRect(-15, -30, 30, 30); 
             ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("A", -5, -10);
-            ctx.restore(); ctx.fillStyle='#333'; ctx.fillText("6.5kg", ax+20, ay);
+            ctx.restore();
+            ctx.fillStyle='#333'; ctx.fillText("6.5kg", ax+20, ay);
 
-            ctx.save(); ctx.translate(bx, by);
-            ctx.fillStyle = '#3498db'; ctx.fillRect(-15, 0, 30, 30); 
+            // B
+            ctx.save();
+            ctx.translate(bx, by);
+            ctx.fillStyle = '#3498db'; 
+            ctx.fillRect(-15, 0, 30, 30); 
             ctx.fillStyle = 'white'; ctx.font='bold 12px Arial'; ctx.fillText("B", -5, 20);
-            ctx.restore(); ctx.fillStyle='#333'; ctx.fillText("m kg", bx+20, by+15);
+            ctx.restore();
+            ctx.fillStyle='#333'; ctx.fillText("m kg", bx+20, by+15);
             
-            ctx.fillStyle = '#7f8c8d'; ctx.fillText("α", px + 40, py + 15);
+            // Annotations
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillText("α", px + 40, py + 15);
         }
 
         setTimeout(() => { resize(); updateBars(); }, 200);

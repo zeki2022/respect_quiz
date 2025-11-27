@@ -6,16 +6,8 @@
     <title>Economics - Respect Quiz</title>
     <link rel="stylesheet" href="../../common/css/style.css">
     <style>
-        /* --- 补上返回箭头样式 --- */
-        .back-arrow {
-            position: fixed; top: 15px; left: 15px; z-index: 9999;
-            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
-            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
-            font-family: sans-serif; line-height: 1; cursor: pointer;
-        }
-
+        /* 复用之前的样式 */
+        .back-arrow { position: fixed; top: 15px; left: 15px; z-index: 9999; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; text-decoration: none; color: #333; font-size: 24px; font-weight: bold; font-family: sans-serif; line-height: 1; cursor: pointer; }
         .filter-section { padding: 0 15px; margin-bottom: 15px; margin-top: 20px;}
         .filter-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; scrollbar-width: none;}
         .filter-row::-webkit-scrollbar { display: none; }
@@ -25,13 +17,14 @@
         .paper-content { display: none; background: #f9f9f9; border-top: 1px solid #eee; padding: 0; }
         .paper-content.show { display: block; }
         .q-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 14px; align-items: center;}
+        .q-row:last-child { border-bottom: none; }
         .btn-view { color: var(--primary); background: rgba(123, 97, 255, 0.1); padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;}
+        .btn-disabled { color: #ccc; background: #f0f0f0; padding: 5px 12px; border-radius: 4px; font-size: 12px; cursor: not-allowed; }
         .empty-tip { text-align: center; color: #999; padding: 30px; font-size: 13px; display: none; }
     </style>
 </head>
 <body>
 
-    <!-- 【这里】手动加上返回首页的箭头 -->
     <a href="../../index.html" class="back-arrow">‹</a>
 
     <div class="header">
@@ -42,62 +35,126 @@
     <div class="section-title" style="padding: 10px 15px; font-size: 18px; font-weight: bold;">真题资料</div>
 
     <div class="filter-section">
-        <div class="filter-row">
+        <div class="filter-row" id="yearFilter">
             <div class="tab-pill active" onclick="selectYear(this)">2025</div>
             <div class="tab-pill" onclick="selectYear(this)">2024</div>
             <div class="tab-pill" onclick="selectYear(this)">2023</div>
         </div>
-        <div class="filter-row">
+        <div class="filter-row" id="subFilter">
             <div class="tab-pill active" onclick="selectSub(this)">AS</div>
             <div class="tab-pill" onclick="selectSub(this)">A2</div>
         </div>
     </div>
 
-    <div class="paper-list" id="paperContainer">
-        <div class="paper-item" id="realPaper">
-            <div class="paper-header" onclick="this.nextElementSibling.classList.toggle('show')">
-                QP-202505-Economics-P21.pdf ▾
-            </div>
-            <div class="paper-content show">
-                <div class="q-row">
-                    <span>题目 1</span>
-                    <span style="color:#ccc; font-size:12px">暂无</span>
-                </div>
-                <div class="q-row">
-                    <span>题目 3: Subsidy Diagram</span>
-                    <a href="2025/AS/qp-202505-economics-p21/3.html" class="btn-view">查看动画</a>
-                </div>
-            </div>
-        </div>
-        <div class="empty-tip" id="emptyTip">该分类暂无数据</div>
-    </div>
+    <div class="paper-list" id="paperContainer"></div>
+    <div class="empty-tip" id="emptyTip">该分类下暂无录入数据</div>
 
     <script>
         (function(){
             var allowedDomains = ["localhost", "127.0.0.1", "github.io"];
             var currentDomain = window.location.hostname;
-            if (window.location.protocol === 'file:') return;
-            if (currentDomain === "") return;
+            if (window.location.protocol === 'file:' || currentDomain === "") return;
             var isAllowed = false;
             for(var i=0; i<allowedDomains.length; i++){
                 if(currentDomain.includes(allowedDomains[i])) { isAllowed = true; break; }
             }
         })();
+    </script>
+
+    <!-- 引用 data.js -->
+    <script src="data.js"></script>
+
+    <script>
+        // 初始化筛选
+        let currentYear = '2025';
+        let currentSub = 'AS'; // 经济学的默认科目
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderList();
+        });
 
         function selectYear(el) {
-            document.querySelectorAll('.filter-row:first-child .tab-pill').forEach(b => b.classList.remove('active'));
-            el.classList.add('active'); checkData();
+            document.querySelectorAll('#yearFilter .tab-pill').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            currentYear = el.innerText;
+            renderList();
         }
+
         function selectSub(el) {
-            document.querySelectorAll('.filter-row:last-child .tab-pill').forEach(b => b.classList.remove('active'));
-            el.classList.add('active'); checkData();
+            document.querySelectorAll('#subFilter .tab-pill').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            currentSub = el.innerText;
+            renderList();
         }
-        function checkData() {
-            const y = document.querySelector('.filter-row:first-child .active').innerText;
-            const s = document.querySelector('.filter-row:last-child .active').innerText;
-            const show = (y === '2025' && s === 'AS');
-            document.getElementById('realPaper').style.display = show ? 'block' : 'none';
-            document.getElementById('emptyTip').style.display = show ? 'none' : 'block';
+
+        function renderList() {
+            const container = document.getElementById('paperContainer');
+            const emptyTip = document.getElementById('emptyTip');
+            container.innerHTML = '';
+
+            // 【关键】使用 ECON_DATA 变量，并按 AS/A2 筛选
+            // 这里的 subject 必须和 Excel 里的 '2nd sub' 列内容一致 (AS 或 A2)
+            if (typeof ECON_DATA === 'undefined') {
+                console.error("ECON_DATA not found. Check data.js");
+                return;
+            }
+
+            const filteredData = ECON_DATA.filter(paper => 
+                paper.year === currentYear && paper.subject === currentSub
+            );
+
+            if (filteredData.length === 0) {
+                emptyTip.style.display = 'block';
+                return;
+            } else {
+                emptyTip.style.display = 'none';
+            }
+
+            filteredData.forEach(paper => {
+                const paperDiv = document.createElement('div');
+                paperDiv.className = 'paper-item';
+
+                let questionsHtml = '';
+                if (paper.questions && paper.questions.length > 0) {
+                    paper.questions.forEach(q => {
+                        const hasLink = q.url && q.url.trim() !== '';
+                        const btnHtml = hasLink 
+                            ? `<a href="${q.url}" class="btn-view">查看动画</a>` 
+                            : `<span class="btn-disabled">暂无</span>`;
+                        
+                        questionsHtml += `
+                            <div class="q-row">
+                                <span>题目 ${q.qNum}: ${q.title || ''}</span>
+                                ${btnHtml}
+                            </div>
+                        `;
+                    });
+                } else {
+                    questionsHtml = `<div class="q-row" style="color:#999; justify-content:center;">暂无题目录入</div>`;
+                }
+
+                paperDiv.innerHTML = `
+                    <div class="paper-header" onclick="togglePaper(this)">
+                        ${paper.paperName} ▸
+                    </div>
+                    <div class="paper-content">
+                        ${questionsHtml}
+                    </div>
+                `;
+
+                container.appendChild(paperDiv);
+            });
+        }
+
+        function togglePaper(header) {
+            const content = header.nextElementSibling;
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                header.innerHTML = header.innerText.replace('▾', '▸');
+            } else {
+                content.classList.add('show');
+                header.innerHTML = header.innerText.replace('▸', '▾');
+            }
         }
     </script>
 </body>
