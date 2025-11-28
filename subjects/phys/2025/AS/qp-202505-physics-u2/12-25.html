@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Physics Section C (Q12-Q25)</title>
     
-    <!-- 引用公共样式 -->
     <link rel="stylesheet" href="../../../../../common/css/style.css">
     
-    <!-- MathJax 配置 -->
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
@@ -18,12 +16,10 @@
     <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* --- V3.0 MCQ 专用适配 --- */
         body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
-        
         .container {
             width: 98%; max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: 200px 1fr; /* 左侧导航窄，右侧题目宽 */
+            display: grid; grid-template-columns: 200px 1fr; 
             gap: 20px; align-items: start;
         }
         @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
@@ -36,13 +32,12 @@
             text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
             font-family: sans-serif; line-height: 1; cursor: pointer;
         }
-
-        /* 左侧导航栏 */
         .nav-panel {
             background: #fff; border-radius: 12px; padding: 15px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            position: sticky; top: 80px; /* 随页面滚动 */
+            position: sticky; top: 80px; 
             display: flex; flex-wrap: wrap; gap: 8px;
+            max-height: 80vh; overflow-y: auto;
         }
         .nav-btn {
             width: 40px; height: 40px; border-radius: 8px;
@@ -50,53 +45,44 @@
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; transition: all 0.2s; font-size: 14px;
         }
-        .nav-btn:hover, .nav-btn.active {
-            background: #3498db; color: white;
-        }
-
-        /* 右侧题目卡片 */
+        .nav-btn:hover { background: #3498db; color: white; }
         .question-card {
             background: #fff; border-radius: 12px; padding: 25px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
-            scroll-margin-top: 80px; /* 锚点定位偏移 */
+            scroll-margin-top: 80px; 
         }
-        
         .q-header {
             font-size: 16px; font-weight: bold; color: #2c3e50;
             border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        
-        .q-content { font-size: 15px; color: #333; line-height: 1.6; }
-        
+        .q-content { font-size: 16px; color: #333; line-height: 1.6; }
+        .q-image {
+            max-width: 100%; height: auto; display: block; margin: 15px 0;
+            border: 1px solid #eee; border-radius: 4px;
+        }
         .options-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;
         }
         @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
-
         .option {
-            background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px solid #eee;
-            font-family: monospace; color: #555; cursor: default;
+            background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee;
+            font-family: "Times New Roman", serif; font-size: 16px; color: #444; cursor: default;
+            display: flex; align-items: center;
         }
-        .option:hover { background: #f0f0f0; }
-        
-        /* 答案区域 */
+        .option strong { margin-right: 10px; color: #2c3e50; font-family: sans-serif; font-weight:bold;}
+        .option:hover { background: #f0f0f0; border-color: #ccc;}
         .answer-box {
-            display: none; /* 默认隐藏 */
-            margin-top: 15px; background: #f0f9ff; 
+            display: none; margin-top: 15px; background: #f0f9ff; 
             border-left: 4px solid #3498db; padding: 15px; border-radius: 4px;
         }
         .answer-box.show { display: block; animation: fadeIn 0.3s ease; }
-        
         .toggle-btn {
             background: #e67e22; color: white; border: none; padding: 6px 12px;
             border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;
         }
         .toggle-btn:hover { background: #d35400; }
-
-        .highlight { color: #e74c3c; font-weight: bold; }
-        .correct { color: #27ae60; font-weight: bold; }
-        
+        .correct { color: #27ae60; font-weight: bold; font-size: 1.1em;}
         @keyframes fadeIn { from { opacity:0; transform:translateY(-5px);} to { opacity:1; transform:translateY(0);} }
     </style>
 </head>
@@ -105,8 +91,6 @@
     <a href="javascript:history.back()" class="back-arrow">‹</a>
 
     <div class="container">
-        
-        <!-- 左侧：快速导航 -->
         <div class="left-col">
             <div class="nav-panel">
                 <div style="width:100%; margin-bottom:10px; font-weight:bold; color:#2c3e50;">Jump to:</div>
@@ -127,7 +111,6 @@
             </div>
         </div>
 
-        <!-- 右侧：题目流 -->
         <div class="right-col">
 
             <!-- Q12 -->
@@ -137,19 +120,20 @@
                     <button class="toggle-btn" onclick="toggleAns('a12')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Two resistors connected together have total resistance $R_T = 10\ \Omega$. One is $12\ \Omega$.<br>
-                    What is the resistance of the other?
+                    When two resistors are connected together, the total resistance of the combination is $10\ \Omega$. One resistor has a resistance of $12\ \Omega$.<br>
+                    What is the resistance of the other resistor?
                     <div class="options-grid">
-                        <div class="option">A. 2.0 Ω</div>
-                        <div class="option">B. 5.5 Ω</div>
-                        <div class="option">C. 17 Ω</div>
-                        <div class="option">D. 60 Ω</div>
+                        <div class="option"><strong>A</strong> 2.0 Ω</div>
+                        <div class="option"><strong>B</strong> 5.5 Ω</div>
+                        <div class="option"><strong>C</strong> 17 Ω</div>
+                        <div class="option"><strong>D</strong> 60 Ω</div>
                     </div>
                 </div>
                 <div id="a12" class="answer-box">
-                    <span class="correct">Answer: D (60 Ω)</span><br><br>
-                    Since $R_T (10) < R_1 (12)$, they must be in <strong>Parallel</strong>.<br>
-                    $\frac{1}{10} = \frac{1}{12} + \frac{1}{R_2} \Rightarrow \frac{1}{R_2} = \frac{1}{60} \Rightarrow R_2 = 60$.
+                    <span class="correct">Answer: D</span><br><br>
+                    Since $R_{total} (10) < R_1 (12)$, they must be in <strong>Parallel</strong>.<br>
+                    $\frac{1}{10} = \frac{1}{12} + \frac{1}{R_2} \Rightarrow \frac{1}{R_2} = \frac{1}{10} - \frac{1}{12} = \frac{1}{60}$.<br>
+                    $R_2 = 60\ \Omega$.
                 </div>
             </div>
 
@@ -160,21 +144,26 @@
                     <button class="toggle-btn" onclick="toggleAns('a13')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Filament lamp I-V graph. Identical lamp in parallel. Voltage = 6.0 V. Find Total Power.
-                     <!-- 【新增】插入图片，max-width 确保手机不撑破 -->
-                    <img src="q13.png" style="max-width: 100%; height: auto; margin: 10px 0; border: 1px solid #eee; border-radius: 6px;">
+                    The graph shows the $I-V$ characteristic of a filament lamp L.<br>
+                    An identical lamp is connected in parallel with L.<br>
+                    The voltage across the parallel combination is $6.0$ V.<br>
+                    What is the total power dissipated by the two lamps?
+                    
+                    <!-- 【修复】加了 onerror，如果图片加载失败就隐藏 -->
+                    <img src="q13.png" class="q-image" alt="Q13 Graph" onerror="this.style.display='none'">
+
                     <div class="options-grid">
-                        <div class="option">A. 0.42 W</div>
-                        <div class="option">B. 0.65 W</div>
-                        <div class="option">C. 0.90 W</div>
-                        <div class="option">D. 1.3 W</div>
+                        <div class="option"><strong>A</strong> 0.42 W</div>
+                        <div class="option"><strong>B</strong> 0.65 W</div>
+                        <div class="option"><strong>C</strong> 0.90 W</div>
+                        <div class="option"><strong>D</strong> 1.3 W</div>
                     </div>
                 </div>
                 <div id="a13" class="answer-box">
-                    <span class="correct">Answer: D (1.3 W)</span><br><br>
-                    From graph at 6.0V, $I \approx 0.11$ A.<br>
-                    Power of one lamp $P = VI = 0.66$ W.<br>
-                    Two lamps in parallel: $P_{total} = 2 \times 0.66 \approx 1.3$ W.
+                    <span class="correct">Answer: D</span><br><br>
+                    1. From graph, at $V=6.0$V, current $I \approx 110$ mA $= 0.11$ A.<br>
+                    2. Power of one lamp: $P = VI = 6.0 \times 0.11 = 0.66$ W.<br>
+                    3. Total Power (2 lamps in parallel): $P_{total} = 2 \times 0.66 = 1.32$ W.
                 </div>
             </div>
 
@@ -185,18 +174,20 @@
                     <button class="toggle-btn" onclick="toggleAns('a14')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Superconducting component S in series with R. Voltage across combo is V.
+                    A superconducting component S is placed in series with a resistor of resistance $R$. The voltage across the combination is $V$.<br>
+                    Which row is correct?
                     <div class="options-grid">
-                        <div class="option">A. I=V/R, Vs=0</div>
-                        <div class="option">B. I=V/R, Vs=V/2</div>
-                        <div class="option">C. I=inf, Vs=0</div>
-                        <div class="option">D. I=inf, Vs=V/2</div>
+                        <div class="option"><strong>A</strong> Current in S: $V/R$, Voltage across S: $0$</div>
+                        <div class="option"><strong>B</strong> Current in S: $V/R$, Voltage across S: $V/2$</div>
+                        <div class="option"><strong>C</strong> Current in S: infinite, Voltage across S: $0$</div>
+                        <div class="option"><strong>D</strong> Current in S: infinite, Voltage across S: $V/2$</div>
                     </div>
                 </div>
                 <div id="a14" class="answer-box">
                     <span class="correct">Answer: A</span><br><br>
-                    Superconductor has $R=0$. So $V_S = IR = 0$.<br>
-                    Total $R_{total} = 0 + R = R$. So $I = V/R$.
+                    Superconductor resistance $R_S = 0$.<br>
+                    1. Voltage across S: $V_S = I \times R_S = 0$.<br>
+                    2. Total Resistance = $R$. Current $I = V/R$.
                 </div>
             </div>
 
@@ -207,19 +198,23 @@
                     <button class="toggle-btn" onclick="toggleAns('a15')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    $R_1 = 14\Omega \pm 20\%$, $R_2 = 30\Omega \pm 10\%$. Series.
+                    Two resistors $R_1$ and $R_2$ are connected in series.<br>
+                    $R_1 = 14\ \Omega \pm 20\%$<br>
+                    $R_2 = 30\ \Omega \pm 10\%$<br>
+                    What is the absolute uncertainty of the total resistance?
                     <div class="options-grid">
-                        <div class="option">A. 13 Ω</div>
-                        <div class="option">B. 9 Ω</div>
-                        <div class="option">C. 7 Ω</div>
-                        <div class="option">D. 6 Ω</div>
+                        <div class="option"><strong>A</strong> 13 Ω</div>
+                        <div class="option"><strong>B</strong> 9 Ω</div>
+                        <div class="option"><strong>C</strong> 7 Ω</div>
+                        <div class="option"><strong>D</strong> 6 Ω</div>
                     </div>
                 </div>
                 <div id="a15" class="answer-box">
-                    <span class="correct">Answer: D (6 Ω)</span><br><br>
-                    Abs uncertainty adds up.<br>
-                    $\Delta R_1 = 14 \times 0.2 = 2.8$. $\Delta R_2 = 30 \times 0.1 = 3.0$.<br>
-                    Total = $2.8 + 3.0 = 5.8 \approx 6\Omega$.
+                    <span class="correct">Answer: D</span><br><br>
+                    Absolute uncertainties add up for addition ($R_T = R_1 + R_2$).<br>
+                    $\Delta R_1 = 14 \times 0.2 = 2.8\ \Omega$<br>
+                    $\Delta R_2 = 30 \times 0.1 = 3.0\ \Omega$<br>
+                    Total = $2.8 + 3.0 = 5.8 \approx 6\ \Omega$.
                 </div>
             </div>
 
@@ -230,19 +225,22 @@
                     <button class="toggle-btn" onclick="toggleAns('a16')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Resistance increased by 15%. Voltage constant. New I and P?
+                    A potential difference is applied across a variable resistor.<br>
+                    Current is $I$. Power is $P$.<br>
+                    The resistance is increased by $15\%$. The same potential difference is applied.<br>
+                    Which row shows the new current and power?
                     <div class="options-grid">
-                        <div class="option">A. 0.87I, 0.87P</div>
-                        <div class="option">B. 0.87I, 1.15P</div>
-                        <div class="option">C. 0.85I, 0.85P</div>
-                        <div class="option">D. 0.85I, 1.15P</div>
+                        <div class="option"><strong>A</strong> 0.87I, 0.87P</div>
+                        <div class="option"><strong>B</strong> 0.87I, 1.15P</div>
+                        <div class="option"><strong>C</strong> 0.85I, 0.85P</div>
+                        <div class="option"><strong>D</strong> 0.85I, 1.15P</div>
                     </div>
                 </div>
                 <div id="a16" class="answer-box">
                     <span class="correct">Answer: A</span><br><br>
-                    $R_{new} = 1.15R$.<br>
-                    $I \propto 1/R \rightarrow 1/1.15 \approx 0.87$.<br>
-                    $P \propto 1/R \rightarrow 0.87$.
+                    New Resistance $R' = 1.15R$. Voltage $V$ constant.<br>
+                    Current: $I' = \frac{V}{1.15R} = \frac{1}{1.15}I \approx 0.87I$.<br>
+                    Power: $P' = \frac{V^2}{1.15R} = \frac{1}{1.15}P \approx 0.87P$.
                 </div>
             </div>
 
@@ -253,18 +251,21 @@
                     <button class="toggle-btn" onclick="toggleAns('a17')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Mass $M \to 2M$, Spring $k \to 3k$. New frequency?
+                    An object of mass $M$ on a spring of stiffness $k$ oscillates with frequency $f$.<br>
+                    An object of mass $2M$ is suspended from a spring of stiffness $3k$.<br>
+                    What is the frequency of oscillation?
                     <div class="options-grid">
-                        <div class="option">A. 1.5f</div>
-                        <div class="option">B. 1.2f</div>
-                        <div class="option">C. 0.82f</div>
-                        <div class="option">D. 0.67f</div>
+                        <div class="option"><strong>A</strong> 1.5f</div>
+                        <div class="option"><strong>B</strong> 1.2f</div>
+                        <div class="option"><strong>C</strong> 0.82f</div>
+                        <div class="option"><strong>D</strong> 0.67f</div>
                     </div>
                 </div>
                 <div id="a17" class="answer-box">
-                    <span class="correct">Answer: B (1.2f)</span><br><br>
-                    $f \propto \sqrt{k/m}$.<br>
-                    Factor $= \sqrt{3/2} = \sqrt{1.5} \approx 1.22$.
+                    <span class="correct">Answer: B</span><br><br>
+                    $f = \frac{1}{2\pi}\sqrt{\frac{k}{m}}$.<br>
+                    $f_{new} = \frac{1}{2\pi}\sqrt{\frac{3k}{2M}} = \sqrt{\frac{3}{2}} \times f$.<br>
+                    $\sqrt{1.5} \approx 1.22 f$.
                 </div>
             </div>
 
@@ -275,18 +276,22 @@
                     <button class="toggle-btn" onclick="toggleAns('a18')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Transverse wave $f=2.0$ Hz, $A=3.0$ cm. Distance travelled by a point in 1s?
+                    A transverse wave travels along a string.<br>
+                    Frequency $f=2.0$ Hz, wavelength $\lambda=4.0$ cm, amplitude $A=3.0$ cm.<br>
+                    What is the total distance travelled by a point on the string in one second?
                     <div class="options-grid">
-                        <div class="option">A. 6.0 cm</div>
-                        <div class="option">B. 8.0 cm</div>
-                        <div class="option">C. 12 cm</div>
-                        <div class="option">D. 24 cm</div>
+                        <div class="option"><strong>A</strong> 6.0 cm</div>
+                        <div class="option"><strong>B</strong> 8.0 cm</div>
+                        <div class="option"><strong>C</strong> 12 cm</div>
+                        <div class="option"><strong>D</strong> 24 cm</div>
                     </div>
                 </div>
                 <div id="a18" class="answer-box">
-                    <span class="correct">Answer: D (24 cm)</span><br><br>
-                    In 1 cycle, point travels $4 \times A = 12$ cm.<br>
-                    In 1 sec, there are 2 cycles ($f=2$). Total = $2 \times 12 = 24$ cm.
+                    <span class="correct">Answer: D</span><br><br>
+                    In one cycle, a point oscillates up and down 4 times the amplitude ($0 \to A \to 0 \to -A \to 0$).<br>
+                    Distance per cycle = $4 \times 3.0 = 12$ cm.<br>
+                    Frequency = 2.0 Hz (2 cycles per second).<br>
+                    Total Distance = $2 \times 12 = 24$ cm.
                 </div>
             </div>
 
@@ -297,18 +302,21 @@
                     <button class="toggle-btn" onclick="toggleAns('a19')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    $f=104$ MHz. Phase diff 1.4 rad. Min path diff ($d_1-d_2$)?
+                    Two aerials $A_1$ and $A_2$ receive radio waves from transmitter T.<br>
+                    Frequency = 104 MHz. Phase difference = 1.4 rad.<br>
+                    What is the minimum value for $d_1 - d_2$?
                     <div class="options-grid">
-                        <div class="option">A. 0.32 m</div>
-                        <div class="option">B. 0.64 m</div>
-                        <div class="option">C. 1.3 m</div>
-                        <div class="option">D. 13 m</div>
+                        <div class="option"><strong>A</strong> 0.32 m</div>
+                        <div class="option"><strong>B</strong> 0.64 m</div>
+                        <div class="option"><strong>C</strong> 1.3 m</div>
+                        <div class="option"><strong>D</strong> 13 m</div>
                     </div>
                 </div>
                 <div id="a19" class="answer-box">
-                    <span class="correct">Answer: B (0.64 m)</span><br><br>
-                    $\lambda = c/f = 300/104 \approx 2.88$ m.<br>
-                    $x = (\phi/2\pi) \lambda = (1.4 / 6.28) \times 2.88 \approx 0.64$ m.
+                    <span class="correct">Answer: B</span><br><br>
+                    Wavelength $\lambda = c/f = \frac{3 \times 10^8}{104 \times 10^6} \approx 2.885$ m.<br>
+                    Phase diff $\phi = \frac{2\pi x}{\lambda}$.<br>
+                    $1.4 = \frac{2\pi x}{2.885} \Rightarrow x = \frac{1.4 \times 2.885}{2\pi} \approx 0.64$ m.
                 </div>
             </div>
 
@@ -319,17 +327,20 @@
                     <button class="toggle-btn" onclick="toggleAns('a20')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Young's Slit. Slit separation ($s$) doubled, Distance ($D$) doubled.
+                    Young's double-slit apparatus. Fringes with spacing $y$.<br>
+                    Slit separation ($s$) and distance to screen ($D$) are both doubled.<br>
+                    What is the new fringe spacing?
                     <div class="options-grid">
-                        <div class="option">A. 4y</div>
-                        <div class="option">B. 2y</div>
-                        <div class="option">C. y</div>
-                        <div class="option">D. y/2</div>
+                        <div class="option"><strong>A</strong> 4y</div>
+                        <div class="option"><strong>B</strong> 2y</div>
+                        <div class="option"><strong>C</strong> y</div>
+                        <div class="option"><strong>D</strong> y/2</div>
                     </div>
                 </div>
                 <div id="a20" class="answer-box">
-                    <span class="correct">Answer: C (y)</span><br><br>
-                    $w = \lambda D / s$. Both double $\rightarrow$ factor $2/2 = 1$. Unchanged.
+                    <span class="correct">Answer: C</span><br><br>
+                    Formula: $y = \frac{\lambda D}{s}$.<br>
+                    New spacing: $y' = \frac{\lambda (2D)}{(2s)} = \frac{\lambda D}{s} = y$. (Unchanged)
                 </div>
             </div>
 
@@ -340,18 +351,20 @@
                     <button class="toggle-btn" onclick="toggleAns('a21')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Photoelectric. Frequency increases, Power same. Effect on $N$ and $E_{k(max)}$?
+                    Ultraviolet light incident on metal. $N$ electrons/sec emitted. Max KE is $E_{k(max)}$.<br>
+                    Frequency increased, Power kept same.<br>
+                    What happens to $N$ and $E_{k(max)}$?
                     <div class="options-grid">
-                        <div class="option">A. N dec, Ek inc</div>
-                        <div class="option">B. N dec, Ek same</div>
-                        <div class="option">C. N inc, Ek inc</div>
-                        <div class="option">D. N inc, Ek same</div>
+                        <div class="option"><strong>A</strong> N decreases, Ek increases</div>
+                        <div class="option"><strong>B</strong> N decreases, Ek same</div>
+                        <div class="option"><strong>C</strong> N increases, Ek increases</div>
+                        <div class="option"><strong>D</strong> N increases, Ek same</div>
                     </div>
                 </div>
                 <div id="a21" class="answer-box">
                     <span class="correct">Answer: A</span><br><br>
-                    $E_{photon}$ increases $\rightarrow E_{k}$ increases.<br>
-                    Total Power constant $\rightarrow$ fewer photons ($N$ decreases).
+                    1. Photon energy $E = hf$ increases. So $E_{k(max)} = hf - \phi$ <strong>Increases</strong>.<br>
+                    2. Total Power $P = N_{photons} \times hf$. If $P$ is constant and $hf$ increases, then number of photons ($N_{photons}$) must <strong>Decrease</strong>. Thus $N$ decreases.
                 </div>
             </div>
 
@@ -362,20 +375,24 @@
                     <button class="toggle-btn" onclick="toggleAns('a22')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Optical fibre time difference formula.
-                    <!-- 【新增】插入图片 -->
-                    <img src="q22.png" style="max-width: 100%; height: auto; margin: 10px 0; border: 1px solid #eee; border-radius: 6px;">
+                    Light travels with speed $v$ in optical fibre of length $L$.<br>
+                    Longest path is at angle $\theta$ to axis. Shortest path is along axis.
+                    
+                    <img src="q22.png" class="q-image" alt="Optical Fibre" onerror="this.style.display='none'">
+
+                    What is the difference between the times taken?
                     <div class="options-grid">
-                        <div class="option">A. (L/v)(1/sin - 1)</div>
-                        <div class="option">B. (L/v)(1 - sin)</div>
-                        <div class="option">C. (L/v)(1/cos - 1)</div>
-                        <div class="option">D. (L/v)(1 - cos)</div>
+                        <div class="option"><strong>A</strong> $\frac{L}{v}(\frac{1}{\sin\theta} - 1)$</div>
+                        <div class="option"><strong>B</strong> $\frac{L}{v}(1 - \sin\theta)$</div>
+                        <div class="option"><strong>C</strong> $\frac{L}{v}(\frac{1}{\cos\theta} - 1)$</div>
+                        <div class="option"><strong>D</strong> $\frac{L}{v}(1 - \cos\theta)$</div>
                     </div>
                 </div>
                 <div id="a22" class="answer-box">
                     <span class="correct">Answer: C</span><br><br>
-                    Path 1: $L$. Path 2: $L/\cos\theta$.<br>
-                    $\Delta t = \frac{L/\cos\theta}{v} - \frac{L}{v} = \frac{L}{v}(\frac{1}{\cos\theta} - 1)$.
+                    Shortest distance = $L$. Time $t_1 = L/v$.<br>
+                    Longest distance = $L / \cos\theta$. Time $t_2 = \frac{L}{v\cos\theta}$.<br>
+                    Difference = $\frac{L}{v}(\frac{1}{\cos\theta} - 1)$.
                 </div>
             </div>
 
@@ -386,18 +403,21 @@
                     <button class="toggle-btn" onclick="toggleAns('a23')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Least modal dispersion?
+                    Materials refractive indices: Teflon (1.4), Acrylic (1.5), Sapphire (1.7).<br>
+                    Which combination for Core and Cladding results in <strong>least modal dispersion</strong>?
                     <div class="options-grid">
-                        <div class="option">A. Teflon/Sapphire</div>
-                        <div class="option">B. Sapphire/Teflon</div>
-                        <div class="option">C. Acrylic/Teflon</div>
-                        <div class="option">D. Teflon/Acrylic</div>
+                        <div class="option"><strong>A</strong> Core: Teflon, Cladding: Sapphire</div>
+                        <div class="option"><strong>B</strong> Core: Sapphire, Cladding: Teflon</div>
+                        <div class="option"><strong>C</strong> Core: Acrylic, Cladding: Teflon</div>
+                        <div class="option"><strong>D</strong> Core: Teflon, Cladding: Acrylic</div>
                     </div>
                 </div>
                 <div id="a23" class="answer-box">
-                    <span class="correct">Answer: C (Acrylic/Teflon)</span><br><br>
-                    Need Core > Cladding (for TIR) and smallest difference in refractive index (to reduce multipath dispersion).<br>
-                    $1.5 - 1.4 = 0.1$ (Smallest valid difference).
+                    <span class="correct">Answer: C</span><br><br>
+                    Condition 1: Core index > Cladding index (for TIR). (Eliminates A, D).<br>
+                    Condition 2: Smallest difference in index minimizes modal dispersion (multipath effect).<br>
+                    Sapphire/Teflon diff = 0.3. Acrylic/Teflon diff = 0.1.<br>
+                    So <strong>Acrylic core, Teflon cladding</strong> is best.
                 </div>
             </div>
 
@@ -408,17 +428,18 @@
                     <button class="toggle-btn" onclick="toggleAns('a24')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Fluorescent tube powder coating function.
+                    Fluorescent tube powder coating.<br>
+                    Which row is correct?
                     <div class="options-grid">
-                        <div class="option">A. Absorb UV, Emit e-</div>
-                        <div class="option">B. Absorb UV, Emit Visible</div>
-                        <div class="option">C. Absorb e-, Emit Visible</div>
-                        <div class="option">D. Absorb e-, Emit UV</div>
+                        <div class="option"><strong>A</strong> Abs: UV photons, Emit: Electrons</div>
+                        <div class="option"><strong>B</strong> Abs: UV photons, Emit: Visible photons</div>
+                        <div class="option"><strong>C</strong> Abs: Electrons, Emit: Visible photons</div>
+                        <div class="option"><strong>D</strong> Abs: Electrons, Emit: UV photons</div>
                     </div>
                 </div>
                 <div id="a24" class="answer-box">
                     <span class="correct">Answer: B</span><br><br>
-                    Powder absorbs High-E UV photons and emits Lower-E visible photons.
+                    The mercury vapour inside produces UV. The phosphor coating absorbs this UV radiation and re-emits it as visible light.
                 </div>
             </div>
 
@@ -429,18 +450,19 @@
                     <button class="toggle-btn" onclick="toggleAns('a25')">Show Answer</button>
                 </div>
                 <div class="q-content">
-                    Electron diffraction. Momentum decreases. Effect on $\lambda$ and Diameter?
+                    Electron diffraction rings. Momentum decreases.<br>
+                    What happens to de Broglie wavelength and Diameter of rings?
                     <div class="options-grid">
-                        <div class="option">A. Inc, Dec</div>
-                        <div class="option">B. Inc, Inc</div>
-                        <div class="option">C. Dec, Dec</div>
-                        <div class="option">D. Dec, Inc</div>
+                        <div class="option"><strong>A</strong> $\lambda$ increases, D decreases</div>
+                        <div class="option"><strong>B</strong> $\lambda$ increases, D increases</div>
+                        <div class="option"><strong>C</strong> $\lambda$ decreases, D decreases</div>
+                        <div class="option"><strong>D</strong> $\lambda$ decreases, D increases</div>
                     </div>
                 </div>
                 <div id="a25" class="answer-box">
                     <span class="correct">Answer: B</span><br><br>
-                    $\lambda = h/p$. If $p$ decreases, $\lambda$ <strong>Increases</strong>.<br>
-                    Diffraction spread $\propto \lambda$. So Diameter <strong>Increases</strong>.
+                    1. De Broglie $\lambda = h/p$. Momentum $p$ decreases $\rightarrow \lambda$ <strong>Increases</strong>.<br>
+                    2. Diffraction angle $\sin\theta \propto \lambda$. If $\lambda$ increases, angle increases $\rightarrow$ Ring diameter <strong>Increases</strong>.
                 </div>
             </div>
 
@@ -448,7 +470,6 @@
     </div>
 
     <script>
-        // 简单的切换显示逻辑
         function toggleAns(id) {
             const box = document.getElementById(id);
             if (box.classList.contains('show')) {
