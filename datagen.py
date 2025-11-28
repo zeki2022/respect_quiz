@@ -20,7 +20,7 @@ BATCH_CONFIG = [
         "var_name": "ECON_DATA"
     },
     # 未来只需在这里加一行：
-    # { "input": "physics.xlsx", "output": "subjects/physics/data.js", "var_name": "PHYSICS_DATA" },
+    { "input": "physics.xlsx", "output": "subjects/phys/data.js", "var_name": "PHYSICS_DATA" },
 ]
 # ==========================================
 
@@ -72,8 +72,8 @@ def generate_data(input_file, output_file, var_name=None):
             # 智能清洗路径：不管 Excel 里写没写 subjects/xxx/，都清洗干净
             clean_path = base_path
             # 移除常见前缀
-            prefixes = ["subjects/math/", "subjects/econ/", "subjects/physics/", 
-                        "subjects/math", "subjects/econ", "subjects/physics"]
+            prefixes = ["subjects/math/", "subjects/econ/", "subjects/phys/", 
+                        "subjects/math", "subjects/econ", "subjects/phys"]
             for p in prefixes:
                 clean_path = clean_path.replace(p, "")
             

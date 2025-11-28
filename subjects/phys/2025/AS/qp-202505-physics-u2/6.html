@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q6: V-I Characteristics</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V3.0 布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 图表容器 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 60%; /* 保持 5:3 左右的比例，适合 V-I 图 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 80%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        button.action-btn.secondary { background-color: #2ecc71; }
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：图表交互区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q6</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Given:</strong> Figure 7 shows the variation of terminal pd $V$ with current $I$ for <strong>Cell A</strong>.<br>
+                    <strong>06.1</strong> Determine the emf of A.<br>
+                    <strong>06.2</strong> Determine the internal resistance ($r$) of A.<br>
+                    <strong>06.3</strong> Cell B has same emf but <strong>smaller</strong> internal resistance. Compare lamp brightness.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="graphCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="toggleGradient()">Show Gradient Calc</button>
+                    <button class="action-btn secondary" onclick="toggleCellB()">Compare with Cell B</button>
+                    <div style="flex:1; text-align:right; font-size:12px; color:#666;">
+                        *Click buttons to visualize concepts
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q6.1 -->
+                <div class="step-box">
+                    <strong>06.1 Determine EMF (1 mark)</strong><br>
+                    EMF ($\varepsilon$) is the terminal pd when current $I = 0$.<br>
+                    Read the Y-intercept from graph:<br>
+                    <span class="math-eq highlight">$\varepsilon = 1.60$ V</span>
+                </div>
+
+                <!-- Q6.2 -->
+                <div class="step-box">
+                    <strong>06.2 Internal Resistance (3 marks)</strong><br>
+                    Equation: $V = \varepsilon - Ir \Rightarrow V = -rI + \varepsilon$<br>
+                    This is a straight line ($y = mx + c$) where:<br>
+                    Gradient $m = -r$.<br><br>
+                    <strong>Calculation:</strong><br>
+                    Pick two points far apart (e.g., intercepts):<br>
+                    Point 1: $(0, 1.6)$<br>
+                    Point 2: $(8.6, 0)$ (from MS extrapolation)<br>
+                    $r = -\text{gradient} = \frac{1.6 - 0}{8.6 - 0}$<br>
+                    $r = \frac{1.6}{8.6} \approx 0.186...$<br>
+                    <span class="math-eq highlight">$r = 0.19\ \Omega$</span>
+                </div>
+
+                <!-- Q6.3 -->
+                <div class="step-box" style="border-left-color: #2ecc71;">
+                    <strong>06.3 Compare Cell B (2 marks)</strong><br>
+                    Cell B has <strong>smaller internal resistance</strong>.<br>
+                    <ul style="padding-left:20px; margin-top:5px;">
+                        <li>Less "lost volts" inside the battery ($Ir$ is smaller).</li>
+                        <li>Higher terminal pd ($V$) across the lamp.</li>
+                        <li>Higher power ($P = V^2/R$).</li>
+                    </ul>
+                    <span class="highlight">Result: Lamp with Cell B is brighter.</span>
+                    <br><small style="color:#666;">(See green line in diagram)</small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // State
+        let showGradient = false;
+        let showCellB = false;
+        
+        // Graph Data for Cell A
+        // Intercepts from MS/Question
+        const emf = 1.6; 
+        const iMaxA = 8.6; // X-intercept (calculated from 1.6/0.19 approx)
+        
+        // Cell B (Hypothetical: same emf, smaller r -> larger iMax)
+        const iMaxB = 12.0; 
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawGraph();
+        }
+        window.addEventListener('resize', resize);
+
+        function toggleGradient() {
+            showGradient = !showGradient;
+            drawGraph();
+        }
+
+        function toggleCellB() {
+            showCellB = !showCellB;
+            drawGraph();
+        }
+
+        function drawGraph() {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // Margins
+            const padLeft = 50;
+            const padBottom = 40;
+            const padTop = 30;
+            const padRight = 30;
+            
+            const graphW = w - padLeft - padRight;
+            const graphH = h - padTop - padBottom;
+            
+            // Scales
+            // Y: 0 to 2.0
+            // X: 0 to 10.0
+            const scaleY = graphH / 2.0;
+            const scaleX = graphW / 10.0;
+            
+            // Helper to convert units to pixels
+            const toPx = (x, y) => {
+                return {
+                    x: padLeft + x * scaleX,
+                    y: padTop + (2.0 - y) * scaleY // Y is inverted
+                };
+            };
+
+            // 1. Draw Grid
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            
+            // Y Axis Grid
+            for(let v = 0; v <= 2.0; v += 0.5) {
+                let p = toPx(0, v);
+                ctx.beginPath(); ctx.moveTo(padLeft, p.y); ctx.lineTo(w - padRight, p.y); ctx.stroke();
+                ctx.fillText(v.toFixed(1), padLeft - 5, p.y);
+            }
+            
+            // X Axis Grid
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            for(let i = 0; i <= 10; i += 2) {
+                let p = toPx(i, 0);
+                ctx.beginPath(); ctx.moveTo(p.x, padTop); ctx.lineTo(p.x, h - padBottom); ctx.stroke();
+                ctx.fillText(i, p.x, h - padBottom + 5);
+            }
+
+            // Labels
+            ctx.save();
+            ctx.translate(15, h/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText("Terminal pd V / V", 0, 0);
+            ctx.restore();
+            
+            ctx.textAlign = 'center';
+            ctx.fillText("Current I / A", padLeft + graphW/2, h - 15);
+
+            // 2. Draw Cell A Line
+            const pA_start = toPx(0, emf);
+            const pA_end = toPx(iMaxA, 0);
+            
+            ctx.beginPath();
+            ctx.moveTo(pA_start.x, pA_start.y);
+            ctx.lineTo(pA_end.x, pA_end.y);
+            ctx.strokeStyle = '#2c3e50'; // Dark Blue
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Label A
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText("Cell A", pA_start.x + 40, pA_start.y + 10);
+
+            // 3. Draw Cell B Line (if toggled)
+            if (showCellB) {
+                const pB_start = toPx(0, emf); // Same EMF
+                const pB_end = toPx(iMaxB, 0); // Larger current (smaller r)
+                
+                ctx.beginPath();
+                ctx.moveTo(pB_start.x, pB_start.y);
+                ctx.lineTo(pB_end.x, pB_end.y);
+                ctx.strokeStyle = '#2ecc71'; // Green
+                ctx.lineWidth = 3;
+                // ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Label B
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText("Cell B (Smaller r)", pB_end.x - 60, pB_end.y - 20);
+                
+                // Annotation
+                ctx.font = '12px Arial';
+                ctx.fillStyle = '#555';
+                ctx.fillText("Flatter slope = Less lost volts", pB_end.x - 80, pB_end.y - 50);
+            }
+
+            // 4. Draw Gradient Triangle (if toggled)
+            if (showGradient) {
+                // Draw triangle using full range
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
+                ctx.beginPath();
+                ctx.moveTo(pA_start.x, pA_start.y);
+                ctx.lineTo(pA_start.x, pA_end.y);
+                ctx.lineTo(pA_end.x, pA_end.y);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                // Vertical line (Delta V)
+                ctx.moveTo(pA_start.x, pA_start.y);
+                ctx.lineTo(pA_start.x, pA_end.y);
+                ctx.stroke();
+                
+                // Horizontal line (Delta I)
+                ctx.moveTo(pA_start.x, pA_end.y);
+                ctx.lineTo(pA_end.x, pA_end.y);
+                ctx.stroke();
+                
+                // Text
+                ctx.fillStyle = '#3498db';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText("ΔV = 1.6 V", pA_start.x + 10, (pA_start.y + pA_end.y)/2);
+                
+                ctx.textAlign = 'center';
+                ctx.fillText("ΔI = 8.6 A", (pA_start.x + pA_end.x)/2, pA_end.y - 10);
+                
+                ctx.textAlign = 'left';
+                ctx.fillText("r = ΔV / ΔI", pA_end.x - 80, pA_start.y + 30);
+            }
+        }
+
+        // Init
+        setTimeout(resize, 200);
+    </script>
+</body>
+</html>

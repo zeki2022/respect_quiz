@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q10: Micrometer Measurement</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V3.0 布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布容器 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 50%; 
+            position: relative; background: #f0f3f5; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 70%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        /* 数据表格样式 */
+        .data-row {
+            display: flex; gap: 5px; justify-content: center; margin-bottom: 10px;
+        }
+        .data-cell {
+            width: 50px; height: 30px; border: 1px solid #ccc; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-family: monospace; font-size: 14px; border-radius: 4px;
+            color: #ccc; /* Default empty color */
+        }
+        .data-cell.filled { color: #333; border-color: #3498db; background: #eaf2f8; font-weight: bold; }
+        .data-cell.anomaly { color: #c0392b; border-color: #e74c3c; background: #fadbd8; text-decoration: line-through; }
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：测量模拟区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q10</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Experiment:</strong> Measuring diameter $d$ of a wire at different positions.<br>
+                    <strong>Goal:</strong> Identify anomaly and calculate uncertainty.<br>
+                    <strong>10.4</strong> Calculate % uncertainty in Area.<br>
+                    <strong>10.5</strong> Calculate % uncertainty in Volume.
+                </div>
+
+                <!-- 数据展示区 -->
+                <div class="data-row" id="dataRow">
+                    <div class="data-cell" id="cell0">--</div>
+                    <div class="data-cell" id="cell1">--</div>
+                    <div class="data-cell" id="cell2">--</div>
+                    <div class="data-cell" id="cell3">--</div>
+                    <div class="data-cell" id="cell4">--</div>
+                    <div class="data-cell" id="cell5">--</div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; bottom:10px; right:10px; color:#7f8c8d; font-size:12px;">
+                        Micrometer Screw Gauge
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="measureNext()" id="btnMeasure">Take Measurement</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    <div style="flex:1; text-align:right; font-size:16px; font-weight:bold; color:#2c3e50;">
+                        Reading: <span id="readDisplay">0.00</span> mm
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q10.1 -->
+                <div class="step-box">
+                    <strong>10.1 Instrument (1 mark)</strong><br>
+                    Precision required: 0.01 mm.<br>
+                    Tool: <span class="highlight">Micrometer screw gauge</span> (or digital calipers).
+                </div>
+
+                <!-- Q10.2 -->
+                <div class="step-box">
+                    <strong>10.2 Systematic Error (1 mark)</strong><br>
+                    Check for <strong>Zero Error</strong>:<br>
+                    - Close jaws fully.<br>
+                    - If reading $\neq 0$, subtract this offset from all results.
+                </div>
+
+                <!-- Q10.4 Analysis -->
+                <div id="step4" class="step-box" style="border-left-color: #e74c3c;">
+                    <strong>10.4 Analysis (3 marks)</strong><br>
+                    <strong>1. Mean Diameter:</strong><br>
+                    Anomaly: <span style="color:#c0392b; text-decoration:line-through;">0.26</span> (Discard)<br>
+                    Mean $d = \frac{0.17+0.17+0.16+0.18+0.16}{5} = 0.168$ mm<br><br>
+                    <strong>2. Uncertainty in $d$:</strong><br>
+                    $\Delta d = \frac{\text{Range}}{2} = \frac{0.18-0.16}{2} = 0.01$<br>
+                    $\% d = \frac{0.01}{0.168} \times 100 = 5.95\%$<br><br>
+                    <strong>3. Uncertainty in Area $A$:</strong><br>
+                    $A = \frac{\pi d^2}{4} \Rightarrow \% A = 2 \times \% d$<br>
+                    $\% A = 2 \times 5.95\% = \mathbf{11.9\%}$
+                </div>
+
+                <!-- Q10.5 Volume -->
+                <div class="step-box" style="border-left-color: #2ecc71;">
+                    <strong>10.5 Volume Uncertainty (2 marks)</strong><br>
+                    $V = A \times L$<br>
+                    $\% L = \frac{0.1}{8.3} \times 100 \approx 1.2\%$<br>
+                    $\% V = \% A + \% L$<br>
+                    $\% V = 11.9 + 1.2 = \mathbf{13.1\%}$
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Data Points
+        const measurements = [0.17, 0.17, 0.16, 0.18, 0.26, 0.16];
+        let currentIdx = 0;
+        
+        // Animation State
+        let gaugeX = 0; // Animation position of micrometer
+        let targetX = 0;
+        let isMeasuring = false;
+        let gaugeOpen = 20; // Gap in pixels
+        
+        // Wire Visuals
+        const wireY = 150;
+        const wirePositions = [100, 180, 260, 340, 420, 500]; // X pos on canvas
+        
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            // Recalculate positions based on width
+            const w = canvas.width;
+            for(let i=0; i<6; i++) {
+                wirePositions[i] = w * 0.15 + i * (w * 0.14);
+            }
+            gaugeX = w * 0.05; // Start pos
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function resetSim() {
+            currentIdx = 0;
+            isMeasuring = false;
+            document.getElementById('btnMeasure').disabled = false;
+            document.getElementById('btnMeasure').innerText = "Take Measurement 1";
+            document.getElementById('readDisplay').innerText = "0.00";
+            
+            // Clear table
+            for(let i=0; i<6; i++) {
+                let cell = document.getElementById('cell'+i);
+                cell.innerText = "--";
+                cell.className = "data-cell";
+            }
+            document.getElementById('step4').classList.remove('active');
+            
+            resize(); // Reset pos
+        }
+
+        function measureNext() {
+            if (currentIdx >= 6) return;
+            
+            isMeasuring = true;
+            targetX = wirePositions[currentIdx];
+            document.getElementById('btnMeasure').disabled = true;
+            
+            animateMove();
+        }
+        
+        function animateMove() {
+            // Simple lerp animation
+            const dx = targetX - gaugeX;
+            if (Math.abs(dx) > 2) {
+                gaugeX += dx * 0.1;
+                drawFrame();
+                requestAnimationFrame(animateMove);
+            } else {
+                // Arrived
+                gaugeX = targetX;
+                animateMeasure();
+            }
+        }
+        
+        function animateMeasure() {
+            // Close jaws animation
+            if (gaugeOpen > 5) {
+                gaugeOpen -= 1;
+                drawFrame();
+                requestAnimationFrame(animateMeasure);
+            } else {
+                // Measured!
+                const val = measurements[currentIdx];
+                document.getElementById('readDisplay').innerText = val.toFixed(2);
+                
+                // Update Table
+                const cell = document.getElementById('cell' + currentIdx);
+                cell.innerText = val.toFixed(2);
+                cell.classList.add('filled');
+                
+                // Anomaly Check
+                if (val > 0.2) {
+                    cell.classList.add('anomaly');
+                    alert("⚠️ Warning: Anomaly Detected! (Check for dirt/deformation)");
+                }
+                
+                // Next
+                gaugeOpen = 20; // Open for next
+                currentIdx++;
+                
+                if (currentIdx < 6) {
+                    document.getElementById('btnMeasure').disabled = false;
+                    document.getElementById('btnMeasure').innerText = "Take Measurement " + (currentIdx + 1);
+                } else {
+                    document.getElementById('btnMeasure').innerText = "Done";
+                    // Highlight calculation step
+                    document.getElementById('step4').classList.add('active');
+                }
+            }
+        }
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const cy = h / 2;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // 1. Draw Wire
+            ctx.beginPath();
+            ctx.moveTo(0, cy);
+            ctx.lineTo(w, cy);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#d35400'; // Copper wire color
+            ctx.stroke();
+            
+            // Draw "bumps" to simulate non-uniformity? 
+            // The 5th spot is 0.26 (anomaly), let's draw a dirt blob there
+            const anomalyX = wirePositions[4];
+            ctx.fillStyle = '#7f8c8d'; // Dirt color
+            ctx.beginPath();
+            ctx.arc(anomalyX, cy, 6, 0, Math.PI*2);
+            ctx.fill();
+            
+            // 2. Draw Micrometer (Moving part)
+            // Frame C-shape
+            const mx = gaugeX;
+            const my = cy;
+            const gap = gaugeOpen; 
+            
+            ctx.fillStyle = '#34495e';
+            
+            // Left Jaw (Anvil)
+            ctx.fillRect(mx - 20, my - 30, 10, 40); // Fixed jaw
+            // C-Frame
+            ctx.beginPath();
+            ctx.arc(mx - 25, my + 20, 40, 0, Math.PI, false);
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = '#2c3e50';
+            ctx.stroke();
+            
+            // Right Jaw (Spindle) - Moves
+            // Spindle moves left to close gap.
+            // Gap starts at center of wire. 
+            // Wire is ~4px thick.
+            // Jaw should stop at wire surface.
+            
+            const spindleX = mx + gap; 
+            
+            // Spindle
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(spindleX, my - 30, 40, 10); // Shaft
+            
+            // Thimble (Handle)
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(spindleX + 40, my - 40, 60, 30); // Thimble
+            
+            // Draw markings on thimble
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            for(let i=0; i<5; i++) {
+                ctx.beginPath(); 
+                ctx.moveTo(spindleX + 45 + i*10, my-40); 
+                ctx.lineTo(spindleX + 45 + i*10, my-25); 
+                ctx.stroke();
+            }
+            
+            // Highlight current measuring position
+            if (!isMeasuring && currentIdx < 6) {
+               ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
+               ctx.beginPath();
+               ctx.arc(wirePositions[currentIdx], cy, 10, 0, Math.PI*2);
+               ctx.fill();
+            }
+        }
+
+        setTimeout(resize, 200);
+    </script>
+</body>
+</html>

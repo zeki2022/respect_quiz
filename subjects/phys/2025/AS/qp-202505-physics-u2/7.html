@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q7: TIR & Water Jet</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V3.0 布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 55%; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 80%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：交互演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q7</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Experiment:</strong> Laser shines horizontally through a water jet.<br>
+                    <strong>Fig 9:</strong> High water level $\rightarrow$ Spot on table (TIR).<br>
+                    <strong>Fig 10:</strong> Low water level $\rightarrow$ Spot on screen (Refraction).<br>
+                    <strong>07.3</strong> Explain why the spot moves to the screen.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; color:#555; font-size:12px;">
+                        <div>Status: <span id="statusText" style="font-weight:bold;">--</span></div>
+                        <div>Incidence Angle $\theta_i$: <span id="angleText">--</span></div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div style="flex:1; display:flex; align-items:center; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Water Level:</span>
+                        <span style="font-size:12px; color:#888;">Low</span>
+                        <input type="range" id="levelSlider" min="0" max="100" value="80" style="flex:1; cursor:pointer;">
+                        <span style="font-size:12px; color:#888;">High</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q7.1 Sketch -->
+                <div class="step-box">
+                    <strong>07.1 Sketch (Fig 9) (1 mark)</strong><br>
+                    Draw path through water jet:<br>
+                    Light undergoes <strong>Total Internal Reflection (TIR)</strong> inside the water.<br>
+                    - Zig-zag path down the stream.<br>
+                    - Lines must be straight.<br>
+                    - Ray stays <strong>inside</strong> the water.
+                </div>
+
+                <!-- Q7.2 Sketch -->
+                <div class="step-box">
+                    <strong>07.2 Sketch (Fig 10) (1 mark)</strong><br>
+                    Draw new path:<br>
+                    - Light travels straight to water-air boundary.<br>
+                    - <strong>Refracts downwards</strong> at the boundary (bending away from normal).<br>
+                    - Travels straight to the screen.
+                </div>
+
+                <!-- Q7.3 Explanation -->
+                <div id="step3" class="step-box" style="border-left-color: #e67e22;">
+                    <strong>07.3 Explanation (3 marks)</strong><br>
+                    Why does the spot move to the screen?<br>
+                    1. As water level drops, jet curves more sharply.<br>
+                    2. The <strong>angle of incidence ($i$) decreases</strong>.<br>
+                    3. $i$ becomes <strong>less than the Critical Angle ($C$)</strong>.<br>
+                    4. <span class="highlight">Total Internal Reflection ceases, and Refraction occurs.</span><br>
+                    <small style="color:#666;">(Water $n \approx 1.33$, light speeds up in air, bends away from normal)</small>
+                </div>
+
+                <!-- Q7.4 Safety -->
+                <div class="step-box">
+                    <strong>07.4 Safety Measure (1 mark)</strong><br>
+                    Any one valid precaution:<br>
+                    - Do not look directly into the laser beam.<br>
+                    - Put a warning sign on the door.<br>
+                    - Use a non-reflective screen.<br>
+                    - Keep laser at low power / below eye level.
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics
+        // Water n = 1.33. Critical angle C = arcsin(1/1.33) approx 48.8 degrees
+        const criticalAngleDeg = 48.8;
+        
+        let waterLevel = 80; // 0 to 100
+        
+        document.getElementById('levelSlider').addEventListener('input', (e) => {
+            waterLevel = parseInt(e.target.value);
+            drawFrame();
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // Layout
+            const groundY = h * 0.9;
+            const cylinderX = w * 0.2;
+            const cylinderW = w * 0.15;
+            const holeY = h * 0.4;
+            const screenX = w * 0.85;
+            const tableY = groundY; // Spot on table
+            
+            // 1. Draw Cylinder
+            ctx.fillStyle = '#ecf0f1';
+            ctx.strokeStyle = '#7f8c8d';
+            ctx.lineWidth = 2;
+            ctx.fillRect(cylinderX, h*0.1, cylinderW, groundY - h*0.1);
+            ctx.strokeRect(cylinderX, h*0.1, cylinderW, groundY - h*0.1);
+            
+            // 2. Draw Water in Cylinder
+            // waterLevel 0 -> holeY, 100 -> top
+            const maxWaterH = holeY - h*0.15;
+            const currentWaterH = (waterLevel / 100) * maxWaterH; // Height above hole
+            const surfaceY = holeY - currentWaterH;
+            
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
+            ctx.fillRect(cylinderX, surfaceY, cylinderW, groundY - surfaceY);
+            
+            // 3. Draw Water Jet (Parabola)
+            // v_x depends on sqrt(h) (Torricelli)
+            // Low water = low velocity = steep curve
+            // High water = high velocity = flat curve
+            let v0 = 2 + (waterLevel / 100) * 8; // Arbitrary units for visual
+            
+            ctx.beginPath();
+            ctx.moveTo(cylinderX + cylinderW, holeY);
+            
+            // Trace upper boundary of water jet
+            // y = x^2 / (something proportional to v0^2)
+            let points = [];
+            for(let x = 0; x < w - cylinderX; x+=2) {
+                let y = holeY + (x * x) / (v0 * 30); // Simple parabola
+                points.push({x: cylinderX + cylinderW + x, y: y});
+                if(y > groundY) break;
+            }
+            
+            // Draw the stream thick
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.4)';
+            ctx.lineWidth = 15;
+            ctx.beginPath();
+            if (points.length > 0) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for(let p of points) ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+            
+            // 4. Draw Laser & Ray Tracing
+            // Laser source
+            ctx.fillStyle = '#333';
+            ctx.fillRect(cylinderX - 40, holeY - 5, 30, 10);
+            
+            // Laser line (Horizontal inside cylinder)
+            ctx.strokeStyle = '#e74c3c'; // Red laser
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cylinderX - 10, holeY);
+            ctx.lineTo(cylinderX + cylinderW, holeY);
+            ctx.stroke();
+            
+            // Ray hitting the top boundary of the jet
+            // We approximate the boundary slope.
+            // At x=0 (hole), slope is 0.
+            // Light travels straight until it hits the "curving down" boundary.
+            // As stream curves down, the 'normal' tilts back.
+            // Since ray is horizontal, Angle of Incidence (i) = 90 - Stream Angle (with vertical)
+            
+            // Let's simplify: The ray travels horizontally for a bit, then hits the 'roof' of the stream
+            // The 'roof' drops.
+            // For animation visual:
+            // We check the intersection of y=holeY (ray) with the parabolic boundary?
+            // No, the ray travels inside. The boundary curves *away* or *towards*?
+            // Actually, in the diagram, the ray goes straight, hits the top surface.
+            
+            // Visual Hack: Calculate intersection with a theoretical "top surface"
+            // Let's assume the ray hits the boundary at some x distance 'd_hit'
+            // Low velocity -> Stream drops fast -> Hits boundary SOON.
+            // High velocity -> Stream flat -> Ray travels far inside (TIR logic).
+            
+            // Let's define collision point X based on velocity
+            let collisionX = cylinderX + cylinderW + v0 * 15; 
+            let collisionY = holeY; // Ray is horizontal
+            
+            // Draw ray to collision
+            ctx.beginPath();
+            ctx.moveTo(cylinderX + cylinderW, holeY);
+            ctx.lineTo(collisionX, collisionY);
+            ctx.stroke();
+            
+            // Calculate Angle of Incidence at collision
+            // Slope of stream at collisionX: dy/dx = 2x / k
+            // Normal vector is perpendicular to slope.
+            // Horizontal ray angle with Normal = 90 - slopeAngle?
+            // Let's just map 'waterLevel' to 'Angle of Incidence' for simplicity and robustness
+            
+            // Low Water -> Steep Curve -> Normal is tilted -> Angle of Incidence is SMALL
+            // High Water -> Flat Curve -> Normal is vertical -> Angle of Incidence is LARGE (~90)
+            
+            let angleIncidence = 20 + (waterLevel / 100) * 70; // Map 0-100 to 20-90 degrees
+            
+            // Update UI
+            document.getElementById('angleText').innerText = angleIncidence.toFixed(1) + "°";
+            
+            // Decision: TIR or Refract?
+            if (angleIncidence > criticalAngleDeg) {
+                // --- TIR Case (High Water) ---
+                document.getElementById('statusText').innerText = "Total Internal Reflection";
+                document.getElementById('statusText').style.color = "#27ae60";
+                
+                // Reflection: Bounce down
+                ctx.beginPath();
+                ctx.moveTo(collisionX, collisionY);
+                // Simple bounce to table
+                ctx.lineTo(collisionX + 100, groundY); 
+                ctx.stroke();
+                
+                // Spot on Table
+                drawSpot(collisionX + 100, groundY, true); // Horizontal spot
+                
+            } else {
+                // --- Refraction Case (Low Water) ---
+                document.getElementById('statusText').innerText = "Refraction (Light escapes)";
+                document.getElementById('statusText').style.color = "#d35400";
+                
+                // Refraction: Bends AWAY from normal (Downwards)
+                // Since surface slopes down, normal points "Up-Back". 
+                // Ray bends down towards screen.
+                
+                ctx.beginPath();
+                ctx.moveTo(collisionX, collisionY);
+                // Ray goes to screen
+                let screenHitY = holeY + (screenX - collisionX) * 0.5; // Linear path down
+                ctx.lineTo(screenX, screenHitY);
+                ctx.stroke();
+                
+                // Spot on Screen
+                drawSpot(screenX, screenHitY, false); // Vertical spot
+            }
+            
+            // Draw Screen Line
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(screenX, holeY - 50);
+            ctx.lineTo(screenX, groundY);
+            ctx.stroke();
+            ctx.fillStyle = '#333'; ctx.font = '12px Arial'; ctx.fillText("Screen", screenX-20, holeY-60);
+        }
+        
+        function drawSpot(x, y, isHorizontal) {
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.8)';
+            ctx.beginPath();
+            if (isHorizontal) {
+                ctx.ellipse(x, y, 15, 4, 0, 0, Math.PI*2);
+            } else {
+                ctx.ellipse(x, y, 4, 15, 0, 0, Math.PI*2);
+            }
+            ctx.fill();
+        }
+
+        // Init
+        setTimeout(resize, 200);
+    </script>
+</body>
+</html>

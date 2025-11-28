@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q11: Thermistor Circuit</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布容器优化 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 50%; /* PC端比例 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+            /* 【关键修复】设置最小高度，防止塌陷 */
+            min-height: 350px;
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 80%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; flex-direction: column; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border:1px solid #eee;}
+        .control-row { display: flex; align-items: center; gap: 10px; }
+        .control-label { font-weight: bold; color: #555; width: 100px; }
+        input[type=range] { flex: 1; cursor: pointer; }
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：电路模拟区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q11</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Scenario:</strong> Bath water temperature indicator. Light ON if $V_{AB} > 0.65$ V.<br>
+                    <strong>Circuit:</strong> 3.0V Battery, Thermistor ($R_{th}$), Variable Resistor ($R$).<br>
+                    <strong>11.1</strong> Calc $R$ when light turns on at 37°C.<br>
+                    <strong>11.2</strong> Explain effect of increasing $R$.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <!-- 数据浮窗 -->
+                    <div style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.95); padding:8px; border-radius:6px; font-size:13px; color:#333; border:1px solid #ccc; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                        <div style="margin-bottom:4px;">$V_{supply} = 3.0$ V</div>
+                        <div style="margin-bottom:4px;">$R_{th}$: <span id="valRth" style="font-weight:bold;">--</span> $\Omega$</div>
+                        <div style="margin-bottom:4px;">$R$: <span id="valR" style="font-weight:bold;">--</span> $\Omega$</div>
+                        <div style="border-top:1px solid #ddd; padding-top:4px; font-weight:bold;">
+                            $V_{AB}$: <span id="valVab" style="font-size:15px;">--</span> V
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-row">
+                        <div class="control-label">Temp ($^\circ$C):</div>
+                        <span style="font-size:12px; color:#888">20</span>
+                        <input type="range" id="tempSlider" min="20" max="45" step="0.5" value="37">
+                        <span style="font-size:12px; color:#888">45</span>
+                        <span id="dispTemp" style="width:40px; text-align:right; font-weight:bold;">37</span>
+                    </div>
+                    
+                    <div class="control-row">
+                        <div class="control-label">Resistor $R$:</div>
+                        <span style="font-size:12px; color:#888">1k</span>
+                        <input type="range" id="resSlider" min="1000" max="4000" step="50" value="2150">
+                        <span style="font-size:12px; color:#888">4k</span>
+                        <span id="dispR" style="width:40px; text-align:right; font-weight:bold;">2150</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <div class="step-box">
+                    <strong>11.1 Calculate R (3 marks)</strong><br>
+                    At 37°C, read graph Fig 15:<br>
+                    $R_{th} \approx 7.6 \text{ k}\Omega$<br>
+                    Desired $V_{AB} = 0.65$ V across $R$.<br><br>
+                    <strong>Potential Divider:</strong><br>
+                    $V_{AB} = V_{in} \times \frac{R}{R + R_{th}}$<br>
+                    $0.65 = 3.0 \times \frac{R}{R + 7600}$<br>
+                    $0.65(R + 7600) = 3.0R$<br>
+                    $R \approx 2102 \Omega$<br>
+                    <span class="highlight">Ans: $2100 - 2200 \Omega$</span>
+                </div>
+
+                <div class="step-box" style="border-left-color: #e67e22;">
+                    <strong>11.2 Effect of Increasing R (3 marks)</strong><br>
+                    If $R$ increases:<br>
+                    1. $R$ takes a <strong>larger share</strong> of voltage ($V_{AB}$ rises).<br>
+                    2. Threshold $0.65$ V is reached "earlier" (at higher $R_{th}$).<br>
+                    3. Higher $R_{th}$ corresponds to <strong>lower temperature</strong>.<br>
+                    <span class="highlight">Result: Light turns on at a LOWER temp.</span>
+                </div>
+
+                <div class="step-box" style="border-left-color: #2ecc71;">
+                    <strong>11.3 & 11.4 Concepts (2 marks)</strong><br>
+                    <strong>Benefit:</strong> Allows adjustment of threshold temp.<br>
+                    <strong>A-B Resistance:</strong> Must be <span class="highlight">Very High</span> (so it doesn't draw current from the divider).
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const Vin = 3.0;
+        let temp = 37; 
+        let R = 2150; 
+        
+        // NTC Thermistor Model (Interpolation)
+        function getThermistorR(t) {
+            const points = [
+                {t: 20, r: 30000}, {t: 25, r: 21000}, {t: 30, r: 14000},
+                {t: 35, r: 9500}, {t: 40, r: 6000}, {t: 45, r: 4000}
+            ];
+            for(let i=0; i<points.length-1; i++) {
+                if (t >= points[i].t && t <= points[i+1].t) {
+                    let ratio = (t - points[i].t) / (points[i+1].t - points[i].t);
+                    return points[i].r + ratio * (points[i+1].r - points[i].r);
+                }
+            }
+            return 7600;
+        }
+        
+        // UI Listeners
+        document.getElementById('tempSlider').addEventListener('input', (e) => {
+            temp = parseFloat(e.target.value);
+            document.getElementById('dispTemp').innerText = temp;
+            updateCircuit();
+        });
+        
+        document.getElementById('resSlider').addEventListener('input', (e) => {
+            R = parseInt(e.target.value);
+            document.getElementById('dispR').innerText = R;
+            updateCircuit();
+        });
+        
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 【关键修复】强制设置高度，防止为0
+            canvas.height = canvas.parentElement.clientHeight || 400;
+            updateCircuit();
+        }
+        window.addEventListener('resize', resize);
+
+        function updateCircuit() {
+            const Rth = getThermistorR(temp);
+            const Vab = Vin * (R / (R + Rth));
+            
+            document.getElementById('valRth').innerText = Math.round(Rth);
+            document.getElementById('valR').innerText = R;
+            document.getElementById('valVab').innerText = Vab.toFixed(2);
+            
+            const isLightOn = Vab > 0.65;
+            document.getElementById('valVab').style.color = isLightOn ? '#2ecc71' : '#e74c3c';
+            
+            drawFrame(isLightOn);
+        }
+
+        function drawFrame(isLightOn) {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            const cx = w / 2;
+            const cy = h / 2;
+            const rectW = w * 0.6;
+            const rectH = h * 0.6;
+            const leftX = (w - rectW) / 2;
+            const rightX = leftX + rectW;
+            const topY = (h - rectH) / 2;
+            const botY = topY + rectH;
+            
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#333';
+            
+            // Wires
+            ctx.beginPath();
+            ctx.moveTo(leftX + 40, topY); ctx.lineTo(rightX, topY);
+            ctx.lineTo(rightX, botY); ctx.lineTo(leftX, botY);
+            ctx.lineTo(leftX, topY); ctx.stroke();
+            
+            // Battery
+            ctx.fillStyle = '#fff'; ctx.fillRect(leftX + 5, topY - 15, 35, 30);
+            ctx.beginPath();
+            ctx.moveTo(leftX + 15, topY - 10); ctx.lineTo(leftX + 15, topY + 10); // +
+            ctx.moveTo(leftX + 25, topY - 5); ctx.lineTo(leftX + 25, topY + 5);   // -
+            ctx.stroke();
+            ctx.font = 'bold 14px Arial'; ctx.fillStyle='#333'; ctx.fillText("3.0V", leftX+10, topY-20);
+
+            // Resistor R (Bottom Right)
+            const rX = rightX - rectW/3;
+            ctx.fillStyle = '#fff'; ctx.fillRect(rX - 25, botY - 10, 50, 20);
+            ctx.strokeRect(rX - 25, botY - 10, 50, 20);
+            // Arrow
+            ctx.beginPath(); ctx.moveTo(rX - 20, botY + 20); ctx.lineTo(rX + 20, botY - 20); 
+            ctx.lineTo(rX + 15, botY - 20); ctx.stroke();
+            ctx.fillStyle='#333'; ctx.fillText("R", rX-5, botY+35);
+            
+            // Thermistor (Bottom Left)
+            const thX = leftX + rectW/3;
+            ctx.fillStyle = '#fff'; ctx.fillRect(thX - 25, botY - 10, 50, 20);
+            ctx.strokeRect(thX - 25, botY - 10, 50, 20);
+            ctx.beginPath(); ctx.moveTo(thX - 15, botY + 15); ctx.lineTo(thX + 15, botY + 15); ctx.lineTo(thX + 15, botY - 15); ctx.stroke();
+            ctx.fillStyle='#333'; ctx.fillText("Thermistor", thX-30, botY+35);
+            
+            // Lamp / Duck
+            const lampY = botY - 60;
+            ctx.beginPath(); ctx.moveTo(rX - 35, botY); ctx.lineTo(rX - 35, lampY); ctx.lineTo(rX + 35, lampY); ctx.lineTo(rX + 35, botY);
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.stroke();
+            
+            // Duck Body
+            ctx.beginPath(); ctx.arc(rX, lampY, 18, 0, Math.PI*2);
+            ctx.fillStyle = isLightOn ? '#f1c40f' : '#ecf0f1';
+            ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            
+            // Glow
+            if(isLightOn) {
+                ctx.shadowBlur = 20; ctx.shadowColor = "gold";
+                ctx.fillStyle = "rgba(241, 196, 15, 0.6)";
+                ctx.beginPath(); ctx.arc(rX, lampY, 30, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#333'; ctx.font='bold 14px Arial'; ctx.fillText("LIGHT ON", rX-30, lampY-40);
+            }
+            
+            // Labels A B
+            ctx.fillStyle = '#333';
+            ctx.fillText("A", rX - 45, botY - 15);
+            ctx.fillText("B", rX + 40, botY - 15);
+        }
+
+        // Double Init for Safety
+        setTimeout(() => { resize(); }, 100);
+        setTimeout(() => { resize(); }, 500);
+    </script>
+</body>
+</html>

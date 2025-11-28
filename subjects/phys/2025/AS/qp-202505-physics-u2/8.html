@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q8: Stationary Waves</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V3.0 标准布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 60%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        button.action-btn.secondary { background-color: #9b59b6; } /* Purple for harmonic switch */
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+        
+        /* 表格样式 */
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+        .comp-table th, .comp-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .comp-table th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：实验演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q8</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Experiment:</strong> Determining mass per unit length $\mu$ using stationary waves on a string.<br>
+                    <strong>Setup:</strong> Vibration generator, String, Pulley, Masses.<br>
+                    <strong>08.2</strong> Describe the method (6 marks).<br>
+                    <strong>08.3</strong> Why use 2nd harmonic to reduce error?
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; color:#555; font-size:12px;">
+                        Mode: <span id="modeText" style="font-weight:bold; color:#9b59b6;">1st Harmonic</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn secondary" onclick="toggleHarmonic()">Switch Harmonic (1st / 2nd)</button>
+                    <div style="flex:1; text-align:right; font-size:12px; color:#666;">
+                        *Observe the Nodes (Blue Dots)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q8.1 Difference -->
+                <div class="step-box">
+                    <strong>08.1 Stationary vs Progressive (2 marks)</strong><br>
+                    <table class="comp-table">
+                        <tr>
+                            <th>Property</th>
+                            <th>Stationary Wave</th>
+                            <th>Progressive Wave</th>
+                        </tr>
+                        <tr>
+                            <td>Energy</td>
+                            <td>Stored (Trapped)</td>
+                            <td>Transferred</td>
+                        </tr>
+                        <tr>
+                            <td>Phase</td>
+                            <td>Constant between nodes</td>
+                            <td>Varies continuously</td>
+                        </tr>
+                        <tr>
+                            <td>Amplitude</td>
+                            <td>Varies (0 at node to max at antinode)</td>
+                            <td>Constant everywhere</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Q8.2 Experiment Method -->
+                <div class="step-box" style="border-left-color: #27ae60;">
+                    <strong>08.2 Experimental Method (6 marks)</strong><br>
+                    Formula: $f = \frac{1}{2L}\sqrt{\frac{T}{\mu}} \Rightarrow f^2 = \frac{T}{4L^2\mu}$<br><br>
+                    <strong>1. Measurements:</strong><br>
+                    - Measure Length $L$ with a <span class="highlight">meter ruler</span>.<br>
+                    - Measure Mass $m$ with a <span class="highlight">mass balance</span> (to find Tension $T = mg$).<br>
+                    - Measure Frequency $f$ using signal generator.<br><br>
+                    <strong>2. Uncertainty Reduction:</strong><br>
+                    - Use at least 6 different masses.<br>
+                    - Repeat frequency finding and average.<br>
+                    - Increase $f$ until resonance, then decrease, take average.<br><br>
+                    <strong>3. Graphical Analysis:</strong><br>
+                    - Plot graph of <span class="highlight">$f^2$ against $T$</span> (or $f^2$ against $m$).<br>
+                    - Straight line through origin.<br>
+                    - Gradient = $\frac{1}{4L^2\mu} \Rightarrow \mu = \frac{1}{4L^2 \times \text{gradient}}$.
+                </div>
+
+                <!-- Q8.3 Second Harmonic -->
+                <div class="step-box" style="border-left-color: #9b59b6;">
+                    <strong>08.3 Why 2nd Harmonic? (1 mark)</strong><br>
+                    <strong>Reason:</strong> It is easier to identify the exact point of resonance.<br>
+                    - The 2nd harmonic has a <span class="highlight">Node in the centre</span>.<br>
+                    - A stationary point (Node) is easier to locate precisely than a moving point (Antinode) or the ends.
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let harmonic = 1; // 1 or 2
+        let time = 0;
+        
+        function toggleHarmonic() {
+            harmonic = (harmonic === 1) ? 2 : 1;
+            document.getElementById('modeText').innerText = (harmonic === 1) ? "1st Harmonic (Fundamental)" : "2nd Harmonic";
+            drawFrame();
+        }
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // Layout
+            const tableY = h * 0.7;
+            const generatorX = w * 0.1;
+            const pulleyX = w * 0.8;
+            const stringY = tableY - 40;
+            
+            // 1. Draw Apparatus
+            // Table
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(0, tableY, w, h-tableY);
+            ctx.strokeStyle = '#bdc3c7';
+            ctx.beginPath(); ctx.moveTo(0, tableY); ctx.lineTo(w, tableY); ctx.stroke();
+            
+            // Vibration Generator (Box)
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(generatorX - 20, stringY, 40, tableY - stringY);
+            // Pin
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(generatorX - 2, stringY - 10, 4, 10);
+            
+            // Pulley
+            ctx.beginPath();
+            ctx.arc(pulleyX, stringY + 10, 10, 0, Math.PI*2);
+            ctx.fillStyle = '#95a5a6'; ctx.fill(); ctx.stroke();
+            
+            // Hanging Mass
+            ctx.strokeStyle = '#333';
+            ctx.beginPath();
+            ctx.moveTo(pulleyX + 10, stringY + 10);
+            ctx.lineTo(pulleyX + 10, stringY + 60);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#e74c3c'; // Red Mass
+            ctx.fillRect(pulleyX + 2, stringY + 60, 16, 20);
+            ctx.fillStyle = 'white'; ctx.font='10px Arial'; ctx.fillText(harmonic===1?"m":"4m", pulleyX+4, stringY+73); // 2nd harmonic needs 4T if f const, or higher f. Just visual.
+            
+            // 2. Draw String (Stationary Wave)
+            // y = A sin(kx) cos(wt)
+            // k = n * PI / L
+            
+            const L = pulleyX - generatorX;
+            const amp = 30;
+            
+            time += 0.15; // Animation speed
+            
+            ctx.beginPath();
+            ctx.strokeStyle = '#e67e22'; // Orange string
+            ctx.lineWidth = 3;
+            
+            const cosWt = Math.cos(time); // Oscillating term
+            
+            for (let x = 0; x <= L; x += 2) {
+                // Standing wave equation
+                // x ratio from 0 to 1
+                let r = x / L;
+                
+                // n * PI * r
+                let shape = Math.sin(harmonic * Math.PI * r);
+                
+                let y = stringY - 10 - (shape * cosWt * amp); // -10 is top of pulley
+                
+                if (x === 0) ctx.moveTo(generatorX + x, y);
+                else ctx.lineTo(generatorX + x, y);
+            }
+            ctx.stroke();
+            
+            // 3. Draw Nodes (Blue Dots)
+            ctx.fillStyle = '#3498db';
+            // Node at start
+            drawNode(generatorX, stringY - 10);
+            // Node at end (approx at pulley)
+            drawNode(pulleyX, stringY - 10);
+            
+            if (harmonic === 2) {
+                // Node in center
+                drawNode(generatorX + L/2, stringY - 10);
+                
+                // Annotation for Q8.3
+                ctx.fillStyle = '#3498db';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText("Center Node (Easier to measure)", generatorX + L/2, stringY + 40);
+                
+                // Arrow
+                ctx.beginPath();
+                ctx.moveTo(generatorX + L/2, stringY + 25);
+                ctx.lineTo(generatorX + L/2, stringY);
+                ctx.strokeStyle = '#3498db';
+                ctx.stroke();
+            }
+            
+            // Length label
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            // Dimension line
+            const dimY = stringY - 50;
+            ctx.beginPath();
+            ctx.moveTo(generatorX, dimY); ctx.lineTo(pulleyX, dimY);
+            ctx.moveTo(generatorX, dimY-5); ctx.lineTo(generatorX, dimY+5);
+            ctx.moveTo(pulleyX, dimY-5); ctx.lineTo(pulleyX, dimY+5);
+            ctx.stroke();
+            ctx.fillStyle = '#333';
+            ctx.fillText("L", generatorX + L/2, dimY - 5);
+
+            requestAnimationFrame(drawFrame);
+        }
+        
+        function drawNode(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        resize();
+        drawFrame();
+    </script>
+</body>
+</html>

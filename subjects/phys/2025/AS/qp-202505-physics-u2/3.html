@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q3: Water Wave Refraction</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V3.0 标准布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 50%; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 60%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        /* 错误提示样式 */
+        .error-note {
+            background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404;
+            padding: 10px; border-radius: 6px; font-size: 0.9em; margin-bottom: 10px;
+        }
+
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：图示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q3</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Scenario:</strong> Water waves travel from a <strong>Deep region (D)</strong> to a <strong>Shallow region (S)</strong>.<br>
+                    Waves travel slower in shallow water ($v_S < v_D$).<br>
+                    <strong>03.1</strong> Explain why wavelength $\lambda_D > \lambda_S$.<br>
+                    <strong>03.2</strong> Calculate ratio $v_D / v_S$.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <!-- 静态标注，防止 Canvas 渲染慢 -->
+                    <div style="position:absolute; top:10px; left:10px; font-weight:bold; color:#2980b9;">Region D (Deep)</div>
+                    <div style="position:absolute; bottom:10px; right:10px; font-weight:bold; color:#27ae60;">Region S (Shallow)</div>
+                </div>
+
+                <div class="controls">
+                    <div style="flex:1; display:flex; align-items:center; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Wave Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q3.1 -->
+                <div class="step-box">
+                    <strong>03.1 Explanation (1 mark)</strong><br>
+                    Relationship: $v = f\lambda$<br>
+                    1. The <strong>frequency ($f$)</strong> of the wave remains constant as it crosses the boundary.<br>
+                    2. Speed decreases ($v_S < v_D$).<br>
+                    <span class="highlight">Therefore, wavelength must decrease ($\lambda \propto v$).</span>
+                </div>
+
+                <!-- Q3.2 -->
+                <div class="step-box">
+                    <strong>03.2 Calculation (1 mark)</strong>
+                    
+                    <!-- 试卷错误提示 -->
+                    <div class="error-note">
+                        <strong>⚠️ Note from Mark Scheme:</strong><br>
+                        "Due to an error in the question paper formula, this item has been discounted. All candidates have been awarded one mark."
+                    </div>
+
+                    <strong>Calculation using correct physics:</strong><br>
+                    Angles from MS: $\theta_D \approx 53^\circ$, $\theta_S \approx 31^\circ$.<br>
+                    (Note: $D$ is fast/deep, so angle with normal is larger)<br><br>
+                    Refractive Index Concept:<br>
+                    $\frac{v_D}{v_S} = \frac{\sin\theta_D}{\sin\theta_S}$<br>
+                    Substituting values:<br>
+                    $\frac{v_D}{v_S} = \frac{\sin 53^\circ}{\sin 31^\circ}$<br>
+                    $\frac{v_D}{v_S} = \frac{0.7986}{0.5150}$<br>
+                    <span class="math-eq highlight">Ratio $\approx 1.6$</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Visual Parameters
+        // Top Left: Deep (Fast), Bottom Right: Shallow (Slow)
+        // Boundary is a diagonal line
+        
+        let time = 0;
+        let speed = 0.5; // Controlled by slider
+        
+        // Angles (Approx visual match to diagram)
+        const angleD = 53 * (Math.PI/180); // Angle relative to normal? Let's simplify for visual.
+        // Let's draw wavefronts.
+        // In D: Spaced out. In S: Close together.
+        // Boundary angle:
+        const boundaryAngle = 60 * (Math.PI/180); 
+        
+        const lambdaD = 40; // Pixels
+        const lambdaS = 25; // Pixels (Smaller)
+        const vD = 2; // Pixels per frame base
+        const vS = vD * (lambdaS/lambdaD); // v proportional to lambda
+        
+        document.getElementById('speedRange').addEventListener('input', (e) => {
+            speed = parseFloat(e.target.value);
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // 1. Draw Boundary (Diagonal line)
+            // Let's define boundary from (w*0.3, 0) to (w*0.7, h)
+            const bx1 = w * 0.35, by1 = 0;
+            const bx2 = w * 0.65, by2 = h;
+            
+            // Draw Regions
+            ctx.fillStyle = '#eaf2f8'; // Deep (Light Blue) - Left
+            ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(bx1,by1); ctx.lineTo(bx2,by2); ctx.lineTo(0,h); ctx.fill();
+            
+            ctx.fillStyle = '#d4e6f1'; // Shallow (Darker Blue) - Right
+            ctx.beginPath(); ctx.moveTo(bx1,by1); ctx.lineTo(w,0); ctx.lineTo(w,h); ctx.lineTo(bx2,by2); ctx.fill();
+            
+            // Draw Boundary Line
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(bx1, by1); ctx.lineTo(bx2, by2); ctx.stroke();
+            
+            // 2. Draw Wavefronts
+            time += speed;
+            
+            // We draw lines.
+            // Region D (Left): Moving Right-Down
+            // Region S (Right): Moving Right-Down (Steeper)
+            
+            ctx.lineWidth = 2;
+            
+            // Draw D waves
+            ctx.strokeStyle = '#2980b9'; // Blue lines
+            const offsetD = time * vD % lambdaD;
+            
+            // Vector perpendicular to boundary? No, assume incident angle.
+            // Let's just draw parallel lines for D
+            // Angle of lines in D
+            const lineAngleD = 0.2; // Radians
+            // We iterate covering the whole screen
+            for(let i = -10; i < 30; i++) {
+                let dist = i * lambdaD + offsetD;
+                // Line equation: cos(a)x + sin(a)y = dist
+                // Use simplified drawing for visual only
+                drawWaveLine(ctx, dist, lineAngleD, bx1, by1, bx2, by2, true);
+            }
+            
+            // Draw S waves
+            ctx.strokeStyle = '#27ae60'; // Green lines
+            // Phase matching at boundary is complex to calc perfectly for animation loop
+            // We just visually approximate: spacing is tighter, speed is slower
+            const offsetS = time * vS % lambdaS;
+            const lineAngleS = 0.6; // Refracted angle (steeper)
+            
+            for(let i = -10; i < 50; i++) {
+                let dist = i * lambdaS + offsetS;
+                drawWaveLine(ctx, dist, lineAngleS, bx1, by1, bx2, by2, false);
+            }
+            
+            requestAnimationFrame(draw);
+        }
+        
+        // Helper to draw lines clipped by boundary
+        function drawWaveLine(ctx, dist, angle, bx1, by1, bx2, by2, isLeft) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const dx = Math.cos(angle);
+            const dy = Math.sin(angle);
+            
+            // Center point of line
+            const cx = dist * Math.cos(angle); 
+            const cy = dist * Math.sin(angle);
+            
+            // Draw long line, then clip visually by logic (not perfect clipping but fast)
+            // Vector along line (-dy, dx)
+            const lx = -dy * 1000;
+            const ly = dx * 1000;
+            
+            const p1x = cx - lx, p1y = cy - ly;
+            const p2x = cx + lx, p2y = cy + ly;
+            
+            // Intersect with boundary line?
+            // Boundary: (bx2-bx1)y - (by2-by1)x + ... = 0
+            // Simple visual hack: Check center point against boundary x at that y
+            // x on boundary at y:
+            // slope m = (bx2-bx1)/(by2-by1)
+            // x = bx1 + (y - by1) * m
+            
+            // We just clip drawing.
+            ctx.beginPath();
+            // Checking segments is hard. Let's just draw full lines and use clip()
+            // Clip region is safer
+            ctx.save();
+            ctx.beginPath();
+            if(isLeft) {
+                ctx.moveTo(0,0); ctx.lineTo(bx1,by1); ctx.lineTo(bx2,by2); ctx.lineTo(0,h);
+            } else {
+                ctx.moveTo(bx1,by1); ctx.lineTo(w,0); ctx.lineTo(w,h); ctx.lineTo(bx2,by2);
+            }
+            ctx.clip();
+            
+            ctx.beginPath();
+            ctx.moveTo(p1x, p1y); ctx.lineTo(p2x, p2y);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        resize();
+        draw();
+    </script>
+</body>
+</html>

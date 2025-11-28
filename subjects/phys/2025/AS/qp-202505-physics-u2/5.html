@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q5: Polarisation</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- math_physV3.0 标准布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; 
+            position: relative; background: #2c3e50; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 70%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：演示区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q5</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>05.1</strong> Explain why longitudinal waves cannot be polarised but transverse waves can.<br>
+                    <strong>05.2</strong> Figure 6 shows an early mobile phone antenna (metal rod). Explain why transmitted microwaves must <strong>not</strong> be polarised in a single plane.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; color:white; font-size:12px;">
+                        <div>Signal: <span id="sigVal">100</span>%</div>
+                        <div style="margin-top:5px; font-style:italic; opacity:0.8;">Rotate phone to see signal loss</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div style="flex:1; display:flex; align-items:center; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Phone Angle:</span>
+                        <input type="range" id="angleSlider" min="0" max="90" value="0" style="flex:1; cursor:pointer;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q5.1 -->
+                <div class="step-box">
+                    <strong>05.1 Polarisation Theory (2 marks)</strong><br>
+                    <strong>Difference in Oscillations:</strong><br>
+                    1. <strong>Polarisation</strong> restricts oscillations to a single plane perpendicular to the direction of energy transfer.<br><br>
+                    2. <strong>Longitudinal waves:</strong> Oscillations are <span class="highlight">parallel</span> to propagation. They cannot be restricted to a "plane" sideways.<br><br>
+                    3. <strong>Transverse waves:</strong> Oscillations are <span class="highlight">perpendicular</span> to propagation. They can be restricted to vertical or horizontal planes.
+                </div>
+
+                <!-- Q5.2 -->
+                <div class="step-box" style="border-left-color: #e67e22;">
+                    <strong>05.2 Application (2 marks)</strong><br>
+                    <strong>Antenna Alignment:</strong><br>
+                    1. For optimal signal, the antenna (rod) must be <span class="highlight">aligned</span> with the plane of polarisation (Electric field vector).<br><br>
+                    2. <strong>Real-world use:</strong> Mobile phones are held in <span class="highlight">different orientations</span> (vertical, horizontal, tilted).<br><br>
+                    <strong>Conclusion:</strong><br>
+                    If microwaves were single-plane polarised (e.g., strictly vertical), turning the phone horizontally ($90^\circ$) would result in <strong>zero signal reception</strong>. (See animation).
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let angle = 0; // Antenna angle (0 = vertical)
+        let time = 0;
+        
+        // Slider
+        document.getElementById('angleSlider').addEventListener('input', (e) => {
+            angle = parseInt(e.target.value);
+            drawFrame();
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            // 1. Draw Incoming Wave (Vertical Polarisation for demo)
+            // Represented by vertical E-field vectors
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+            ctx.lineWidth = 2;
+            const waveSpacing = 40;
+            const waveAmp = 60;
+            
+            // Draw "ghost" waves moving left to right
+            let offset = (Date.now() / 20) % waveSpacing;
+            
+            ctx.beginPath();
+            for (let x = 0; x < w; x += waveSpacing) {
+                let xPos = x + offset;
+                // Draw vertical arrow representing vertical polarisation
+                ctx.moveTo(xPos, cy - waveAmp);
+                ctx.lineTo(xPos, cy + waveAmp);
+                // Arrowheads
+                ctx.moveTo(xPos - 5, cy - waveAmp + 5); ctx.lineTo(xPos, cy - waveAmp); ctx.lineTo(xPos + 5, cy - waveAmp + 5);
+                ctx.moveTo(xPos - 5, cy + waveAmp - 5); ctx.lineTo(xPos, cy + waveAmp); ctx.lineTo(xPos + 5, cy + waveAmp - 5);
+            }
+            ctx.stroke();
+            
+            // 2. Draw Phone/Antenna
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle * Math.PI / 180);
+            
+            // Draw Rod Antenna
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -80);
+            ctx.lineTo(0, 80);
+            ctx.stroke();
+            
+            // Draw Phone Body (simple rect)
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(-30, 20, 60, 100);
+            // Screen
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(-25, 30, 50, 60);
+            
+            ctx.restore();
+            
+            // 3. Calculate Signal Strength (Malus's Law Concept: I ~ cos^2(theta))
+            // Here we assume incoming wave is Vertical (0 deg)
+            // Antenna angle is 'angle'
+            let rad = angle * Math.PI / 180;
+            let signalFactor = Math.abs(Math.cos(rad)); // E-component parallel to rod
+            let signalPercent = Math.round(signalFactor * 100);
+            
+            // Update Text
+            const sigText = document.getElementById('sigVal');
+            sigText.innerText = signalPercent;
+            sigText.style.color = (signalPercent > 50) ? '#2ecc71' : '#e74c3c'; // Green/Red
+            
+            // 4. Visualize Signal Strength Bar
+            const barW = 200;
+            const barH = 10;
+            const barX = (w - barW) / 2;
+            const barY = h - 30;
+            
+            // Background
+            ctx.fillStyle = '#444';
+            ctx.fillRect(barX, barY, barW, barH);
+            // Fill
+            ctx.fillStyle = (signalPercent > 50) ? '#2ecc71' : '#e74c3c';
+            ctx.fillRect(barX, barY, barW * signalFactor, barH);
+            
+            // Label
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText("Received Signal Strength", cx, barY - 10);
+            
+            // Request animation just for the background wave movement
+            requestAnimationFrame(drawFrame);
+        }
+
+        // Start loop
+        resize();
+    </script>
+</body>
+</html>

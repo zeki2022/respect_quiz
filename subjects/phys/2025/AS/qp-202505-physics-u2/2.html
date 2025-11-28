@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q2: Diffraction Grating</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- math_physV3.0 标准布局 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 50%; 
+            position: relative; background: #222; /* 深色背景模拟光学实验 */
+            border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 70%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：模拟演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q2</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Given:</strong> Laser light ($\lambda = 6.94 \times 10^{-7}$ m) incident normally on a diffraction grating.<br>
+                    The grating has <strong>280 lines per millimetre</strong>.<br>
+                    <strong>Q:</strong> Calculate the total number of bright spots that appear on the semicircular screen.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; bottom:10px; left:10px; color:#aaa; font-size:12px;">
+                        Screen
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <label style="font-weight:bold; color:#555;">Grating ($N$ lines/mm):</label>
+                            <span id="nVal" style="font-weight:bold; color:#3498db;">280</span>
+                        </div>
+                        <input type="range" id="nSlider" min="100" max="600" step="10" value="280" style="cursor:pointer;">
+                    </div>
+                    <button class="action-btn" onclick="resetSim()" style="height:40px;">Reset to Q2</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <div id="step1" class="step-box">
+                    <strong>Step 1: Calculate Grating Spacing ($d$)</strong><br>
+                    $N = 280$ lines per mm $= 280,000$ lines per m.<br>
+                    $d = \frac{1}{N}$<br>
+                    $d = \frac{1 \times 10^{-3}}{280}$ m<br>
+                    <span class="math-eq">$d \approx 3.57 \times 10^{-6}$ m</span>
+                </div>
+
+                <div id="step2" class="step-box">
+                    <strong>Step 2: Max Order ($n_{max}$)</strong><br>
+                    Formula: $n\lambda = d \sin\theta$<br>
+                    Max diffraction angle $\theta = 90^\circ$ ($\sin90^\circ = 1$)<br>
+                    $n_{max} = \frac{d}{\lambda}$<br>
+                    $n_{max} = \frac{3.57 \times 10^{-6}}{6.94 \times 10^{-7}}$<br>
+                    $n_{max} \approx 5.14$<br>
+                    Since $n$ must be an integer: <span class="highlight">$n = 5$</span>
+                </div>
+
+                <div id="step3" class="step-box">
+                    <strong>Step 3: Total Bright Spots</strong><br>
+                    Spots appear at: $n = 0$ (central), $\pm1, \pm2, \pm3, \pm4, \pm5$<br>
+                    Total = $2 \times n_{max} + 1$<br>
+                    Total = $2(5) + 1$<br>
+                    <span class="math-eq highlight">Total = 11 spots</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics Vars
+        const lambda = 694e-9; // 6.94 x 10^-7 m
+        let N = 280; // lines per mm
+        let d = 1e-3 / N; 
+        
+        // Animation State
+        let rays = []; // Stores ray objects {angle, length, active}
+        
+        // UI Controls
+        const nSlider = document.getElementById('nSlider');
+        const nVal = document.getElementById('nVal');
+        
+        nSlider.addEventListener('input', (e) => {
+            N = parseInt(e.target.value);
+            nVal.innerText = N;
+            d = 1e-3 / N; // Update d
+            recalcRays();
+            drawFrame();
+            updateSteps();
+        });
+
+        function resetSim() {
+            N = 280;
+            nSlider.value = 280;
+            nVal.innerText = 280;
+            d = 1e-3 / N;
+            recalcRays();
+            drawFrame();
+            updateSteps();
+        }
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            recalcRays();
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function recalcRays() {
+            rays = [];
+            // Calculate max order n
+            // n * lambda = d * sin(theta) => n <= d/lambda
+            const maxOrder = Math.floor(d / lambda);
+            
+            // Add Central Max
+            rays.push({ n: 0, angle: 0 });
+            
+            // Add orders
+            for(let i=1; i<=maxOrder; i++) {
+                let theta = Math.asin( (i * lambda) / d );
+                rays.push({ n: i, angle: theta });  // Positive
+                rays.push({ n: -i, angle: -theta }); // Negative
+            }
+        }
+        
+        function updateSteps() {
+            // Update the text in Step 2 & 3 based on slider?
+            // Optional: Makes the text interactive too.
+            // For now, let's keep static text for Q2, but highlighting the concept.
+            const maxOrder = Math.floor(d / lambda);
+            const total = 2 * maxOrder + 1;
+            // You could dynamically update DOM here if desired
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const cx = canvas.width / 2;
+            const cy = canvas.height * 0.8; // Source/Grating position (Bottom center ish)
+            const radius = Math.min(canvas.width, canvas.height) * 0.7; // Screen radius
+            
+            // 1. Draw Semicircular Screen
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, Math.PI, 0); // Semicircle
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // 2. Draw Laser Source & Incident Beam
+            ctx.strokeStyle = '#e74c3c'; // Red Laser
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy + 50); // From below
+            ctx.lineTo(cx, cy);      // To grating
+            ctx.stroke();
+            
+            // 3. Draw Grating
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(cx - 20, cy - 2, 40, 4);
+            // Grating lines lines
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+            for(let i=-15; i<=15; i+=3) {
+                ctx.beginPath(); ctx.moveTo(cx+i, cy-2); ctx.lineTo(cx+i, cy+2); ctx.stroke();
+            }
+
+            // 4. Draw Diffracted Rays
+            rays.forEach(ray => {
+                // Angle is from normal (vertical up)
+                // In canvas, 0 is right. Vertical Up is -PI/2.
+                // So ray angle in canvas coords = -PI/2 + ray.angle
+                
+                const canvasAngle = -Math.PI/2 + ray.angle;
+                
+                const ex = cx + radius * Math.cos(canvasAngle);
+                const ey = cy + radius * Math.sin(canvasAngle);
+                
+                // Draw Beam
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(ex, ey);
+                ctx.strokeStyle = `rgba(231, 76, 60, ${0.4 + (1 - Math.abs(ray.n)/10)})`; // Fades slightly with order
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw Spot on Screen
+                ctx.beginPath();
+                ctx.arc(ex, ey, 6, 0, Math.PI*2);
+                ctx.fillStyle = '#ff0000'; // Bright red spot
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "red";
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                // Draw Label (n=0, n=1...)
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                // Offset text slightly
+                const tx = cx + (radius + 20) * Math.cos(canvasAngle);
+                const ty = cy + (radius + 20) * Math.sin(canvasAngle);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`n=${ray.n}`, tx, ty);
+            });
+            
+            // Draw Total Count Label
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Total Spots: ${rays.length}`, canvas.width - 20, 30);
+        }
+
+        // Initialize
+        setTimeout(() => {
+            resize();
+            recalcRays();
+            drawFrame();
+        }, 200);
+    </script>
+</body>
+</html>

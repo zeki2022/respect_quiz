@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Q1: Photoelectric Effect</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 (强制开启 $ 符号识别) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- math_physV3.0 布局标准 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        /* 原生返回箭头 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布容器 (PC端40%高度，手机端60%) */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 45%; 
+            position: relative; background: #2c3e50; /* 深色背景显示光子 */
+            border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 60%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* 控制条 */
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        /* 步骤解析 */
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：物理模拟区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Physics / Unit 2 / Q1</h3>
+                
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <strong>Given:</strong> Light frequency $f = 9.1 \times 10^{14}$ Hz incident on metal. <br>
+                    Electrons are emitted. <strong>Stopping potential</strong> $V_s = 1.65$ V.<br>
+                    <strong>01.1</strong> Define threshold frequency.<br>
+                    <strong>01.2</strong> Calculate the threshold frequency ($f_0$) for this metal.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; right:10px; color:white; font-size:12px; text-align:right;">
+                        $V_{stop} = 1.65V$<br>
+                        Field opposes e$^-$
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Fire Photon</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right;">0.5x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 (MS Aligned) -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Q1.1 Definition -->
+                <div class="step-box">
+                    <strong>01.1 Definition (1 mark)</strong><br>
+                    Threshold frequency is:<br>
+                    The <span class="highlight">minimum frequency</span> of electromagnetic radiation that results in electrons being emitted from the metal surface.
+                </div>
+
+                <!-- Q1.2 Calculation -->
+                <div id="step1" class="step-box">
+                    <strong>01.2 Step 1: Energy Concepts</strong><br>
+                    Einstein's Photoelectric Equation:<br>
+                    $hf = \phi + E_{k(max)}$<br>
+                    At stopping potential, Max KE is converted to PE:<br>
+                    <span class="math-eq">$E_{k(max)} = eV_s$</span>
+                </div>
+
+                <div id="step2" class="step-box">
+                    <strong>Step 2: Calculate Work Function ($\phi$)</strong><br>
+                    $h = 6.63 \times 10^{-34}$, $e = 1.60 \times 10^{-19}$<br>
+                    $hf = (6.63 \times 10^{-34})(9.1 \times 10^{14}) = 6.033 \times 10^{-19}$ J<br>
+                    $eV_s = (1.60 \times 10^{-19})(1.65) = 2.64 \times 10^{-19}$ J<br>
+                    $\phi = hf - eV_s$<br>
+                    $\phi = 6.033 - 2.64 = 3.393 \times 10^{-19}$ J
+                </div>
+
+                <div id="step3" class="step-box">
+                    <strong>Step 3: Calculate Threshold Frequency</strong><br>
+                    At threshold, kinetic energy is zero, so $\phi = hf_0$.<br>
+                    $f_0 = \frac{\phi}{h}$<br>
+                    $f_0 = \frac{3.393 \times 10^{-19}}{6.63 \times 10^{-34}}$<br>
+                    <span class="highlight">$f_0 = 5.1 \times 10^{14}$ Hz</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics constants (scaled for visual)
+        // Scenario: Photon hits -> Electron released -> Slows down -> Stops -> Returns
+        // This visualizes the meaning of "Stopping Potential"
+        
+        let simState = 'RESET';
+        let animId;
+        let timeScale = 0.5;
+        let objects = []; // Stores photons and electrons
+        
+        // Layout vars
+        let plateX, plateW, plateH, collectX;
+        
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1) + "x";
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            initScene();
+            if(simState !== 'RUNNING') drawFrame();
+        }
+        window.addEventListener('resize', resize);
+
+        function initScene() {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Metal Plate (Emitter) on Left
+            plateW = 20;
+            plateH = h * 0.6;
+            plateX = w * 0.2;
+            
+            // Collector Plate (Anode) on Right (Negative potential visually)
+            collectX = w * 0.8;
+        }
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            
+            // Create a photon
+            objects = [];
+            objects.push({
+                type: 'photon',
+                x: 0,
+                y: canvas.height/2,
+                vx: canvas.width * 0.8, // Speed pixels per sec
+                freq: 20, // visual wiggle frequency
+                amp: 10
+            });
+            
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000;
+                lastTime = now;
+                if(dt > 0.1) dt = 0.1;
+                
+                update(dt * timeScale);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            objects = [];
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Fire Photon";
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            drawFrame();
+        }
+
+        function update(dt) {
+            // Update objects
+            for (let i = objects.length - 1; i >= 0; i--) {
+                let obj = objects[i];
+                
+                if (obj.type === 'photon') {
+                    // Photon moves constant speed
+                    obj.x += obj.vx * dt;
+                    
+                    // Hit metal plate?
+                    if (obj.x >= plateX) {
+                        // Remove photon, create electron
+                        objects.splice(i, 1);
+                        spawnElectron(obj.y);
+                        // Highlight Step 1
+                        highlightStep(1);
+                    }
+                } 
+                else if (obj.type === 'electron') {
+                    // Electron physics: Decelerates due to Stopping Potential
+                    // v = u + at. Here a is negative (retarding force)
+                    // We want it to STOP exactly before the collector plate to visualize V_stop
+                    
+                    // Calculate distance to collector
+                    let distToStop = collectX - plateX - 20; // 20 is buffer
+                    // Deceleration required to stop at distToStop: v^2 = 2as => a = -v^2/2s
+                    // We set initial velocity, then calculate 'a' once
+                    
+                    if (!obj.a) {
+                        obj.a = -(obj.vx * obj.vx) / (2 * distToStop);
+                    }
+                    
+                    obj.vx += obj.a * dt;
+                    obj.x += obj.vx * dt;
+                    
+                    // Check logic state
+                    if (obj.vx <= 0 && !obj.stopped) {
+                        obj.stopped = true;
+                        obj.vx = 0; // Momentary stop
+                        obj.a = 0; // Clear physics for a moment
+                        highlightStep(2); // Show Work Function step when stopped? Or Step 3
+                        
+                        // After a brief pause, it should accelerate back (repelled)
+                        setTimeout(() => {
+                            if(obj) {
+                                obj.a = -500; // Push back left
+                                highlightStep(3); // Result
+                                document.getElementById('btnStart').innerText = "Finished";
+                            }
+                        }, 500);
+                    }
+                    
+                    // Remove if goes off screen left
+                    if (obj.x < 0) objects.splice(i, 1);
+                }
+            }
+        }
+        
+        function spawnElectron(y) {
+            objects.push({
+                type: 'electron',
+                x: plateX + 5,
+                y: y,
+                vx: 300, // Initial velocity (representing KE_max)
+                r: 6
+            });
+        }
+
+        function highlightStep(id) {
+            document.querySelectorAll('.step-box').forEach(el => {
+                if(el.id) el.classList.remove('active');
+            });
+            let step = document.getElementById('step'+id);
+            if(step) step.classList.add('active');
+        }
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Plates
+            // Emitter (Metal)
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(plateX, (canvas.height - plateH)/2, plateW, plateH);
+            ctx.fillStyle = '#fff'; ctx.font = '12px Arial';
+            ctx.fillText("Metal", plateX-10, (canvas.height - plateH)/2 - 5);
+            
+            // Collector (Anode - Negative Potential)
+            ctx.fillStyle = '#e74c3c'; // Red for stopping potential
+            ctx.fillRect(collectX, (canvas.height - plateH)/2, 5, plateH);
+            ctx.fillText("- 1.65V", collectX, (canvas.height - plateH)/2 - 5);
+            
+            // Draw E-field lines (Retarding)
+            ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)';
+            ctx.lineWidth = 2;
+            for(let y = (canvas.height - plateH)/2 + 20; y < (canvas.height + plateH)/2; y+=30) {
+                drawArrow(collectX, y, plateX + plateW, y);
+            }
+            
+            // Draw Objects
+            objects.forEach(obj => {
+                if (obj.type === 'photon') {
+                    // Draw wavy line
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#f1c40f'; // Yellow light
+                    ctx.lineWidth = 3;
+                    let waveLen = 20;
+                    for(let i=0; i<40; i++) {
+                        let x = obj.x - i*2;
+                        let y = obj.y + Math.sin(x/5) * 5;
+                        if(i==0) ctx.moveTo(x,y);
+                        else ctx.lineTo(x,y);
+                    }
+                    ctx.stroke();
+                    // Arrow head
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, 3, 0, Math.PI*2);
+                    ctx.fillStyle = '#f1c40f'; ctx.fill();
+                } 
+                else if (obj.type === 'electron') {
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI*2);
+                    ctx.fillStyle = '#3498db'; // Blue electron
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.fillText("e-", obj.x-4, obj.y+3);
+                    
+                    // Draw KE label
+                    if (obj.vx > 0) {
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText("KE", obj.x, obj.y - 15);
+                    } else if (obj.stopped) {
+                        ctx.fillStyle = '#e74c3c';
+                        ctx.fillText("KE = 0", obj.x, obj.y - 15);
+                    }
+                }
+            });
+        }
+        
+        function drawArrow(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+            ctx.stroke();
+            // arrow head
+            let ang = Math.atan2(y2-y1, x2-x1);
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - 5*Math.cos(ang-Math.PI/6), y2 - 5*Math.sin(ang-Math.PI/6));
+            ctx.lineTo(x2 - 5*Math.cos(ang+Math.PI/6), y2 - 5*Math.sin(ang+Math.PI/6));
+            ctx.fill();
+        }
+
+        setTimeout(() => { resize(); }, 200);
+    </script>
+</body>
+</html>
