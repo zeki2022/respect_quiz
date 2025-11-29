@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math Q5: Power & Resistance</title>
+    <title>Math Q4: Forces at a Point</title>
     
     <!-- 1. 引用公共样式 -->
     <link rel="stylesheet" href="../../../../../common/css/style.css">
@@ -18,22 +18,25 @@
     <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* 3. 核心布局与样式 */
+        /* 3. 布局修复：取消所有高度限制，防止截断 */
         body { 
             padding-top: 60px; padding-bottom: 40px; 
             background-color: #f4f7f6; 
             max-width: none !important; 
+            overflow-y: auto !important; /* 强制允许页面滚动 */
         }
         
         .container {
-            width: 98%; max-width: 1600px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 480px; 
+            width: 96%; max-width: 1400px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 450px; 
             gap: 20px; align-items: start;
         }
+        /* 手机端适配 */
         @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
 
         .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         
+        /* 返回箭头 */
         .back-arrow {
             position: fixed; top: 15px; left: 15px; z-index: 9999;
             width: 40px; height: 40px; background: rgba(255,255,255,0.9);
@@ -43,6 +46,7 @@
             font-family: sans-serif; line-height: 1; cursor: pointer;
         }
         
+        /* 原题图片 */
         .orig-img { 
             max-width: 100%; height: auto; 
             border: 1px solid #eee; border-radius: 6px; 
@@ -50,24 +54,22 @@
             display: block;
         }
 
-        /* 【核心修复】画布高度优化 */
+        /* 画布容器：强制最小高度，防止消失 */
         .canvas-container { 
             width: 100%; 
-            /* 高度改为固定或较小比例，防止太高 */
-            height: 300px; 
+            height: 450px; /* 固定高度，确保一定能看到 */
             position: relative; background: #fff; border: 1px solid #ddd; 
             border-radius: 8px; margin-bottom: 10px; overflow:hidden; 
         }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        /* 仪表盘 */
-        .dashboard {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-            margin-bottom: 15px; background: #2c3e50; padding: 10px; border-radius: 8px; color: white;
+        /* 图例 */
+        .legend-row {
+            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 15px; padding: 8px; background: #f9f9f9; border-radius: 6px;
+            font-size: 13px; color: #555;
         }
-        .dash-item { text-align: center; }
-        .dash-label { font-size: 12px; opacity: 0.8; display: block; }
-        .dash-val { font-family: monospace; font-size: 16px; font-weight: bold; color: #3498db; }
+        .badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
 
         /* 控制条 */
         .controls { 
@@ -79,65 +81,53 @@
         button.action-btn { 
             flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
             padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;
-            transition: all 0.2s;
         }
         button.action-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
         
-        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        /* 修复：移除 solution-panel 的高度限制 */
+        .solution-panel { 
+            height: auto; /* 让它自然撑开 */
+            overflow: visible; 
+        }
         
         /* 步骤框 */
-        .step-box { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; transition: all 0.3s; }
+        .step-box { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; }
         .active-step { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
         .step-title { font-weight: bold; color: #2c3e50; margin-bottom: 8px; display: block; font-size: 15px; border-bottom: 1px dashed #ddd; padding-bottom:5px;}
         .math-eq { font-family: 'Times New Roman', serif; font-size: 1.1em; color: #2c3e50; background: #f9f9f9; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block; }
         .highlight { color: #d35400; font-weight: bold; background: #fff5e0; padding: 0 4px; border-radius: 2px; }
         .explanation { font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5; border-left: 2px solid #eee; padding-left: 8px; }
-        
         .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
     </style>
 </head>
 <body>
 
-    <!-- 原生导航 -->
     <a href="javascript:history.back()" class="back-arrow">‹</a>
 
     <div class="container">
         <!-- 左侧：动画演示 -->
         <div class="left-col">
             <div class="card">
-                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q5</h3>
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q4</h3>
                 
                 <div class="problem-text">
-                    <img src="q5_orig.png" class="orig-img" onerror="this.style.display='none'" alt="Diagram Placeholder">
+                    <img src="q4_orig.png" class="orig-img" onerror="this.style.display='none'" alt="Diagram">
                     
-                    <p>A car of mass $1500$ kg is travelling along a straight horizontal road.</p>
-                    <p><strong>(a)</strong> It is given that there is a constant resistance to motion. The engine of the car is working at $24$ kW while the car is travelling at a constant speed of $32$ m s$^{-1}$. The power is now increased to $28$ kW. Find the acceleration of the car at the instant it is travelling at a speed of $36$ m s$^{-1}$. [4]</p>
-                    <p><strong>(b)</strong> It is given instead that the resistance to the motion of the car is $(340 + 4v)$ N when the speed of the car is $v$ m s$^{-1}$. When the engine is working at $20$ kW, the car is travelling at constant speed. Find this constant speed. [3]</p>
-                </div>
-
-                <!-- 实时仪表盘 -->
-                <div class="dashboard">
-                    <div class="dash-item">
-                        <span class="dash-label">Power (P)</span>
-                        <span class="dash-val" id="dispP">0</span> kW
-                    </div>
-                    <div class="dash-item">
-                        <span class="dash-label">Speed (v)</span>
-                        <span class="dash-val" id="dispV">0</span> m/s
-                    </div>
-                    <div class="dash-item">
-                        <span class="dash-label">Drive (F)</span>
-                        <span class="dash-val" id="dispF">0</span> N
-                    </div>
-                    <div class="dash-item">
-                        <span class="dash-label">Resist (R)</span>
-                        <span class="dash-val" id="dispR">0</span> N
-                    </div>
+                    <p>Coplanar forces of magnitudes $17$ N, $51$ N and $34$ N act at a point $O$ in the directions shown in the diagram, where $\tan \alpha = \frac{15}{8}$.</p>
+                    <p><strong>(a)</strong> Find the magnitude and direction of the resultant of the three forces. [6]</p>
+                    <p><strong>(b)</strong> The force of magnitude $51$ N is replaced by a force of magnitude $P$ N acting in the same direction. The resultant of the three forces now acts in the positive $x$-direction. Find the value of $P$. [2]</p>
                 </div>
 
                 <div class="canvas-container">
                     <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="legend-row">
+                    <span><span class="badge" style="background:#2980b9"></span>51N / P</span>
+                    <span><span class="badge" style="background:#8e44ad"></span>34N</span>
+                    <span><span class="badge" style="background:#27ae60"></span>17N</span>
+                    <span><span class="badge" style="background:#e74c3c"></span>Resultant</span>
                 </div>
 
                 <div class="controls">
@@ -145,84 +135,84 @@
                         <button class="action-btn active" onclick="setMode('a')" id="btnModeA">Part (a)</button>
                         <button class="action-btn" onclick="setMode('b')" id="btnModeB">Part (b)</button>
                     </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                         <span style="font-size:12px; font-weight:bold; color:#555;">Speed:</span>
-                         <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="flex:1; cursor:pointer;">
-                         <button class="action-btn" style="flex:0 0 80px; background:#95a5a6; color:white;" onclick="resetSim()">Reset</button>
+                    
+                    <div id="sliderContainer" style="display:none; align-items:center; gap:10px; background:#e8f6f3; padding:10px; border-radius:6px; margin-top:10px;">
+                        <span style="font-weight:bold; color:#16a085;">Adjust P:</span>
+                        <input type="range" id="sliderP" min="0" max="100" step="0.1" value="51" style="flex:1; cursor:pointer;">
+                        <span id="valP" style="width:60px; font-family:monospace; font-weight:bold;">51.0 N</span>
+                    </div>
+                    
+                    <div style="font-family:monospace; color:#555; font-size:13px; padding:5px; text-align:center; margin-top:5px;">
+                        Resultant: X = <span id="resX">0</span>, Y = <span id="resY">0</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 右侧：详细解析 -->
+        <!-- 右侧：解题步骤 (高度自适应) -->
         <div class="right-col">
             <div class="card solution-panel">
                 
                 <div class="step-box" style="background:#fff8e1; border-left-color:#f1c40f;">
-                    <span class="step-title">Key Concepts</span>
-                    Power: $P = F \times v$ or Driving Force $F = \frac{P}{v}$<br>
-                    Newton's 2nd Law: $F_{net} = ma$<br>
-                    $F_{driving} - F_{resist} = ma$
+                    <span class="step-title">Step 0: Geometry Setup</span>
+                    <div class="explanation">
+                        From $\tan\alpha = \frac{15}{8}$, use Pythagoras ($8, 15, 17$ triangle).
+                    </div>
+                    $\sin\alpha = \frac{15}{17}, \quad \cos\alpha = \frac{8}{17}$
                 </div>
 
-                <!-- Part (a) Content -->
+                <!-- Part (a) -->
                 <div id="content-a">
                     <div class="step-box active-step">
-                        <span class="step-title">Step 1: Find Constant Resistance</span>
-                        <div class="explanation">
-                            Initially constant speed ($a=0$) at $32$ m/s with $24$ kW ($24000$ W).
-                            At constant speed, Driving Force = Resistance.
-                        </div>
-                        $R = F = \frac{P}{v} = \frac{24000}{32}$<br>
-                        <span class="math-eq">$R = 750$ N</span> <strong>(B1)</strong>
+                        <span class="step-title">Step 1: Resolve Forces (Horizontal X)</span>
+                        <div class="explanation">Sum of horizontal components. Right (+), Left (-).</div>
+                        
+                        <ul>
+                            <li>$51$N: $51 \cos\alpha = 51(\frac{8}{17}) = \mathbf{24}$</li>
+                            <li>$34$N: $34 \cos\alpha = 34(\frac{8}{17}) = \mathbf{16}$</li>
+                            <li>$17$N: $-17 \sin\alpha = -17(\frac{15}{17}) = \mathbf{-15}$</li>
+                        </ul>
+                        $X = 24 + 16 - 15$<br>
+                        <span class="math-eq">$X = \mathbf{25}$ N</span> <strong>(M1)</strong>
                     </div>
 
                     <div class="step-box active-step">
-                        <span class="step-title">Step 2: Apply N2L at New State</span>
-                        <div class="explanation">
-                            Power increases to $28$ kW ($28000$ W).
-                            At the instant $v = 36$ m/s:
-                        </div>
-                        New Driving Force: $F_{new} = \frac{28000}{36}$ N<br>
-                        Equation of Motion ($F - R = ma$):<br>
-                        $\frac{28000}{36} - 750 = 1500a$ <strong>(M1)</strong><br><br>
-                        
-                        Simplify:<br>
-                        $777.77... - 750 = 1500a$<br>
-                        $27.77... = 1500a$
+                        <span class="step-title">Step 2: Resolve Forces (Vertical Y)</span>
+                        <div class="explanation">Sum of vertical components. Up (+), Down (-).</div>
+                        <ul>
+                            <li>$51$N: $51 \sin\alpha = 51(\frac{15}{17}) = \mathbf{45}$</li>
+                            <li>$34$N: $-34 \sin\alpha = -34(\frac{15}{17}) = \mathbf{-30}$</li>
+                            <li>$17$N: $-17 \cos\alpha = -17(\frac{8}{17}) = \mathbf{-8}$</li>
+                        </ul>
+                        $Y = 45 - 30 - 8$<br>
+                        <span class="math-eq">$Y = \mathbf{7}$ N</span> <strong>(A1)</strong>
                     </div>
 
                     <div class="step-box">
-                        <span class="step-title">Step 3: Solve for Acceleration</span>
-                        $a = \frac{27.77...}{1500}$<br>
-                        <span class="math-eq highlight">$a \approx 0.0185$ m s$^{-2}$</span> (or $\frac{1}{54}$) <strong>(A1)</strong>
+                        <span class="step-title">Step 3: Magnitude & Direction</span>
+                        $R = \sqrt{X^2 + Y^2} = \sqrt{25^2 + 7^2}$<br>
+                        $R = \sqrt{674}$<br>
+                        <span class="math-eq highlight">$R \approx \mathbf{26.0}$ N</span> (3 s.f.) <strong>(M1 A1)</strong>
+                        <hr style="border-top:1px dashed #ddd; margin:10px 0;">
+                        $\tan\beta = \frac{Y}{X} = \frac{7}{25}$<br>
+                        $\beta = \tan^{-1}(0.28)$<br>
+                        <span class="math-eq highlight">$\beta \approx \mathbf{15.6^\circ}$</span> <strong>(A1)</strong>
                     </div>
                 </div>
 
-                <!-- Part (b) Content -->
+                <!-- Part (b) -->
                 <div id="content-b" style="display:none;">
-                    <div class="step-box active-step" style="border-left-color:#8e44ad;">
-                        <span class="step-title" style="color:#8e44ad;">Part (b): Variable Resistance</span>
+                    <div class="step-box active-step" style="border-left-color:#16a085;">
+                        <span class="step-title" style="color:#16a085;">Part (b): Find P</span>
                         <div class="explanation">
-                            Resistance $R = 340 + 4v$. Power $P = 20$ kW ($20000$ W).
-                            Constant speed means $a=0$, so Driving Force = Resistance.
+                            Resultant is along positive x-axis $\Rightarrow$ <strong>Vertical Component Y must be 0.</strong>
                         </div>
-                        $F = R$<br>
-                        $\frac{P}{v} = 340 + 4v$ <strong>(M1)</strong><br>
-                        $\frac{20000}{v} = 340 + 4v$
-                    </div>
-                    
-                    <div class="step-box">
-                        <span class="step-title">Solve Quadratic Equation</span>
-                        Multiply by $v$:<br>
-                        $20000 = 340v + 4v^2$<br>
-                        $4v^2 + 340v - 20000 = 0$ <strong>(DM1)</strong><br>
-                        Divide by 4:<br>
-                        $v^2 + 85v - 5000 = 0$<br><br>
-                        Factorise or Formula:<br>
-                        $(v - 40)(v + 125) = 0$<br>
-                        Since $v > 0$:<br>
-                        <span class="math-eq highlight">$v = 40$ m s$^{-1}$</span> <strong>(A1)</strong>
+                        Replace $51$ with $P$:<br>
+                        $P \sin\alpha - 34 \sin\alpha - 17 \cos\alpha = 0$ <strong>(M1)</strong><br>
+                        $P(\frac{15}{17}) - 30 - 8 = 0$<br>
+                        $\frac{15}{17}P = 38$<br>
+                        $P = 38 \times \frac{17}{15}$<br>
+                        <span class="math-eq highlight">$P \approx \mathbf{43.1}$ N</span> <strong>(A1)</strong>
                     </div>
                 </div>
 
@@ -234,196 +224,126 @@
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         
-        const mass = 1500;
+        // Geometry Factors (from 8-15-17 triangle)
+        const sinA = 15/17;
+        const cosA = 8/17;
+        
         let currentMode = 'a'; 
-        
-        // Animation Vars
-        let simTime = 0;
-        let carX = 0;
-        let v = 0;
-        let animId;
-        let timeScale = 0.5;
-        
-        let valP = 0, valR = 0, valF = 0;
+        let valP = 51; 
+        let origin = {x: 0, y: 0};
+        let scale = 1;
 
-        document.getElementById('speedRange').addEventListener('input', function(e) {
-            timeScale = parseFloat(e.target.value);
-        });
-
-        function resize() {
-            if(!canvas.parentElement) return;
-            canvas.width = canvas.parentElement.clientWidth;
-            // 【修复】高度设为固定 300px，防止太高
-            canvas.height = 300;
+        document.getElementById('sliderP').addEventListener('input', function(e) {
+            valP = parseFloat(e.target.value);
+            document.getElementById('valP').innerText = valP.toFixed(1) + " N";
             drawFrame();
-        }
-        window.addEventListener('resize', resize);
-        window.addEventListener('load', resize);
+        });
 
         function setMode(mode) {
             currentMode = mode;
             document.getElementById('btnModeA').className = mode === 'a' ? 'action-btn active' : 'action-btn';
             document.getElementById('btnModeB').className = mode === 'b' ? 'action-btn active' : 'action-btn';
-            
+            document.getElementById('sliderContainer').style.display = mode === 'b' ? 'flex' : 'none';
             document.getElementById('content-a').style.display = mode === 'a' ? 'block' : 'none';
             document.getElementById('content-b').style.display = mode === 'b' ? 'block' : 'none';
-            
-            resetSim();
+            if (mode === 'a') valP = 51;
+            drawFrame();
         }
 
-        function startSim() {
-            if(animId) return;
-            simTime = 0;
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 强制高度，确保可见
+            canvas.height = 450; 
             
-            if (currentMode === 'a') {
-                v = 32; 
-            } else {
-                v = 10; 
-            }
-            
-            let lastTime = performance.now();
-            
-            function loop(now) {
-                let dt = (now - lastTime) / 1000;
-                lastTime = now;
-                if(dt > 0.1) dt = 0.1;
-                update(dt * timeScale);
-                drawFrame();
-                animId = requestAnimationFrame(loop);
-            }
-            animId = requestAnimationFrame(loop);
-        }
-
-        function resetSim() {
-            cancelAnimationFrame(animId);
-            animId = null;
-            carX = 0;
-            v = (currentMode === 'a') ? 32 : 0;
-            
-            if(currentMode === 'a') updatePhysicsA(0); 
-            else updatePhysicsB(0);
+            // Center Origin
+            origin = { x: canvas.width * 0.4, y: canvas.height * 0.6 };
+            // Scale factor
+            scale = (canvas.width * 0.4) / 60; 
             
             drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function drawArrow(fromX, fromY, vecX, vecY, color, width=3) {
+            const toX = fromX + vecX * scale;
+            const toY = fromY - vecY * scale; // Y flip for canvas
             
-            // Auto start after reset for better UX
-            startSim();
-        }
-
-        function update(dt) {
-            carX += v * dt * 10; 
-            if (carX > canvas.width + 100) carX = -100; // Loop cleanly
-
-            if (currentMode === 'a') {
-                updatePhysicsA(dt);
-            } else {
-                updatePhysicsB(dt);
-            }
-        }
-
-        function updatePhysicsA(dt) {
-            let P, R, F;
-            if (simTime < 2) {
-                P = 24000; v = 32; R = 750; F = P/v;
-            } else {
-                P = 28000; R = 750; F = P/v;
-                let a = (F - R) / mass;
-                v += a * dt * 10; 
-                if (v >= 36) v = 36; 
-            }
-            simTime += dt;
-            updateDash(P, v, F, R);
-        }
-
-        function updatePhysicsB(dt) {
-            let P = 20000;
-            let R = 340 + 4*v;
-            let F = P/v;
-            if (v < 1) { F = 2000; R = 340; } 
+            const head = 10;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
             
-            let a = (F - R) / mass;
-            v += a * dt * 20; 
-            updateDash(P, v, F, R);
-        }
-
-        function updateDash(P, v, F, R) {
-            document.getElementById('dispP').innerText = (P/1000).toFixed(1);
-            document.getElementById('dispV').innerText = v.toFixed(1);
-            document.getElementById('dispF').innerText = F.toFixed(0);
-            document.getElementById('dispR').innerText = R.toFixed(0);
-            valF = F; valR = R;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.stroke();
+            
+            // Arrowhead
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - head * Math.cos(angle - Math.PI/6), toY - head * Math.sin(angle - Math.PI/6));
+            ctx.lineTo(toX - head * Math.cos(angle + Math.PI/6), toY - head * Math.sin(angle + Math.PI/6));
+            ctx.fillStyle = color;
+            ctx.fill();
         }
 
         function drawFrame() {
-            const w = canvas.width; const h = canvas.height;
+            const w = canvas.width;
+            const h = canvas.height;
             ctx.clearRect(0, 0, w, h);
             
-            // 1. Road
-            const roadY = h * 0.6;
-            ctx.fillStyle = '#ecf0f1'; ctx.fillRect(0, 0, w, h); // Sky
-            ctx.fillStyle = '#bdc3c7'; ctx.fillRect(0, roadY, w, h-roadY); // Ground
-            ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(0, roadY); ctx.lineTo(w, roadY); ctx.stroke(); // Horizon line
-            
-            // 2. Car (Draw it relative to carX)
-            const cw = 100; const ch = 50;
-            let cx = carX;
-            const cy = roadY - ch - 2;
+            // Axes
+            ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, origin.y); ctx.lineTo(w, origin.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(origin.x, 0); ctx.lineTo(origin.x, h); ctx.stroke();
+            ctx.fillStyle = '#999'; ctx.font = "12px Arial";
+            ctx.fillText("x", w-20, origin.y-5); ctx.fillText("y", origin.x+5, 20);
 
-            // Body
-            ctx.fillStyle = '#3498db';
-            ctx.beginPath();
-            ctx.roundRect(cx, cy, cw, ch, 8);
-            ctx.fill();
+            // Calculate Vectors based on MS logic
+            // 1. P/51N (Blue) - Quadrant 1
+            const f1_mag = valP;
+            const f1_x = f1_mag * cosA; 
+            const f1_y = f1_mag * sinA;
             
-            // Top
-            ctx.fillStyle = '#2980b9';
-            ctx.beginPath();
-            ctx.roundRect(cx + 15, cy - 20, cw - 30, 20, [10, 10, 0, 0]);
-            ctx.fill();
+            // 2. 34N (Purple) - Quadrant 4
+            const f2_mag = 34;
+            const f2_x = f2_mag * cosA; 
+            const f2_y = -f2_mag * sinA;
+            
+            // 3. 17N (Green) - Quadrant 3 (per MS: -X, -Y)
+            const f3_mag = 17;
+            const f3_x = -f3_mag * sinA; // Note: MS uses 17sinA for X component
+            const f3_y = -f3_mag * cosA; // Note: MS uses 17cosA for Y component
+            
+            // Draw Vectors from Origin
+            drawArrow(origin.x, origin.y, f1_x, f1_y, '#2980b9', 4); // Blue
+            drawArrow(origin.x, origin.y, f2_x, f2_y, '#8e44ad', 4); // Purple
+            drawArrow(origin.x, origin.y, f3_x, f3_y, '#27ae60', 4); // Green
+            
+            // Calculate Resultant
+            const rx = f1_x + f2_x + f3_x;
+            const ry = f1_y + f2_y + f3_y;
+            
+            // Draw Resultant (Red)
+            drawArrow(origin.x, origin.y, rx, ry, '#e74c3c', 5);
 
-            // Wheels
-            ctx.fillStyle = '#333';
-            ctx.beginPath(); ctx.arc(cx+20, cy+ch, 10, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(cx+cw-20, cy+ch, 10, 0, Math.PI*2); ctx.fill();
+            // Update Text
+            document.getElementById('resX').innerText = rx.toFixed(1);
+            document.getElementById('resY').innerText = ry.toFixed(1);
             
-            // 3. Forces (F & R)
-            const forceScale = 0.1; 
-            // Drive (Green, Forward)
-            drawArrow(cx + cw, cy + ch/2, valF * forceScale, 0, '#27ae60', `F=${valF.toFixed(0)}N`);
-            // Resistance (Red, Backward)
-            drawArrow(cx, cy + ch/2, -valR * forceScale, 0, '#e74c3c', `R=${valR.toFixed(0)}N`);
-        }
-
-        function drawArrow(x, y, len, dy, color, text) {
-            if (Math.abs(len) < 10) return; // Too small to draw
-            
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + len, y + dy);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            
-            const angle = Math.atan2(dy, len);
-            const endX = x + len; const endY = y + dy;
-            const head = 8;
-            
-            ctx.beginPath();
-            ctx.moveTo(endX, endY);
-            ctx.lineTo(endX - head * Math.cos(angle - Math.PI/6), endY - head * Math.sin(angle - Math.PI/6));
-            ctx.lineTo(endX - head * Math.cos(angle + Math.PI/6), endY - head * Math.sin(angle + Math.PI/6));
-            ctx.fillStyle = color;
-            ctx.fill();
-            
-            ctx.font = "bold 12px Arial";
-            ctx.fillStyle = color;
-            ctx.textAlign = len > 0 ? "left" : "right";
-            ctx.fillText(text, x + len + (len>0?10:-10), y + 5);
+            // Success Visual for Part B
+            if (currentMode === 'b' && Math.abs(ry) < 0.5) {
+                ctx.fillStyle = 'rgba(39, 174, 96, 0.1)';
+                ctx.fillRect(0,0,w,h);
+                ctx.fillStyle = '#27ae60'; ctx.font = "bold 20px Arial";
+                ctx.fillText("✓ Resultant is Horizontal", 20, 40);
+            }
         }
 
         // Init
-        resetSim();
-        setTimeout(resize, 500);
+        setTimeout(resize, 200);
     </script>
 </body>
 </html>
