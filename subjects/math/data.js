@@ -10,13 +10,28 @@ const MATH_DATA = [
         "questions": [
             {
                 "qNum": "1",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 1",
+                "url": "2025/M/qp-202505-mathematics-p43/1.html"
             },
             {
                 "qNum": "2",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 2",
+                "url": "2025/M/qp-202505-mathematics-p43/2.html"
+            },
+            {
+                "qNum": "3",
+                "title": "Question 3",
+                "url": "2025/M/qp-202505-mathematics-p43/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/M/qp-202505-mathematics-p43/4.html"
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/M/qp-202505-mathematics-p43/5.html"
             },
             {
                 "qNum": "6",
@@ -33,24 +48,38 @@ const MATH_DATA = [
         "questions": [
             {
                 "qNum": "1",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 1",
+                "url": "2025/M/qp-202505-mathematics-p45/1.html"
             },
             {
                 "qNum": "2",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 2",
+                "url": "2025/M/qp-202505-mathematics-p45/2.html"
             },
             {
                 "qNum": "3",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 3",
+                "url": "2025/M/qp-202505-mathematics-p45/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/M/qp-202505-mathematics-p45/4.html"
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/M/qp-202505-mathematics-p45/5.html"
+            },
+            {
+                "qNum": "6",
+                "title": "Question 6",
+                "url": "2025/M/qp-202505-mathematics-p45/6.html"
             },
             {
                 "qNum": "7",
                 "title": "Question 7",
-                "url": "2025/M/qp-202505-mathematics-p45/7.html",
-                "isNew": true
+                "url": "2025/M/qp-202505-mathematics-p45/7.html"
             }
         ]
     },

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q6: Kinematics Calculus</title>
+    
+    <!-- 1. 引用公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- 2. MathJax 配置 (强制开启 $ 符号识别) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 3. 核心布局 (Template 规范) */
+        body { 
+            padding-top: 60px; padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; 
+        }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 450px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        /* 原生返回箭头 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 原图样式 */
+        .orig-img { 
+            max-width: 100%; height: auto; 
+            border: 1px solid #eee; border-radius: 6px; 
+            margin-bottom: 15px; mix-blend-mode: multiply; 
+            display: block;
+        }
+
+        /* 画布容器 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; /* PC端扁平 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 10px; overflow:hidden; 
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 65%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* 仪表盘 */
+        .dashboard {
+            display: flex; gap: 20px; margin-bottom: 15px; 
+            background: #2c3e50; padding: 10px 20px; border-radius: 8px; color: white;
+            justify-content: space-around;
+        }
+        .dash-item { text-align: center; }
+        .dash-label { font-size: 12px; opacity: 0.8; display: block; }
+        .dash-val { font-family: monospace; font-size: 18px; font-weight: bold; color: #3498db; }
+
+        /* 控制条 */
+        .controls { 
+            display: flex; gap: 15px; background: #f8f9fa; padding: 15px; 
+            border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;
+        }
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        
+        /* 步骤框 */
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .step-title { font-weight: bold; color: #2c3e50; margin-bottom: 8px; display: block; font-size: 15px; border-bottom: 1px dashed #ddd; padding-bottom:5px;}
+        .math-eq { font-family: 'Times New Roman', serif; font-size: 1.1em; color: #2c3e50; background: #f9f9f9; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block; }
+        .highlight { color: #d35400; font-weight: bold; background: #fff5e0; padding: 0 4px; border-radius: 2px; }
+        .explanation { font-size: 13px; color: #555; margin-bottom: 5px; font-style: italic; line-height: 1.4; }
+        
+        .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：动画区 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q6</h3>
+                
+                <div class="problem-text">
+                    <!-- 图片占位 -->
+                    <img src="q6_orig.png" class="orig-img" onerror="this.style.display='none'" alt="Question 6">
+                    
+                    <p>A particle $P$ moves in a straight line starting from a point $O$. At time $t$ s after leaving $O$, the velocity, $v$ m s$^{-1}$, of $P$ is given by $v = (15 - 2t)^2$.</p>
+                    <p><strong>(a)</strong> Find the values of $t$ when the velocity of $P$ is $100$ m s$^{-1}$. [2]</p>
+                    <p><strong>(b)</strong> Show that there is a particular value of $t$ for which the velocity and acceleration of the particle are both zero. [3]</p>
+                    <p><strong>(c)</strong> Find the displacement of $P$ from $O$ at the time that the velocity and acceleration of the particle are both zero. [4]</p>
+                </div>
+
+                <!-- 实时仪表盘 -->
+                <div class="dashboard">
+                    <div class="dash-item">
+                        <span class="dash-label">Time (t)</span>
+                        <span class="dash-val" id="dispT">0.00</span> s
+                    </div>
+                    <div class="dash-item">
+                        <span class="dash-label">Velocity (v)</span>
+                        <span class="dash-val" id="dispV">225</span>
+                    </div>
+                    <div class="dash-item">
+                        <span class="dash-label">Accel (a)</span>
+                        <span class="dash-val" id="dispA">-60</span>
+                    </div>
+                    <div class="dash-item">
+                        <span class="dash-label">Displacement (s)</span>
+                        <span class="dash-val" id="dispS">0</span>
+                    </div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Animation</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right;">0.5x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：详细解析 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Part (a) -->
+                <div class="step-box">
+                    <span class="step-title">Part (a): Find t when v = 100</span>
+                    <div class="explanation">Substitute $v = 100$ into the given equation.</div>
+                    $(15 - 2t)^2 = 100$<br>
+                    Square root both sides:<br>
+                    $15 - 2t = \pm 10$<br>
+                    <strong>Case 1:</strong> $15 - 2t = 10 \Rightarrow 2t = 5 \Rightarrow t = 2.5$<br>
+                    <strong>Case 2:</strong> $15 - 2t = -10 \Rightarrow 2t = 25 \Rightarrow t = 12.5$<br>
+                    <span class="math-eq highlight">$t = 2.5$ or $t = 12.5$</span> <strong>(B1 B1)</strong>
+                </div>
+
+                <!-- Part (b) -->
+                <div class="step-box">
+                    <span class="step-title">Part (b): Velocity & Acceleration zero</span>
+                    <div class="explanation">First, find acceleration by differentiating velocity ($a = \frac{dv}{dt}$). Use Chain Rule.</div>
+                    $v = (15 - 2t)^2$<br>
+                    $a = 2(15 - 2t) \times (-2)$ <strong>(M1 for diff)</strong><br>
+                    $a = -4(15 - 2t) = 8t - 60$<br><br>
+                    
+                    <strong>Condition:</strong> $v=0$ AND $a=0$<br>
+                    Set $v=0$: $(15-2t)^2 = 0 \Rightarrow 15-2t = 0 \Rightarrow t = 7.5$<br>
+                    Check if $a=0$ at $t=7.5$:<br>
+                    $a = 8(7.5) - 60 = 60 - 60 = 0$<br>
+                    <span class="math-eq highlight">$t = 7.5$</span> (shown) <strong>(DM1 A1)</strong>
+                </div>
+
+                <!-- Part (c) -->
+                <div id="step-c" class="step-box">
+                    <span class="step-title">Part (c): Displacement at t = 7.5</span>
+                    <div class="explanation">Displacement is the integral of velocity ($s = \int v \, dt$).</div>
+                    $s = \int (15 - 2t)^2 \, dt$<br>
+                    Using reverse chain rule:<br>
+                    $s = \frac{(15 - 2t)^3}{3 \times (-2)} + c$ <strong>(M1 A1)</strong><br>
+                    $s = -\frac{1}{6}(15 - 2t)^3 + c$<br><br>
+                    
+                    <strong>Initial Condition:</strong> At $t=0$, $s=0$ (starts from O).<br>
+                    $0 = -\frac{1}{6}(15)^3 + c \Rightarrow c = \frac{3375}{6} = 562.5$<br><br>
+                    
+                    At $t = 7.5$:<br>
+                    $s = -\frac{1}{6}(15 - 2(7.5))^3 + 562.5$<br>
+                    $s = -\frac{1}{6}(0)^3 + 562.5$<br>
+                    <span class="math-eq highlight">$s = 562.5$ m</span> (or 563) <strong>(DM1 A1)</strong>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics Model: v = (15-2t)^2
+        // t ranges from 0 to 7.5 (where it stops) or beyond.
+        // Let's visualize up to t=10 to show the curve flattening.
+        
+        const t_stop = 7.5; 
+        
+        // Animation State
+        let simState = 'RESET';
+        let animId;
+        let t = 0;
+        let timeScale = 0.5; // Default speed
+        
+        // Visualization Data (Pre-calculate for graph)
+        const graphPoints = [];
+        
+        // Speed Control
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1) + "x";
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight || 400;
+            
+            if(simState !== 'RUNNING') drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000;
+                lastTime = now;
+                if(dt > 0.1) dt = 0.1;
+                
+                update(dt * timeScale);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            t = 0;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Animation";
+            
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            updateUI(0, 225, -60, 0);
+            drawFrame();
+        }
+
+        function update(dt) {
+            // Physics update
+            // We can speed up time since 7.5s is quite long
+            t += dt * 2; // Visual speed multiplier
+            
+            if (t >= t_stop) {
+                t = t_stop;
+                simState = 'END';
+                document.getElementById('btnStart').innerText = "Finished";
+                highlightStep();
+            }
+            
+            // Calculate current physics values
+            const v = Math.pow(15 - 2*t, 2);
+            const a = -4 * (15 - 2*t);
+            // Integral s: -1/6 * (15-2t)^3 + 562.5
+            const s = (-1/6 * Math.pow(15 - 2*t, 3)) + 562.5;
+            
+            updateUI(t, v, a, s);
+        }
+        
+        function highlightStep() {
+            document.getElementById('step-c').classList.add('active');
+        }
+
+        function updateUI(tVal, vVal, aVal, sVal) {
+            document.getElementById('dispT').innerText = tVal.toFixed(2);
+            document.getElementById('dispV').innerText = vVal.toFixed(1);
+            document.getElementById('dispA').innerText = aVal.toFixed(1);
+            document.getElementById('dispS').innerText = sVal.toFixed(1);
+        }
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // Layout: Top half for Particle Line, Bottom half for Graph
+            const lineY = h * 0.2;
+            const graphY = h * 0.5;
+            const graphH = h * 0.4;
+            
+            // --- 1. Particle Motion on Line ---
+            // Draw Track
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(50, lineY); ctx.lineTo(w-50, lineY); ctx.stroke();
+            
+            // Draw O
+            ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(50, lineY, 4, 0, Math.PI*2); ctx.fill();
+            ctx.fillText("O", 45, lineY - 15);
+            
+            // Calculate P position (Scale s: Max 562.5m -> fits in width)
+            const sMax = 562.5;
+            // Current s
+            const sCurr = (-1/6 * Math.pow(15 - 2*t, 3)) + 562.5;
+            
+            const scaleX = (w - 100) / sMax;
+            const px = 50 + sCurr * scaleX;
+            
+            // Draw Particle P
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath(); ctx.arc(px, lineY, 8, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#333'; ctx.font = 'bold 12px Arial';
+            ctx.fillText("P", px-4, lineY - 15);
+            
+            // Draw Velocity Vector
+            const vCurr = Math.pow(15 - 2*t, 2);
+            const vScale = 0.2; // Visual scale for arrow
+            if(vCurr > 1) {
+                ctx.beginPath();
+                ctx.moveTo(px, lineY);
+                ctx.lineTo(px + vCurr*vScale, lineY);
+                ctx.strokeStyle = '#2ecc71'; ctx.lineWidth = 3; ctx.stroke();
+                // Arrowhead
+                ctx.beginPath(); ctx.fillStyle = '#2ecc71';
+                ctx.moveTo(px + vCurr*vScale, lineY);
+                ctx.lineTo(px + vCurr*vScale - 5, lineY - 3);
+                ctx.lineTo(px + vCurr*vScale - 5, lineY + 3);
+                ctx.fill();
+                ctx.fillText("v", px + vCurr*vScale + 5, lineY);
+            }
+
+            // --- 2. Velocity-Time Graph ---
+            // Axes
+            const graphX = 50;
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+            // Y axis (Velocity)
+            ctx.beginPath(); ctx.moveTo(graphX, graphY); ctx.lineTo(graphX, graphY + graphH); ctx.stroke();
+            // X axis (Time)
+            ctx.beginPath(); ctx.moveTo(graphX, graphY + graphH); ctx.lineTo(w - 50, graphY + graphH); ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#666';
+            ctx.fillText("Velocity (v)", graphX + 10, graphY + 10);
+            ctx.fillText("Time (t)", w - 80, graphY + graphH - 10);
+            ctx.fillText("0", graphX - 15, graphY + graphH);
+            ctx.fillText("225", graphX - 25, graphY + 10); // Max V
+            ctx.fillText("7.5", graphX + (7.5/10)*(w-100), graphY + graphH + 15); // Max T
+            
+            // Plot Curve: v = (15 - 2t)^2
+            ctx.beginPath();
+            ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2;
+            
+            // We plot from t=0 to t_stop (7.5) or slightly more for visual
+            // Map: t (0-10) -> x, v (0-225) -> y
+            const tRange = 10; // Show up to 10s on graph
+            const vRange = 225;
+            
+            for(let i=0; i<=100; i++) {
+                let plotT = (i / 100) * tRange;
+                if (plotT > t) break; // Draw up to current time
+                
+                let plotV = Math.pow(15 - 2*plotT, 2);
+                
+                let gx = graphX + (plotT / tRange) * (w - 100);
+                let gy = (graphY + graphH) - (plotV / vRange) * graphH;
+                
+                if(i===0) ctx.moveTo(gx, gy);
+                else ctx.lineTo(gx, gy);
+            }
+            ctx.stroke();
+            
+            // Draw current point on graph
+            let curGx = graphX + (t / tRange) * (w - 100);
+            let curGy = (graphY + graphH) - (vCurr / vRange) * graphH;
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath(); ctx.arc(curGx, curGy, 4, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Init
+        resize();
+    </script>
+</body>
+</html>

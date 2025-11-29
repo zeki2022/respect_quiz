@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q3: Train Kinematics</title>
+    
+    <!-- 1. 引用公共样式 -->
+    <link rel="stylesheet" href="../../common/css/style.css">
+    
+    <!-- 2. MathJax 配置 (强制开启 $ 符号) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 3. 核心布局与微调 (Layout Rules) */
+        body { 
+            padding-top: 60px; padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; /* 宽屏适配 */
+        }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 420px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        /* 原生返回箭头 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布设置 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; /* 宽屏扁平 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+            min-height: 350px; /* CSS 兜底 */
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 60%; } }
+        
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* 控制条 */
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;}
+        
+        /* 右侧面板 */
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        
+        .step-box { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; transition: all 0.3s; }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { font-family: 'Times New Roman', serif; font-size: 1.1em; color: #2c3e50; background: #f9f9f9; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block; }
+        .highlight { color: #d35400; font-weight: bold; }
+        
+        /* 状态指示器 */
+        .status-bar { display: flex; gap: 20px; margin-top: 10px; font-size: 14px; color: #555; justify-content: center;}
+        .status-item { display: flex; align-items: center; gap: 5px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; }
+        .status-item.active .status-dot { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
+        
+    </style>
+</head>
+<body>
+
+    <!-- 原生导航 -->
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：动画演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q3</h3>
+                
+                <!-- 题目全文还原 -->
+                <div style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    A train travels $4.8$ km between two stations, $A$ and $B$. The train starts from rest at $A$ and accelerates at a constant rate until it reaches a speed of $30$ m s$^{-1}$. It then travels at this constant speed for $T$ seconds, before decelerating at a constant rate, coming to rest at $B$. The total time for the journey is $180$ s.<br><br>
+                    Find the value of $T$ and hence find the distance moved by the train while travelling at the constant speed of $30$ m s$^{-1}$. [5]
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; font-size:14px; color:#333; background:rgba(255,255,255,0.8); padding:5px; border-radius:4px; font-family: monospace;">
+                        Time: <span id="timeVal">0.0</span>s | Dist: <span id="distVal">0</span>m
+                    </div>
+                </div>
+
+                <!-- 运动状态指示 -->
+                <div class="status-bar">
+                    <div class="status-item" id="status-acc"><span class="status-dot"></span> Accelerating</div>
+                    <div class="status-item" id="status-const"><span class="status-dot"></span> Constant Speed</div>
+                    <div class="status-item" id="status-dec"><span class="status-dot"></span> Decelerating</div>
+                </div>
+
+                <div class="controls" style="margin-top:15px;">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Journey</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555; font-size:12px;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="5.0" step="0.1" value="1.0" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right; font-size:12px;">1.0x</span>
+                    </div>
+                    
+                    <div style="width:100%; text-align:right; margin-top:5px; font-weight:bold; color:#2c3e50; font-size:18px;">
+                        v = <span id="velDisplay">0.0</span> m/s
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：Marking Scheme 解析 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <div class="step-box" style="background:#fff8e1; border-left-color:#f1c40f;">
+                    <span class="step-title">Key Information</span>
+                    Total Distance $S = 4800$ m<br>
+                    Max Speed $v_{max} = 30$ m s$^{-1}$<br>
+                    Total Time $t_{total} = 180$ s<br>
+                    Constant speed duration = $T$
+                </div>
+
+                <!-- Step 1: Method -->
+                <div id="step1" class="step-box">
+                    <span class="step-title">1. Velocity-Time Graph Method</span>
+                    <div class="explanation">
+                        The most efficient method is to use the area under the Velocity-Time graph (a Trapezium).
+                    </div>
+                    Area of Trapezium = Displacement<br>
+                    <span class="math-eq">$\frac{1}{2}(a + b)h = 4800$</span> <strong>(M1)</strong><br><br>
+                    Where:<br>
+                    $h = 30$ (Max speed)<br>
+                    $b = 180$ (Total time)<br>
+                    $a = T$ (Time at constant speed)
+                </div>
+
+                <!-- Step 2: Calculation -->
+                <div id="step2" class="step-box">
+                    <span class="step-title">2. Solve for T</span>
+                    Substitute values:<br>
+                    <span class="math-eq">$\frac{1}{2}(T + 180) \times 30 = 4800$</span> <strong>(B2)</strong><br>
+                    $15(T + 180) = 4800$<br>
+                    $T + 180 = 320$<br>
+                    <span class="highlight">T = 140 s</span> <strong>(A1)</strong>
+                </div>
+
+                <!-- Step 3: Distance -->
+                <div id="step3" class="step-box">
+                    <span class="step-title">3. Constant Speed Distance</span>
+                    Distance = Speed $\times$ Time<br>
+                    $D = 30 \times T$<br>
+                    $D = 30 \times 140$<br>
+                    <span class="math-eq highlight">Distance = 4200 m</span> <strong>(B1 FT)</strong>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // --- 1. Physics Model ---
+        // Total Time = 180s, T = 140s.
+        // Therefore, Accel Time + Decel Time = 40s.
+        // MS Note: "Condone assumption that magnitude of acc and dec are equal".
+        // For visualization, we assume symmetry: t_acc = 20s, t_dec = 20s.
+        
+        const totalTime = 180;
+        const T = 140;
+        const vMax = 30;
+        const totalDist = 4800;
+        
+        const t1 = (totalTime - T) / 2; // 20s
+        const t2 = t1 + T;              // 160s
+        const t3 = totalTime;           // 180s
+        
+        const acc = vMax / t1;          // 1.5 m/s^2
+        const dec = vMax / (t3 - t2);   // 1.5 m/s^2
+        
+        // --- 2. Animation State ---
+        let simState = 'RESET';
+        let animId;
+        let simTime = 0; // Current simulation time (seconds)
+        let timeScale = 1.0; // Playback speed multiplier (visual only)
+        
+        // Current values
+        let currV = 0;
+        let currS = 0;
+        
+        // Layout
+        let trackY, trainW, trainH;
+
+        // Speed Control
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+            // 动画里的时间流逝速度，为了演示不至于等3分钟，默认倍速快一点
+            // 这里的 timeScale 是基于 requestAnimationFrame 的倍率
+            // 真实 180s 太长，我们让 1s (real) = 10s (sim) as base * timeScale
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1) + "x";
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 兜底高度
+            canvas.height = canvas.parentElement.clientHeight || 350;
+            
+            // Re-calc layout vars
+            trackY = canvas.height * 0.7;
+            trainW = canvas.width * 0.08; // Train is 8% of screen width
+            trainH = trainW * 0.6;
+            
+            if(simState !== 'RUNNING') drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000; // Real seconds
+                lastTime = now;
+                if(dt > 0.1) dt = 0.1;
+                
+                // Simulation speed: Base 10x real time, multiplied by user slider
+                let simDt = dt * 10 * timeScale; 
+                
+                update(simDt);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            simTime = 0;
+            currV = 0;
+            currS = 0;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Journey";
+            
+            // Reset highlighting
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.status-item').forEach(el => el.classList.remove('active'));
+            
+            drawFrame();
+            updateUI();
+        }
+
+        function update(dt) {
+            simTime += dt;
+            
+            // 1. Calculate Velocity based on Phase
+            if (simTime < t1) {
+                // Phase 1: Acceleration
+                currV = acc * simTime;
+                // Displacement s = 0.5 * a * t^2
+                currS = 0.5 * acc * simTime * simTime;
+                
+                highlightStep(1); // Discussing Graph/Method
+                highlightStatus('acc');
+            } 
+            else if (simTime < t2) {
+                // Phase 2: Constant Speed
+                currV = vMax;
+                // Distance = S1 + v * (t - t1)
+                let s1 = 0.5 * acc * t1 * t1;
+                currS = s1 + vMax * (simTime - t1);
+                
+                highlightStep(2); // Discussing T
+                highlightStatus('const');
+            } 
+            else if (simTime <= t3) {
+                // Phase 3: Deceleration
+                let timeInDecel = simTime - t2;
+                currV = vMax - (dec * timeInDecel);
+                if (currV < 0) currV = 0;
+                
+                // Distance = S2 + ut - 0.5at^2
+                // S2 (distance after phase 2) = 0.5*a*t1^2 + v*T
+                let s2 = (0.5 * acc * t1 * t1) + (vMax * T);
+                currS = s2 + (vMax * timeInDecel) - (0.5 * dec * timeInDecel * timeInDecel);
+                
+                highlightStep(3); // Discussing final calculation
+                highlightStatus('dec');
+            } 
+            else {
+                // Finished
+                simTime = totalTime;
+                currV = 0;
+                currS = totalDist;
+                simState = 'END';
+                document.getElementById('btnStart').innerText = "Arrived at B";
+                highlightStatus(''); // clear
+            }
+            
+            updateUI();
+        }
+        
+        function updateUI() {
+            document.getElementById('timeVal').innerText = simTime.toFixed(1);
+            document.getElementById('distVal').innerText = currS.toFixed(0);
+            document.getElementById('velDisplay').innerText = currV.toFixed(1);
+        }
+
+        function highlightStep(id) {
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            document.getElementById('step'+id).classList.add('active');
+        }
+        
+        function highlightStatus(type) {
+            document.querySelectorAll('.status-item').forEach(el => el.classList.remove('active'));
+            if(type) document.getElementById('status-'+type).classList.add('active');
+        }
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // --- 1. Background (Sky & Ground) ---
+            // Ground
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(0, trackY, w, h - trackY);
+            // Track Line
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, trackY);
+            ctx.lineTo(w, trackY);
+            ctx.stroke();
+            
+            // Stations
+            drawStation(w * 0.05, trackY, "A"); // Start
+            drawStation(w * 0.95, trackY, "B"); // End
+            
+            // --- 2. Train Position ---
+            // Map real distance (0 - 4800) to screen width (5% - 95%)
+            const screenStart = w * 0.05;
+            const screenEnd = w * 0.95;
+            const screenDist = screenEnd - screenStart;
+            
+            let progress = currS / totalDist;
+            if(progress > 1) progress = 1;
+            
+            let trainX = screenStart + (progress * screenDist);
+            
+            // Draw Train
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(trainX - trainW/2, trackY - trainH - 4, trainW, trainH);
+            // Wheels
+            ctx.fillStyle = '#333';
+            ctx.beginPath(); ctx.arc(trainX - trainW/3, trackY - 4, 6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(trainX + trainW/3, trackY - 4, 6, 0, Math.PI*2); ctx.fill();
+            
+            // --- 3. Dynamic V-T Graph Overlay (Top Right) ---
+            // Mini graph to show concept
+            drawMiniGraph(w - 160, 20, 140, 80);
+        }
+        
+        function drawStation(x, y, name) {
+            ctx.fillStyle = '#2c3e50';
+            // Pole
+            ctx.fillRect(x - 2, y - 60, 4, 60);
+            // Sign
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(x - 15, y - 60, 30, 20);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(name, x, y - 46);
+        }
+        
+        function drawMiniGraph(x, y, w, h) {
+            // Box
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, w, h);
+            
+            // Axes
+            ctx.beginPath();
+            ctx.moveTo(x + 5, y + h - 5); ctx.lineTo(x + w - 5, y + h - 5); // t
+            ctx.moveTo(x + 5, y + h - 5); ctx.lineTo(x + 5, y + 5); // v
+            ctx.strokeStyle = '#333';
+            ctx.stroke();
+            
+            // Plot Shape (Trapezium)
+            // Scale: w represents 180s, h represents 30m/s
+            let gx1 = x + 5;
+            let gy1 = y + h - 5;
+            
+            let gx2 = gx1 + (t1 / 180) * (w - 10);
+            let gy2 = gy1 - (vMax / 30) * (h - 15); // max height
+            
+            let gx3 = gx1 + (t2 / 180) * (w - 10);
+            let gy3 = gy2;
+            
+            let gx4 = x + w - 5;
+            let gy4 = gy1;
+            
+            ctx.beginPath();
+            ctx.moveTo(gx1, gy1);
+            ctx.lineTo(gx2, gy2);
+            ctx.lineTo(gx3, gy3);
+            ctx.lineTo(gx4, gy4);
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Current Time Indicator Line
+            let curGx = gx1 + (simTime / 180) * (w - 10);
+            ctx.beginPath();
+            ctx.moveTo(curGx, y);
+            ctx.lineTo(curGx, y + h);
+            ctx.strokeStyle = 'rgba(231, 76, 60, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '10px Arial';
+            ctx.fillText("v-t graph", x + w/2, y + 10);
+        }
+
+        // 双重初始化
+        resize(); 
+        setTimeout(resize, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q1: Work on Incline</title>
+    
+    <!-- 1. 引用公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- 2. MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 3. 核心布局军规 V6.0 */
+        body { 
+            padding-top: 60px; padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; /* 宽屏适配 */
+        }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 420px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布防塌陷 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 40%; /* 比例 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+            min-height: 350px; /* CSS 兜底 */
+        }
+        
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        
+        .step-box { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; transition: all 0.3s; opacity: 0.9; }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); opacity: 1; }
+        
+        .step-title { font-weight: bold; color: #2c3e50; margin-bottom: 8px; display: block; font-size: 15px; border-bottom: 1px dashed #ddd; padding-bottom:5px;}
+        .math-eq { font-family: 'Times New Roman', serif; font-size: 1.1em; color: #2c3e50; background: #f9f9f9; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block; }
+        .highlight { color: #d35400; font-weight: bold; }
+        .explanation { font-size: 13px; color: #666; margin-bottom: 5px; font-style: italic; line-height: 1.4; }
+
+        /* 能量条 (Stacked) */
+        .energy-bar-container { height: 24px; background: #eee; border-radius: 6px; overflow: hidden; display: flex; margin-top: 10px; border:1px solid #ccc;}
+        .bar-pe { background: #e74c3c; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; }
+        .bar-ke { background: #2ecc71; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; }
+        .bar-work { background: #95a5a6; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; }
+        .legend { font-size: 12px; color: #666; margin-top:5px; display:flex; gap:15px; justify-content:center;}
+        .dot { width:8px; height:8px; display:inline-block; border-radius:50%; margin-right:4px;}
+        
+        /* 题目文本 */
+        .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
+        .orig-img { max-width: 100%; mix-blend-mode:multiply; margin-bottom:10px; border-radius:4px; }
+    </style>
+</head>
+<body>
+
+    <!-- 原生导航 -->
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：动画演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q1</h3>
+                
+                <!-- 题目全文还原 -->
+                <div class="problem-text">
+                    <!-- 图片占位 -->
+                    <img src="q1_orig.png" class="orig-img" onerror="this.style.display='none'">
+                    
+                    <p>A box of mass $25$ kg is pulled $12$ m up a rough plane inclined at an angle of $8^\circ$ to the horizontal. The box moves up a line of greatest slope against a frictional force of $50$ N. The force pulling the box is parallel to the line of greatest slope. The box starts from rest and has speed $2.4$ m s$^{-1}$ at the end of the $12$ m.</p>
+                    <p>Find the work done by the pulling force. [4]</p>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; font-size:14px; color:#333; background:rgba(255,255,255,0.8); padding:5px; border-radius:4px;">
+                        Distance: <span id="distVal" style="font-weight:bold; color:#3498db;">0.0</span> m
+                    </div>
+                </div>
+
+                <!-- 能量条 -->
+                <div class="energy-bar-container">
+                    <div class="bar-pe" id="barPE">PE</div>
+                    <div class="bar-ke" id="barKE">KE</div>
+                    <div class="bar-work" id="barWork">Friction</div>
+                </div>
+                <div class="legend">
+                    <span><span class="dot" style="background:#e74c3c"></span>PE Gain</span>
+                    <span><span class="dot" style="background:#2ecc71"></span>KE Gain</span>
+                    <span><span class="dot" style="background:#95a5a6"></span>Work vs Friction</span>
+                </div>
+
+                <div class="controls" style="margin-top:15px;">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Pulling</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555; font-size:12px;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="1.0" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right; font-size:12px;">1.0x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：深度解析 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <div class="step-box" style="background:#fff8e1; border-left-color:#f1c40f;">
+                    <span class="step-title">Given Data</span>
+                    $m=25$ kg, $d=12$ m, $\theta=8^\circ$<br>
+                    $F_{\text{friction}}=50$ N<br>
+                    $u=0$, $v=2.4$ m s$^{-1}$
+                </div>
+
+                <!-- Step 1 -->
+                <div id="step1" class="step-box">
+                    <span class="step-title">1. Energy Gains (PE & KE)</span>
+                    <div class="explanation">
+                        Calculate the increase in Potential Energy (due to height) and Kinetic Energy (due to speed).
+                    </div>
+                    <strong>(i) Gain in PE ($mgh$):</strong><br>
+                    $h = d \sin\theta = 12 \sin 8^\circ$<br>
+                    $\Delta PE = 25 \times 10 \times (12 \sin 8^\circ)$<br>
+                    <span class="math-eq">$\Delta PE \approx 417.5$ J</span> <strong>(B1)</strong><br><br>
+                    
+                    <strong>(ii) Gain in KE ($\frac{1}{2}mv^2$):</strong><br>
+                    $\Delta KE = \frac{1}{2} \times 25 \times 2.4^2$<br>
+                    <span class="math-eq">$\Delta KE = 72$ J</span> <strong>(B1)</strong>
+                </div>
+
+                <!-- Step 2 -->
+                <div id="step2" class="step-box">
+                    <span class="step-title">2. Work Against Friction</span>
+                    <div class="explanation">
+                        Work done to overcome resistive forces is energy "lost" from the mechanical system.
+                    </div>
+                    $WD_{\text{fric}} = \text{Force} \times \text{Distance}$<br>
+                    $WD_{\text{fric}} = 50 \times 12$<br>
+                    <span class="math-eq">$WD_{\text{fric}} = 600$ J</span>
+                </div>
+
+                <!-- Step 3 -->
+                <div id="step3" class="step-box" style="border-left-color: #27ae60;">
+                    <span class="step-title" style="color:#27ae60;">3. Total Work Done</span>
+                    <div class="explanation">
+                        Apply <strong>Work-Energy Principle</strong>: The work done by the driving force must supply the energy for PE gain, KE gain, and overcoming friction.
+                    </div>
+                    $WD_{\text{pull}} = \Delta PE + \Delta KE + WD_{\text{fric}}$<br>
+                    $WD_{\text{pull}} = 417.5 + 72 + 600$<br>
+                    $WD_{\text{pull}} = 1089.5$<br>
+                    <span class="math-eq highlight">Total Work = 1090 J</span> (3 s.f.) <strong>(A1)</strong>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics Constants
+        const g = 10;
+        const m = 25;
+        const d_total = 12;
+        const theta_deg = 8;
+        const theta_rad = theta_deg * Math.PI / 180;
+        const friction = 50;
+        const v_final = 2.4;
+        
+        // Calculated Totals
+        const pe_total = m * g * d_total * Math.sin(theta_rad); // ~417.5
+        const ke_total = 0.5 * m * v_final * v_final; // 72
+        const wd_fric_total = friction * d_total; // 600
+        const work_total = pe_total + ke_total + wd_fric_total; // ~1089.5
+        
+        // Animation State
+        let simState = 'RESET';
+        let animId;
+        let currentDist = 0;
+        let currentVel = 0;
+        let timeScale = 1.0;
+        
+        // Acceleration (v^2 = u^2 + 2as)
+        const accel = (v_final * v_final) / (2 * d_total); 
+        
+        let pathStart = {}, pathEnd = {};
+
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1) + "x";
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 【防白屏】JS 强制兜底
+            canvas.height = canvas.parentElement.clientHeight || 400;
+            initLayout();
+            if(simState !== 'RUNNING') drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize); // 双重保险
+
+        function initLayout() {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            const padding = 40;
+            const startX = padding;
+            const startY = h - padding;
+            
+            // Visual Angle: Exaggerate 8 deg to 15 deg for visibility
+            const visualAngle = 15 * Math.PI / 180;
+            const run = w - 2 * padding;
+            const rise = run * Math.tan(visualAngle);
+            
+            const endX = startX + run;
+            const endY = startY - rise;
+            
+            pathStart = {x: startX, y: startY, angle: visualAngle};
+            pathEnd = {x: endX, y: endY};
+        }
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000; lastTime = now; if(dt > 0.1) dt = 0.1;
+                update(dt * timeScale);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            currentDist = 0;
+            currentVel = 0;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Pulling";
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            updateBars();
+            drawFrame();
+        }
+
+        function update(dt) {
+            if (currentDist < d_total) {
+                currentVel += accel * dt;
+                currentDist += currentVel * dt;
+                
+                let p = currentDist / d_total;
+                if (p < 0.33) highlightStep(1);
+                else if (p < 0.66) highlightStep(2);
+                else highlightStep(3);
+            } else {
+                currentDist = d_total;
+                currentVel = v_final;
+                simState = 'END';
+                document.getElementById('btnStart').innerText = "Finished";
+            }
+            
+            document.getElementById('distVal').innerText = currentDist.toFixed(1);
+            updateBars();
+        }
+        
+        function highlightStep(id) {
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            document.getElementById('step'+id).classList.add('active');
+        }
+
+        function updateBars() {
+            let p = currentDist / d_total;
+            
+            let pe = pe_total * p;
+            let ke = 0.5 * m * currentVel * currentVel;
+            let fric = wd_fric_total * p;
+            let total = pe + ke + fric;
+            let max = work_total;
+            
+            document.getElementById('barPE').style.width = (pe / max * 100) + '%';
+            document.getElementById('barKE').style.width = (ke / max * 100) + '%';
+            document.getElementById('barWork').style.width = (fric / max * 100) + '%';
+        }
+
+        function drawFrame() {
+            const w = canvas.width; const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            if (!pathStart.x) initLayout();
+            
+            const {x: sx, y: sy} = pathStart;
+            const {x: ex, y: ey} = pathEnd;
+            
+            // Draw Slope (Filled)
+            ctx.fillStyle = '#ecf0f1';
+            ctx.beginPath();
+            ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.lineTo(ex, sy);
+            ctx.closePath(); ctx.fill();
+            
+            // Slope Line
+            ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+            
+            // Draw Box
+            let p = currentDist / d_total; if(p>1) p=1;
+            let boxX = sx + (ex - sx) * p;
+            let boxY = sy + (ey - sy) * p;
+            
+            ctx.save();
+            ctx.translate(boxX, boxY);
+            ctx.rotate(-pathStart.angle);
+            
+            // Box Body
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(0, -30, 40, 30);
+            ctx.strokeStyle = '#2980b9'; ctx.lineWidth=2;
+            ctx.strokeRect(0, -30, 40, 30);
+            
+            // Text
+            ctx.fillStyle = 'white'; ctx.font='bold 12px Arial';
+            ctx.fillText("25kg", 5, -10);
+            
+            // Forces
+            drawArrow(40, -15, 80, -15, '#e67e22', 'F'); // Pull
+            drawArrow(0, -5, -40, -5, '#e74c3c', '50N'); // Friction
+            
+            ctx.restore();
+            
+            // Angle
+            ctx.strokeStyle = '#999'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.arc(sx, sy, 40, -pathStart.angle, 0); ctx.stroke();
+            ctx.fillStyle='#555'; ctx.fillText("8°", sx+50, sy-10);
+            
+            // Ground
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(w, sy); ctx.stroke();
+        }
+        
+        function drawArrow(x1, y1, x2, y2, color, text) {
+            const head = 8;
+            const angle = Math.atan2(y2-y1, x2-x1);
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x2, y2);
+            ctx.lineTo(x2-head*Math.cos(angle-Math.PI/6), y2-head*Math.sin(angle-Math.PI/6));
+            ctx.lineTo(x2-head*Math.cos(angle+Math.PI/6), y2-head*Math.sin(angle+Math.PI/6));
+            ctx.fillStyle = color; ctx.fill();
+            if(text) { ctx.fillStyle = color; ctx.fillText(text, x2+5, y2-5); }
+        }
+
+        // 双重保险
+        resize(); 
+        setTimeout(resize, 500);
+    </script>
+</body>
+</html>

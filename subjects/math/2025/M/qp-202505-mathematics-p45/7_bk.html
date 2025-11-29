@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Math Q7: Connected Particles</title>
     
+    <!-- 1. 引用公共样式 -->
     <link rel="stylesheet" href="../../../../../common/css/style.css">
     
+    <!-- 2. MathJax 配置 -->
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
@@ -16,12 +18,12 @@
     <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* 3. 核心布局 (Template 规范) */
+        /* 3. 核心布局与样式 */
         body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
         
         .container {
             width: 98%; max-width: 1600px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 450px; 
+            display: grid; grid-template-columns: 1fr 420px; 
             gap: 20px; align-items: start;
         }
         @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
@@ -37,47 +39,48 @@
             font-family: sans-serif; line-height: 1; cursor: pointer;
         }
         
-        .canvas-container { width: 100%; height: 0; padding-bottom: 55%; position: relative; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; overflow:hidden; }
-        @media (max-width: 1000px) { .canvas-container { padding-bottom: 75%; } }
-
+        .canvas-container { width: 100%; height: 0; padding-bottom: 40%; position: relative; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; overflow:hidden; }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 60%; } }
+        
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        .energy-bar-container { height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; display: flex; margin-top: 15px; border:1px solid #ccc; }
-        .bar-pe { background: #e74c3c; width: 0%; transition: width 0.1s; }
-        .bar-ke { background: #2ecc71; width: 0%; transition: width 0.1s; }
-        .bar-work { background: #95a5a6; width: 0%; transition: width 0.1s; }
-        
-        .legend { font-size: 12px; color: #666; margin-top: 5px; display: flex; gap: 15px; justify-content: center; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-
-        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee; margin-top: 15px; }
-        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;}
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
         
         .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
         
-        .step-box { border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; transition: all 0.3s; }
+        .step-box { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ccc; transition: all 0.3s; }
         .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
         .step-title { font-weight: bold; color: #2c3e50; margin-bottom: 8px; display: block; font-size: 15px; border-bottom: 1px dashed #ddd; padding-bottom:5px;}
         .math-eq { font-family: 'Times New Roman', serif; font-size: 1.1em; color: #2c3e50; background: #f9f9f9; border: 1px solid #eee; padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block; }
         .highlight { color: #d35400; font-weight: bold; background: #fff5e0; padding: 0 4px; border-radius: 2px; }
-        .explanation { font-size: 13px; color: #555; margin-bottom: 5px; font-style: italic; line-height: 1.4; }
+        
+        .energy-bar-container { height: 24px; background: #eee; border-radius: 6px; overflow: hidden; display: flex; margin-top: 10px; border:1px solid #ccc;}
+        .bar-pe { background: #e74c3c; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; white-space: nowrap;}
+        .bar-ke { background: #2ecc71; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; white-space: nowrap;}
+        .bar-work { background: #95a5a6; width: 0%; transition: width 0.1s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; overflow: hidden; white-space: nowrap;}
+        .legend { font-size: 12px; color: #666; margin-top:5px; display:flex; gap:15px; justify-content:center;}
+        .dot { width:8px; height:8px; display:inline-block; border-radius:50%; margin-right:4px;}
         
         .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
-        .orig-img { max-width: 100%; height: auto; border: 1px solid #eee; border-radius: 6px; margin-bottom: 15px; mix-blend-mode: multiply; display: block; }
+        .orig-img { max-width: 100%; mix-blend-mode:multiply; margin-bottom:10px; border-radius:4px; }
     </style>
 </head>
 <body>
 
+    <!-- 原生导航 -->
     <a href="javascript:history.back()" class="back-arrow">‹</a>
 
     <div class="container">
+        <!-- 左侧：动画演示 -->
         <div class="left-col">
             <div class="card">
                 <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q7</h3>
                 
                 <div class="problem-text">
-                    <img src="q7_orig.png" class="orig-img" onerror="this.style.display='none'" alt="Question 7 Diagram">
+                    <img src="q7_orig.png" class="orig-img" onerror="this.style.display='none'">
+                    
                     <p>Two particles $A$ and $B$ of masses $6.5$ kg and $m$ kg respectively are connected by a light inextensible string that passes over a smooth pulley. The pulley is fixed at the top of a rough slope which is at an angle of $\alpha$ to the horizontal ground, where $\tan \alpha = \frac{5}{12}$. $A$ is on the rough slope and $B$ hangs below the pulley (see diagram). The coefficient of friction between the slope and $A$ is $0.4$.</p>
                     <p><strong>(a)</strong> Given that the system is in equilibrium, find the set of possible values of $m$. [7]</p>
                     <p><strong>(b)</strong> It is given instead that $m = 12$ and the particles are released from rest with the string taut. Use an energy method to find the speed of the particles when each particle has moved $0.6$ m. [5]</p>
@@ -85,76 +88,84 @@
 
                 <div class="canvas-container">
                     <canvas id="simCanvas"></canvas>
-                    <!-- 恢复你的 distance 显示 -->
                     <div style="position:absolute; top:10px; left:10px; font-size:14px; color:#333; background:rgba(255,255,255,0.8); padding:5px; border-radius:4px;">
-                        Distance: <span id="distVal" style="font-weight:bold; color:#3498db;">0.0</span> m<br>
-                        Speed: <span id="velVal" style="font-weight:bold; color:#3498db;">0.0</span> m/s
+                        Distance: <span id="distVal" style="font-weight:bold; color:#3498db;">0.0</span> m
                     </div>
                 </div>
-                
+
                 <div class="energy-bar-container">
-                    <div class="bar-pe" id="barPE"></div><div class="bar-ke" id="barKE"></div><div class="bar-work" id="barWork"></div>
+                    <div class="bar-pe" id="barPE">PE</div>
+                    <div class="bar-ke" id="barKE">KE</div>
+                    <div class="bar-work" id="barWork">Friction</div>
                 </div>
                 <div class="legend">
                     <span><span class="dot" style="background:#e74c3c"></span>Net PE Loss</span>
                     <span><span class="dot" style="background:#2ecc71"></span>KE Gain</span>
-                    <span><span class="dot" style="background:#95a5a6"></span>Friction Work</span>
+                    <span><span class="dot" style="background:#95a5a6"></span>Work vs Friction</span>
                 </div>
 
-                <div class="controls">
+                <div class="controls" style="margin-top:15px;">
                     <button class="action-btn" onclick="startSim()" id="btnStart">Start Animation (Part b)</button>
                     <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
                     <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
-                        <span style="font-weight:bold; color:#555;">Speed:</span>
-                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
-                        <span id="speedVal" style="width:30px; text-align:right;">0.5x</span>
+                        <span style="font-weight:bold; color:#555; font-size:12px;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="1.0" style="width:100px; cursor:pointer;">
+                        <span id="speedVal" style="width:30px; text-align:right; font-size:12px;">1.0x</span>
+                    </div>
+                    <div style="width:100%; text-align:right; margin-top:5px; font-weight:bold; color:#2c3e50; font-size:18px;">
+                        v = <span id="velDisplay">0.00</span> m/s
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- 右侧：深度解析 -->
         <div class="right-col">
             <div class="card solution-panel">
                 
-                <!-- Part (a) -->
+                <!-- Part (a) 逻辑 -->
                 <div class="step-box" style="border-left-color: #27ae60;">
                     <span class="step-title">Part (a): Equilibrium Analysis (7 marks)</span>
-                    <div class="explanation">Resolve forces on A. Friction opposes tendency of motion.</div>
-                    $\sin\alpha = \frac{5}{13}, \cos\alpha = \frac{12}{13}$<br>
+                    <div><strong>1. Resolve forces on A:</strong></div>
+                    From $\tan\alpha = \frac{5}{12}$, we have $\sin\alpha = \frac{5}{13}, \cos\alpha = \frac{12}{13}$.<br>
                     Normal Reaction $R = 6.5g \cos\alpha = 60$ N <strong>(B1)</strong><br>
                     Friction Limit $F_{max} = \mu R = 0.4 \times 60 = 24$ N<br>
                     Weight down slope $P = 6.5g \sin\alpha = 25$ N<br><br>
                     
-                    <strong>Case 1: A slipping DOWN</strong> (Friction Up)<br>
+                    <strong>2. Analyze Limiting Equilibrium:</strong><br>
+                    Tension $T = mg$. Equilibrium occurs when $T$ balances $P$ and Friction.<br><br>
+                    
+                    <strong>Case 1: A about to slip DOWN</strong> (Friction acts UP)<br>
                     $T + F_{max} = P \Rightarrow T = 25 - 24 = 1$ N<br>
-                    $T = mg \Rightarrow \mathbf{m = 0.1}$<br><br>
+                    $mg = 1 \Rightarrow m = 0.1$ kg<br><br>
                     
-                    <strong>Case 2: A slipping UP</strong> (Friction Down)<br>
+                    <strong>Case 2: A about to slip UP</strong> (Friction acts DOWN)<br>
                     $T = P + F_{max} \Rightarrow T = 25 + 24 = 49$ N<br>
-                    $mg = 49 \Rightarrow m = 4.9$<br><br>
+                    $mg = 49 \Rightarrow m = 4.9$ kg<br><br>
                     
-                    <!-- 【核心修复】加上了 $ 包裹，确保不乱码 -->
                     <span class="math-eq highlight">$0.1 \le m \le 4.9$</span> <strong>(A1)</strong>
                 </div>
 
-                <!-- Part (b) -->
+                <!-- Part (b) 逻辑 -->
                 <div id="step-b1" class="step-box">
-                    <span class="step-title">Part (b) Step 1: Energy Changes</span>
-                    <div class="explanation">System moves $s = 0.6$ m. Mass $B$ falls ($m=12$), Mass $A$ rises.</div>
-                    <strong>PE Loss (B):</strong> $12g \times 0.6 = 72$ J<br>
-                    <strong>PE Gain (A):</strong> $6.5g \times 0.6 \sin\alpha = 15$ J<br>
+                    <span class="step-title">Part (b): Energy Method (5 marks)</span>
+                    <div><strong>1. Calculate Energy Changes</strong></div>
+                    System moves $s = 0.6$ m. Mass $B$ falls ($m=12$), Mass $A$ rises.<br>
+                    PE Loss (B): $12g \times 0.6 = 72$ J<br>
+                    PE Gain (A): $6.5g \times 0.6 \sin\alpha = 15$ J<br>
                     <span class="math-eq highlight">Net PE Loss = 72 - 15 = 57 J</span> <strong>(B1)</strong>
                 </div>
 
                 <div id="step-b2" class="step-box">
                     <span class="step-title">2. Work Done against Friction</span>
-                    $WD = F_{max} \times s$<br>
+                    $WD = \text{Friction} \times \text{Distance}$<br>
                     $WD = 24 \times 0.6 = \mathbf{14.4}$ J <strong>(B1)</strong>
                 </div>
 
                 <div id="step-b3" class="step-box">
                     <span class="step-title">3. Conservation of Energy Principle</span>
-                    <div class="explanation">Net PE Loss = KE Gain + Work Done</div>
+                    <div>Net PE Loss = KE Gain + Work Done</div>
                     $57 = \frac{1}{2}(m_A + m_B)v^2 + 14.4$<br>
                     $57 = \frac{1}{2}(6.5 + 12)v^2 + 14.4$ <strong>(M1)</strong><br>
                     $42.6 = 9.25 v^2$<br>
@@ -168,6 +179,7 @@
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         
+        // Physics
         const g = 10;
         const sinA = 5/13;
         const cosA = 12/13;
@@ -176,11 +188,12 @@
         const mu = 0.4;
         const distTotal = 0.6; 
         
-        const weightA_parallel = mA * g * sinA; 
-        const friction = mu * mA * g * cosA; 
-        const weightB = mB * g; 
-        const netForce = weightB - weightA_parallel - friction; 
-        const totalMass = mA + mB; 
+        // Force Calculation
+        const weightA_parallel = mA * g * sinA; // 25
+        const friction = mu * mA * g * cosA; // 24
+        const weightB = mB * g; // 120
+        const netForce = weightB - weightA_parallel - friction; // 71
+        const totalMass = mA + mB; // 18.5
         const acceleration = netForce / totalMass; 
         const finalVel = Math.sqrt(2 * acceleration * distTotal); 
         
@@ -188,7 +201,7 @@
         let animId;
         let currentDist = 0;
         let currentVel = 0;
-        let timeScale = 0.5; 
+        let timeScale = 1.0; 
         let path = {};
 
         document.getElementById('speedRange').addEventListener('input', function(e) {
@@ -209,12 +222,15 @@
         function initPath() {
             const w = canvas.width;
             const h = canvas.height;
+            
             const pulley = { x: w * 0.3, y: h * 0.15 };
             const slopeRun = w * 0.6; 
             const slopeRise = slopeRun * (5/12);
             const slopeEnd = { x: pulley.x + slopeRun, y: pulley.y + slopeRise };
+            
             const slopePixelLen = Math.sqrt(slopeRun**2 + slopeRise**2);
             const visualScale = slopePixelLen / 2.5; 
+            
             path = { pulley, slopeEnd, visualScale };
         }
 
@@ -236,29 +252,32 @@
         function resetSim() {
             cancelAnimationFrame(animId);
             simState = 'RESET';
-            currentDist = 0; currentVel = 0;
+            currentDist = 0;
+            currentVel = 0;
             document.getElementById('btnStart').disabled = false;
             document.getElementById('btnStart').innerText = "Start Animation (Part b)";
             document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
-            updateBars(); updateStats(); drawFrame();
+            updateBars();
+            drawFrame();
         }
 
         function update(dt) {
             if (currentDist < distTotal) {
                 currentVel += acceleration * dt;
                 currentDist += currentVel * dt;
+                
                 let p = currentDist / distTotal;
-                if (p < 0.3) highlightStep('b1'); else if (p < 0.6) highlightStep('b2'); else highlightStep('b3');
+                if (p < 0.3) highlightStep('b1');
+                else if (p < 0.6) highlightStep('b2');
+                else highlightStep('b3');
             } else {
-                currentDist = distTotal; currentVel = finalVel; simState = 'END';
+                currentDist = distTotal;
+                currentVel = finalVel;
+                simState = 'END';
                 document.getElementById('btnStart').innerText = "Finished";
             }
-            updateStats(); updateBars();
-        }
-        
-        function updateStats() {
-            document.getElementById('distVal').innerText = currentDist.toFixed(2);
-            document.getElementById('velVal').innerText = currentVel.toFixed(2);
+            document.getElementById('velDisplay').innerText = currentVel.toFixed(2);
+            updateBars();
         }
         
         function highlightStep(id) {
@@ -274,31 +293,39 @@
             let workDone = friction * currentDist;
             let ke = 0.5 * totalMass * currentVel * currentVel;
             let totalRef = 60; 
+            
             document.getElementById('barPE').style.width = Math.min((netPELoss / totalRef * 100), 100) + '%';
             document.getElementById('barWork').style.width = Math.min((workDone / totalRef * 100), 100) + '%';
             document.getElementById('barKE').style.width = Math.min((ke / totalRef * 100), 100) + '%';
         }
 
         function drawFrame() {
-            const w = canvas.width; const h = canvas.height;
+            const w = canvas.width;
+            const h = canvas.height;
             ctx.clearRect(0, 0, w, h);
             
-            const px = path.pulley.x, py = path.pulley.y;
-            const ex = path.slopeEnd.x, ey = path.slopeEnd.y;
+            const px = path.pulley.x;
+            const py = path.pulley.y;
+            const ex = path.slopeEnd.x;
+            const ey = path.slopeEnd.y;
             const scale = path.visualScale;
             
             ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.lineTo(px, ey); ctx.closePath();
             ctx.fillStyle = '#ecf0f1'; ctx.fill();
             ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 3; ctx.stroke();
+            
             ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI*2);
             ctx.fillStyle = '#bdc3c7'; ctx.fill(); ctx.stroke();
             
             const movePx = currentDist * scale;
-            const startDistA = 1.5 * scale; const currDistA = startDistA - movePx;
+            const startDistA = 1.5 * scale; 
+            const currDistA = startDistA - movePx;
             const dx = ex - px, dy = ey - py, len = Math.sqrt(dx*dx + dy*dy);
             const ux = dx/len, uy = dy/len;
             const ax = px + ux * currDistA, ay = py + uy * currDistA;
-            const bx = px - 15, startDistB = 0.2 * scale, by = py + startDistB + movePx;
+            
+            const bx = px - 15; const startDistB = 0.2 * scale;
+            const by = py + startDistB + movePx;
             
             ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
             ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ax, ay); ctx.stroke();

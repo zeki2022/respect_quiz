@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q3: Velocity-time Graph</title>
+    
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax 配置 (加强版) -->
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- V5.0 布局标准 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 画布防塌陷 */
+        .canvas-container { 
+            width: 100%; height: 0; 
+            padding-bottom: 55%; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+            min-height: 350px;
+        }
+        @media (max-width: 1000px) { .canvas-container { padding-bottom: 80%; } }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+        .highlight { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：交互演示 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q3</h3>
+                
+                <div class="problem-text" style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <!-- 【原题截图位置】 -->
+                    <img src="q3_orig.png" style="max-width:100%; mix-blend-mode:multiply; margin-bottom:10px; border-radius:4px;" onerror="this.style.display='none'">
+                    
+                    <strong>Summary:</strong> Particle starts at $O$ with $v=5$ ms$^{-1}$.<br>
+                    $0-20$s: Accelerates. $20-50$s: Decelerates. At $t=40$, $v=0$.<br>
+                    At $t=T$, particle comes to rest at $O$ ($s=0$).<br>
+                    <strong>(a)</strong> Find value of $T$.<br>
+                    <strong>(b)</strong> Find acceleration from $t=50$ to $t=T$.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; right:10px; font-size:12px; color:#555; background:rgba(255,255,255,0.9); padding:5px; border-radius:4px; border:1px solid #ccc;">
+                        <div>Time: <span id="tVal" style="font-weight:bold;">0.0</span> s</div>
+                        <div>Vel: <span id="vVal" style="font-weight:bold;">5.0</span> m/s</div>
+                        <div>Disp: <span id="sVal" style="font-weight:bold;">0.0</span> m</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Motion</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="5.0" step="0.1" value="2.0" style="width:100px; cursor:pointer;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解题步骤 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                
+                <!-- Part A Step 1 -->
+                <div id="step1" class="step-box">
+                    <strong>Step 1: Forward Motion (0-40s)</strong><br>
+                    Velocity at $t=20$:<br>
+                    $v_{20} = u + at = 5 + 0.75(20) = 20$ ms$^{-1}$.<br><br>
+                    Displacement (Area under graph):<br>
+                    Area 1 (Trapezoid 0-20): $\frac{1}{2}(5+20)\times 20 = 250$ m<br>
+                    Area 2 (Triangle 20-40): $\frac{1}{2}(20)\times 20 = 200$ m<br>
+                    Total Forward $s_{0-40} = 250 + 200 = \mathbf{450}$ m
+                </div>
+
+                <!-- Part A Step 2 -->
+                <div id="step2" class="step-box">
+                    <strong>Step 2: Backward Motion (40s-T)</strong><br>
+                    To return to O, Net Displacement must be 0.<br>
+                    $\therefore$ Backward area must equal $-450$ m.<br>
+                    We know Area(40-50):<br>
+                    Gradient $20 \to 40$ is $\frac{0-20}{20} = -1$.<br>
+                    At $t=50$, $v = 0 + (-1)(10) = -10$ ms$^{-1}$.<br>
+                    Area(40-50) = $\frac{1}{2}(10)(-10) = -50$ m.<br>
+                    Remaining Area needed: $-(450 - 50) = -400$ m.
+                </div>
+
+                <!-- Part A Step 3 -->
+                <div id="step3" class="step-box">
+                    <strong>Step 3: Solve for T (5 marks)</strong><br>
+                    Area from 40 to T is a single triangle.<br>
+                    $\frac{1}{2} \times \text{base} \times \text{height} = 450$<br>
+                    Height is the max negative velocity. But wait, slope is constant from 20s onwards ($a=-1$).<br>
+                    Velocity at T: $v_T = 0 + (-1)(T-40) = -(T-40)$<br>
+                    Area = $\frac{1}{2}(T-40)(-(T-40)) = -450$<br>
+                    $(T-40)^2 = 900 \Rightarrow T-40 = 30$<br>
+                    Wait, gradient changes at $t=50$?<br>
+                    Re-read Q: "decelerates for next 30s" (20 to 50).<br>
+                    So $v_{50} = -10$. From 50 to T is a NEW segment.<br>
+                    Triangle(50-T): Base $(T-50)$, Height $10$.<br>
+                    Area = $\frac{1}{2}(T-50)(10) = 400$ (magnitude)<br>
+                    $5(T-50) = 400 \Rightarrow T-50 = 80$<br>
+                    <span class="math-eq highlight">$T = 130 \text{ s}$</span>
+                </div>
+
+                <!-- Part B -->
+                <div id="step4" class="step-box" style="border-left-color: #e67e22;">
+                    <strong>Part (b): Acceleration (2 marks)</strong><br>
+                    From $t=50$ to $t=T(130)$.<br>
+                    Points: $(50, -10)$ and $(130, 0)$.<br>
+                    Gradient = Acceleration<br>
+                    $a = \frac{0 - (-10)}{130 - 50} = \frac{10}{80}$<br>
+                    <span class="math-eq highlight">$a = 0.125 \text{ ms}^{-2}$</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Problem Constants
+        const T_final = 130;
+        const maxDisp = 450; 
+        
+        // Animation State
+        let simState = 'RESET';
+        let animId;
+        let time = 0;
+        let timeScale = 2.0; 
+        
+        // Layout Vars
+        let graphX, graphY, graphW, graphH, trackY;
+
+        document.getElementById('speedRange').addEventListener('input', function(e) {
+            timeScale = parseFloat(e.target.value);
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 【核心修复】JS 兜底高度，防止塌陷
+            canvas.height = canvas.parentElement.clientHeight || 400;
+            initLayout();
+            drawFrame();
+        }
+        // 【核心修复】双重事件监听，确保加载完成
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function initLayout() {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            graphX = 50;
+            graphY = 30;
+            graphW = w - 70;
+            graphH = h * 0.55;
+            trackY = h * 0.85;
+        }
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = (now - lastTime) / 1000;
+                lastTime = now;
+                if(dt > 0.1) dt = 0.1;
+                
+                time += dt * timeScale * 5; 
+                if (time > T_final) {
+                    time = T_final;
+                    simState = 'END';
+                    document.getElementById('btnStart').innerText = "Finished";
+                }
+                
+                updateUI(time);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            time = 0;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Motion";
+            
+            document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+            updateUI(0);
+            drawFrame();
+        }
+        
+        function getPhysics(t) {
+            let v = 0, s = 0;
+            if (t <= 20) {
+                v = 5 + 0.75 * t;
+                s = 5 * t + 0.5 * 0.75 * t * t;
+                if(t > 0) highlightStep(1);
+            } else if (t <= 50) {
+                let t2 = t - 20;
+                let s20 = 250;
+                v = 20 - t2;
+                s = s20 + 20*t2 - 0.5*t2*t2;
+                if(t > 40) highlightStep(2);
+            } else {
+                let t3 = t - 50;
+                let s50 = 400; 
+                v = -10 + 0.125 * t3;
+                s = s50 - 10*t3 + 0.5 * 0.125 * t3 * t3;
+                if(t > 50) highlightStep(3);
+                if(t > 100) highlightStep(4);
+            }
+            return {v, s};
+        }
+
+        function highlightStep(id) {
+            document.querySelectorAll('.step-box').forEach(el => {
+                if(el.id) el.classList.remove('active');
+            });
+            let step = document.getElementById('step'+id);
+            if(step) step.classList.add('active');
+        }
+        
+        function updateUI(t) {
+            let phy = getPhysics(t);
+            document.getElementById('tVal').innerText = t.toFixed(1);
+            document.getElementById('vVal').innerText = phy.v.toFixed(1);
+            document.getElementById('sVal').innerText = phy.s.toFixed(1);
+        }
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            if (!graphW) initLayout();
+            
+            // Scales
+            const scaleT = graphW / 140;
+            const scaleV = graphH / 40;
+            const zeroV_Y = graphY + 25 * scaleV; 
+            
+            // Axes
+            ctx.beginPath();
+            ctx.moveTo(graphX, graphY); ctx.lineTo(graphX, graphY + graphH);
+            ctx.moveTo(graphX, zeroV_Y); ctx.lineTo(graphX + graphW, zeroV_Y); 
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            
+            // Graph Path
+            const pts = [{t:0, v:5}, {t:20, v:20}, {t:40, v:0}, {t:50, v:-10}, {t:130, v:0}];
+            ctx.beginPath();
+            ctx.moveTo(graphX + pts[0].t*scaleT, zeroV_Y - pts[0].v*scaleV);
+            for(let i=1; i<pts.length; i++) {
+                ctx.lineTo(graphX + pts[i].t*scaleT, zeroV_Y - pts[i].v*scaleV);
+            }
+            ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3; ctx.stroke();
+            
+            // Fill
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(graphX, graphY, time*scaleT, graphH);
+            ctx.clip();
+            ctx.beginPath();
+            ctx.moveTo(graphX + pts[0].t*scaleT, zeroV_Y - pts[0].v*scaleV);
+            for(let i=1; i<pts.length; i++) {
+                ctx.lineTo(graphX + pts[i].t*scaleT, zeroV_Y - pts[i].v*scaleV);
+            }
+            ctx.lineTo(graphX + 130*scaleT, zeroV_Y); 
+            ctx.lineTo(graphX, zeroV_Y);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+            ctx.fill();
+            ctx.restore();
+
+            // Current Dot
+            const phy = getPhysics(time);
+            const curX = graphX + time * scaleT;
+            const curY = zeroV_Y - phy.v * scaleV;
+            ctx.beginPath(); ctx.arc(curX, curY, 6, 0, Math.PI*2);
+            ctx.fillStyle = '#e74c3c'; ctx.fill();
+            
+            // Track
+            const trackStart = graphX;
+            const trackEnd = graphX + graphW;
+            const trackScale = (trackEnd - trackStart) / 500; 
+            
+            ctx.beginPath(); ctx.moveTo(trackStart, trackY); ctx.lineTo(trackEnd, trackY);
+            ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 4; ctx.stroke();
+            
+            // Marks
+            ctx.beginPath(); ctx.moveTo(trackStart, trackY-10); ctx.lineTo(trackStart, trackY+10); ctx.stroke();
+            ctx.fillText("O", trackStart, trackY+25);
+            const maxX = trackStart + 450 * trackScale;
+            ctx.beginPath(); ctx.moveTo(maxX, trackY-5); ctx.lineTo(maxX, trackY+5); ctx.stroke();
+            ctx.fillText("450m", maxX, trackY+25);
+
+            // Particle
+            const pX = trackStart + phy.s * trackScale;
+            ctx.beginPath(); ctx.arc(pX, trackY, 10, 0, Math.PI*2);
+            ctx.fillStyle = '#e67e22'; ctx.fill();
+            ctx.fillStyle = '#333'; ctx.font='12px Arial';
+            ctx.fillText(phy.v > 0 ? "→" : (phy.v < 0 ? "←" : "Stop"), pX-5, trackY-15);
+        }
+
+        // 【核心修复】双重初始化，防止白屏
+        resize();
+        setTimeout(resize, 500);
+    </script>
+</body>
+</html>

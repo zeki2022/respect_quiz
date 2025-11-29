@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Q1: Momentum & Collision</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 400px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 容器样式 */
+        .canvas-container { 
+            width: 100%; 
+            height: 350px; /* 直接定高，防止CSS塌陷 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        .controls { display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; flex-wrap: wrap; align-items: center; border:1px solid #eee;}
+        button.action-btn { background-color: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;}
+        button.action-btn.secondary { background-color: #9b59b6; }
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px;}
+        .step-box { 
+            border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; 
+            background: #fff; border-radius: 8px; border-left: 4px solid #ccc;
+            transition: all 0.3s;
+        }
+        .step-box.active { border-left: 4px solid #3498db; background: #f0f9ff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .math-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.1em;
+            color: #2c3e50; background: #f9f9f9; border: 1px solid #eee;
+            padding: 2px 6px; border-radius: 4px; margin: 2px 0; display: inline-block;
+        }
+
+        /* 能量条 */
+        .bar-label { font-size: 12px; color: #555; margin-bottom: 5px; display: flex; justify-content: space-between;}
+        .bar-track { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; margin-bottom: 10px;}
+        .bar-fill { height: 100%; background: #2ecc71; width: 0%; transition: width 0.3s; }
+        .bar-fill.loss { background: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9709 Math / Mechanics / Q1</h3>
+                
+                <div class="problem-text" style="background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333;">
+                    <img src="q1_orig.png" style="max-width:100%; mix-blend-mode:multiply; margin-bottom:10px;" onerror="this.style.display='none'">
+                    <strong>Given:</strong> Two particles P ($0.1$ kg) and Q ($0.3$ kg) on smooth horizontal plane.<br>
+                    Initial: P towards Q ($4u$), Q towards P ($u$).<br>
+                    Final: P speed $2$, Q speed $4$.<br>
+                    <strong>(a)</strong> Find two possible values of $u$.<br>
+                    <strong>(b)</strong> Find largest possible loss of KE.
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div style="position:absolute; top:10px; left:10px; font-size:12px; color:#555;">
+                        Mode: <span id="caseText" style="font-weight:bold; color:#9b59b6;">Case 1 (u=14)</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="startSim()" id="btnStart">Start Collision</button>
+                    <button class="action-btn secondary" onclick="toggleCase()">Toggle Case 1/2</button>
+                    <button class="action-btn" style="background:#95a5a6" onclick="resetSim()">Reset</button>
+                    <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                        <span style="font-weight:bold; color:#555;">Speed:</span>
+                        <input type="range" id="speedRange" min="0.1" max="2.0" step="0.1" value="0.5" style="width:100px; cursor:pointer;">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 10px; background: #fcfcfc; border: 1px solid #eee; border-radius: 8px;">
+                    <div class="bar-label"><span>Initial KE</span> <span id="valKEi">-- J</span></div>
+                    <div class="bar-track"><div class="bar-fill" id="barKEi"></div></div>
+                    <div class="bar-label"><span>Final KE</span> <span id="valKEf">-- J</span></div>
+                    <div class="bar-track"><div class="bar-fill" id="barKEf"></div></div>
+                    <div class="bar-label"><span>Loss</span> <span id="valLoss" style="color:#e74c3c; font-weight:bold;">-- J</span></div>
+                    <div class="bar-track"><div class="bar-fill loss" id="barLoss"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="step-box" style="border-left-color: #27ae60;">
+                    <strong style="color:#27ae60;">Part (a): Conservation of Momentum</strong><br>
+                    Taking right as positive (+):<br>
+                    $m_P u_P + m_Q u_Q = m_P v_P + m_Q v_Q$<br>
+                    $0.1(4u) + 0.3(-u) = 0.1(v_P) + 0.3(4)$<br>
+                    <span class="math-eq">$0.1u = 0.1v_P + 1.2$</span>
+                    <hr style="border-top:1px dashed #ddd; margin:10px 0;">
+                    <strong>Case 1: P moves RIGHT ($v_P = +2$)</strong><br>
+                    $0.1u = 0.1(2) + 1.2 \Rightarrow \mathbf{u = 14}$<br><br>
+                    <strong>Case 2: P rebounds LEFT ($v_P = -2$)</strong><br>
+                    $0.1u = 0.1(-2) + 1.2 \Rightarrow \mathbf{u = 10}$
+                </div>
+                <div id="step2" class="step-box">
+                    <strong>Part (b): KE Loss</strong><br>
+                    Largest loss when $u=14$.<br>
+                    Initial KE: $\frac{1}{2}(0.1)(56)^2 + \frac{1}{2}(0.3)(14)^2 = 186.2$ J<br>
+                    Final KE: $\frac{1}{2}(0.1)(2)^2 + \frac{1}{2}(0.3)(4)^2 = 2.6$ J<br>
+                    Loss: $186.2 - 2.6 = \mathbf{183.6 \text{ J}}$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const mP = 0.1, mQ = 0.3;
+        let activeCase = 1; 
+        let simState = 'RESET';
+        let timeScale = 0.5;
+        let animId;
+        let p = { x: 0, v: 0, r: 20, color: '#e67e22', label: 'P' };
+        let q = { x: 0, v: 0, r: 30, color: '#3498db', label: 'Q' };
+        let uVal = 14;
+
+        document.getElementById('speedRange').addEventListener('input', (e) => {
+            timeScale = parseFloat(e.target.value);
+        });
+
+        function toggleCase() {
+            activeCase = (activeCase === 1) ? 2 : 1;
+            uVal = (activeCase === 1) ? 14 : 10;
+            document.getElementById('caseText').innerText = `Case ${activeCase} (u=${uVal})`;
+            resetSim();
+        }
+
+        function resize() {
+            // 【终极防塌陷】强制获取宽度，若失败则默认 350
+            const parentW = canvas.parentElement.clientWidth || 350;
+            const parentH = canvas.parentElement.clientHeight || 350;
+            canvas.width = parentW;
+            canvas.height = parentH;
+            initPositions();
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function initPositions() {
+            const w = canvas.width;
+            const h = canvas.height;
+            p.x = w * 0.2; p.y = h / 2;
+            q.x = w * 0.8; q.y = h / 2;
+            
+            // Scale velocity for visuals
+            const vScale = w * 0.01; 
+            p.v = (4 * uVal) * vScale * 0.1; // Scale down for u=14
+            q.v = (-1 * uVal) * vScale * 0.1;
+            updateEnergyUI(true);
+        }
+
+        function startSim() {
+            if(simState === 'RUNNING') return;
+            simState = 'RUNNING';
+            document.getElementById('btnStart').disabled = true;
+            let lastTime = performance.now();
+            function loop(now) {
+                if(simState !== 'RUNNING') return;
+                let dt = Math.min((now - lastTime)/1000, 0.1); lastTime = now;
+                update(dt * timeScale);
+                drawFrame();
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animId);
+            simState = 'RESET';
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerText = "Start Collision";
+            initPositions();
+            drawFrame();
+        }
+
+        function update(dt) {
+            p.x += p.v * dt * 60; // Adjustment for visual speed
+            q.x += q.v * dt * 60;
+            
+            // Collision
+            if (q.x - p.x <= (p.r + q.r)) {
+                const vScale = canvas.width * 0.01;
+                q.v = 4 * vScale * 0.1; 
+                p.v = (activeCase === 1 ? 2 : -2) * vScale * 0.1;
+                
+                // Separate
+                let overlap = (p.r + q.r) - (q.x - p.x);
+                p.x -= overlap/2; q.x += overlap/2;
+                updateEnergyUI(false);
+            }
+            // Walls
+            if (p.x < p.r || q.x > canvas.width - q.r) {
+                simState = 'END'; document.getElementById('btnStart').innerText = "Finished";
+            }
+        }
+        
+        function updateEnergyUI(isInitial) {
+            let keP, keQ, total;
+            if (isInitial) {
+                keP = 0.5 * 0.1 * Math.pow(4*uVal, 2);
+                keQ = 0.5 * 0.3 * Math.pow(uVal, 2);
+                total = keP + keQ;
+                document.getElementById('valKEi').innerText = total.toFixed(1) + " J";
+                document.getElementById('barKEi').style.width = "100%";
+                document.getElementById('barKEf').style.width = "0%";
+                document.getElementById('barLoss').style.width = "0%";
+            } else {
+                let totalF = 2.6;
+                let loss = parseFloat(document.getElementById('valKEi').innerText) - totalF;
+                document.getElementById('valKEf').innerText = totalF.toFixed(1) + " J";
+                document.getElementById('valLoss').innerText = loss.toFixed(1) + " J";
+                let max = parseFloat(document.getElementById('valKEi').innerText);
+                document.getElementById('barKEf').style.width = (totalF/max*100) + "%";
+                document.getElementById('barLoss').style.width = (loss/max*100) + "%";
+            }
+        }
+
+        function drawFrame() {
+            const w = canvas.width;
+            const h = canvas.height;
+            // Fallback clear
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0,0,w,h);
+            
+            // Floor
+            ctx.beginPath(); ctx.moveTo(0, h/2 + 35); ctx.lineTo(w, h/2 + 35);
+            ctx.strokeStyle = '#eee'; ctx.lineWidth = 2; ctx.stroke();
+
+            drawBall(p); drawBall(q);
+            // Arrows
+            if(simState !== 'END') {
+                drawVector(p); drawVector(q);
+            }
+        }
+        
+        function drawBall(obj) {
+            ctx.beginPath(); ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI*2);
+            ctx.fillStyle = obj.color; ctx.fill();
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = 'white'; ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(obj.label, obj.x, obj.y);
+        }
+        
+        function drawVector(obj) {
+            if(Math.abs(obj.v) < 0.01) return;
+            const dir = obj.v > 0 ? 1 : -1;
+            const len = 40 * dir;
+            const sy = obj.y - 35;
+            ctx.beginPath(); ctx.moveTo(obj.x, sy); ctx.lineTo(obj.x + len, sy);
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(obj.x + len, sy);
+            ctx.lineTo(obj.x + len - 6*dir, sy - 4);
+            ctx.lineTo(obj.x + len - 6*dir, sy + 4);
+            ctx.fillStyle = '#333'; ctx.fill();
+        }
+
+        // 终极保险：多重启动
+        setTimeout(resize, 100);
+        setTimeout(resize, 500);
+        setTimeout(resize, 1000);
+    </script>
+</body>
+</html>
