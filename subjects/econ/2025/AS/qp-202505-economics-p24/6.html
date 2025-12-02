@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q3 - Subsidy Analysis | 9708 Econ</title>
+    
+    <!-- 使用公共样式库 -->
+    <link rel="stylesheet" href="./../../../common/css/style.css">
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 基础样式使用公共库 */
+        /* 这里只添加解题页面特有的样式 */
+        
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: relative;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+        }
+        
+        /* 高质量水印 */
+        .watermark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.08;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50%25' y='50%25' font-size='20' font-weight='bold' fill='%237b61ff' opacity='0.3' text-anchor='middle' dominant-baseline='middle' transform='rotate(-45 100 100)'%3ERESPECT%3C/svg%3E");
+            background-repeat: repeat;
+        }
+        
+        /* 返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 10001;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: sans-serif;
+            line-height: 1;
+            cursor: pointer;
+        }
+        
+        /* 主容器 */
+        .solution-container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        @media (max-width: 1000px) {
+            .solution-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 卡片 */
+        .solution-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        /* 图表容器 */
+        .graph-container {
+            width: 100%;
+            min-height: 450px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        /* 控制面板 */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: space-between;
+        }
+        
+        /* 数据展示 */
+        .data-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .data-item {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .data-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #7b61ff;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* 右侧面板 */
+        .answer-panel {
+            max-height: 85vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* Tabs */
+        .answer-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .answer-tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-tab:hover {
+            color: #7b61ff;
+        }
+        
+        .answer-tab.active {
+            color: #7b61ff;
+            border-bottom-color: #7b61ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 高亮 */
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .solution-container {
+                gap: 15px;
+            }
+            
+            .solution-card {
+                padding: 18px;
+            }
+            
+            .graph-container {
+                min-height: 400px;
+            }
+            
+            .data-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* PED选择按钮 */
+        .ped-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .ped-btn.active {
+            border-color: #7b61ff;
+            background-color: #f0f4ff;
+            color: #7b61ff;
+        }
+        
+        .ped-btn.elastic.active {
+            border-color: #27ae60;
+            background-color: #e8f5e8;
+            color: #27ae60;
+        }
+        
+        .ped-btn.inelastic.active {
+            border-color: #e74c3c;
+            background-color: #ffeaea;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- 水印 -->
+    <div class="watermark"></div>
+    
+    <!-- 返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="solution-container">
+        <!-- 左侧：题目和交互图表 -->
+        <div class="left-col">
+            <div class="solution-card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:12px; color: #333;">
+                    9708 Econ / Section B / Q3
+                </h3>
+                
+                <div style="background:#e8f4fd; padding:20px; border-left:4px solid #7b61ff; margin-bottom:20px; font-size:16px; line-height:1.7; color:#333;">
+                    <p><strong>(a)</strong> With the help of a diagram, explain how changes in a subsidy can influence the price and quantity sold of a product in a market and consider how expenditure on a subsidy is affected by the price elasticity of demand for the product. [8]</p>
+                    
+                    <p><strong>(b)</strong> Assess whether an increase in the tax on a demerit good is always the best way to reduce the consumption of such a product. [12]</p>
+                </div>
+                
+                <!-- 图表容器 -->
+                <div class="graph-container">
+                    <canvas id="econCanvas"></canvas>
+                    <div style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.95); padding:10px 15px; border-radius:6px; font-size:12px; border:1px solid #ddd; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="color:#3498db; margin-bottom:4px;"><strong>● D</strong> (Demand)</div>
+                        <div style="color:#e74c3c; margin-bottom:4px;"><strong>● S</strong> (Supply)</div>
+                        <div style="color:#27ae60;"><strong>● S+Sub</strong> (With Subsidy)</div>
+                    </div>
+                </div>
+                
+                <!-- 实时数据 -->
+                <div class="data-panel">
+                    <div class="data-item">
+                        <div class="data-value" id="priceValue">$60</div>
+                        <div class="data-label">Equilibrium Price</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="quantityValue">80</div>
+                        <div class="data-label">Equilibrium Quantity</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="govCost">$800</div>
+                        <div class="data-label">Government Cost</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-value" id="pedValue">2.0</div>
+                        <div class="data-label">PED</div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <div class="control-row">
+                        <span style="font-weight:bold; font-size:14px; color: #555;">Subsidy Amount:</span>
+                        <input type="range" id="subsidySlider" min="0" max="30" value="10" 
+                               style="flex:1; cursor:pointer; height: 8px; border-radius: 4px; background: #e0e0e0;" 
+                               oninput="updateSubsidy()">
+                        <span id="subsidyDisplay" style="min-width:50px; text-align:center; font-weight:bold; color:#7b61ff;">$10</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#888; margin-top:-8px; padding: 0 5px;">
+                        <span>$0 (No Subsidy)</span>
+                        <span>$30 (Max)</span>
+                    </div>
+                    
+                    <!-- PED选择器 - 改进 -->
+                    <div class="control-row" style="margin-top:15px; gap:10px;">
+                        <div class="ped-btn elastic active" onclick="setPED('elastic')">
+                            Elastic Demand<br><small style="font-weight:normal;">(PED > 1)</small>
+                        </div>
+                        <div class="ped-btn inelastic" onclick="setPED('inelastic')">
+                            Inelastic Demand<br><small style="font-weight:normal;">(PED < 1)</small>
+                        </div>
+                    </div>
+                    
+                    <!-- 比较按钮 -->
+                    <div class="control-row">
+                        <button style="flex:1; padding:12px; background:#7b61ff; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;" 
+                                onclick="showExamMode()">
+                            ★ Show Exam Diagram
+                        </button>
+                        <button style="flex:0.5; padding:12px; background:#95a5a6; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;" 
+                                onclick="resetGraph()">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：解答区域 -->
+        <div class="right-col">
+            <div class="solution-card answer-panel">
+                <div class="answer-tabs">
+                    <div class="answer-tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="answer-tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="answer-tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="tab-analysis" class="tab-content active">
+                    <h4 style="color: #333; border-left: 4px solid #7b61ff; padding-left: 12px; margin-top: 0;">
+                        Part (a) - Core Concepts
+                    </h4>
+                    
+                    <div style="background:#f0f7ff; padding:15px; border-radius:6px; margin:15px 0; border-left:3px solid #7b61ff;">
+                        <p><strong>Subsidy Effect:</strong> A subsidy shifts the supply curve <span class="highlight-term">rightwards</span> (from S to S+Sub). This creates a new equilibrium with <span class="highlight-term">lower price</span> and <span class="highlight-term">higher quantity</span>.</p>
+                    </div>
+                    
+                    <div style="background:#f0f7ff; padding:15px; border-radius:6px; margin:15px 0; border-left:3px solid #7b61ff;">
+                        <p><strong>PED Impact on Government Cost:</strong></p>
+                        <ul style="padding-left:20px; margin:10px 0;">
+                            <li><span class="highlight-term">Elastic Demand (PED > 1)</span>: Flat demand curve → Large quantity increase → <strong>High government cost</strong></li>
+                            <li><span class="highlight-term">Inelastic Demand (PED < 1)</span>: Steep demand curve → Small quantity increase → <strong>Lower government cost</strong></li>
+                        </ul>
+                        <p style="margin-top:10px;">$$ \text{Government Cost} = \text{Subsidy per unit} \times Q_{\text{new}} $$</p>
+                    </div>
+                    
+                    <h4 style="color: #333; border-left: 4px solid #e74c3c; padding-left: 12px; margin-top: 30px;">
+                        Part (b) - Key Arguments
+                    </h4>
+                    
+                    <div style="background:#ffeaea; padding:15px; border-radius:6px; margin:15px 0; border-left:3px solid #e74c3c;">
+                        <p><strong>Why Taxes May Not Always Be Best:</strong></p>
+                        <ul style="padding-left:20px; margin:10px 0;">
+                            <li>Demand for addictive goods is often <span class="highlight-term">price inelastic</span> → minimal quantity reduction</li>
+                            <li>High taxes create <span class="highlight-term">black markets</span></li>
+                            <li><span class="highlight-term">Regressive effect</span> on low-income households</li>
+                            <li>Alternative policies (education, advertising bans) may be more effective</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background:#fff3cd; padding:15px; border-radius:6px; margin:20px 0; border-left:3px solid #ffc107;">
+                        <p><strong>Interactive Demonstration:</strong></p>
+                        <p>Use the controls above to see how PED affects subsidy effectiveness. Compare:</p>
+                        <ul style="padding-left:20px; margin:10px 0;">
+                            <li><strong>Elastic Demand</strong> (flat curve): Large quantity response to subsidy</li>
+                            <li><strong>Inelastic Demand</strong> (steep curve): Small quantity response</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+              <div id="tab-evaluation" class="tab-content">
+                    <h4 style="color: #333; border-left: 4px solid #f39c12; padding-left: 12px; margin-top: 0;">
+                        AO3 Evaluation Criteria
+                    </h4>
+                    
+                    <div class="mark-point">
+                        <p><strong>For Part (a): Critical Evaluation Points</strong></p>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li><span class="highlight-term">Effectiveness depends on PED</span> - Use the interactive graph to compare elastic vs inelastic scenarios</li>
+                            <li><span class="highlight-term">Deadweight loss</span> - Subsidies may create welfare loss by distorting efficient market allocation</li>
+                            <li><span class="highlight-term">Opportunity cost</span> - Government funds have alternative uses (education, healthcare, infrastructure)</li>
+                            <li><span class="highlight-term">Long-term effects</span> - Subsidies may prevent necessary adjustments in declining industries</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mark-point">
+                        <p><strong>For Part (b): Critical Evaluation Points</strong></p>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li><span class="highlight-term">Regressive impact</span> - Taxes on demerit goods disproportionately affect low-income households</li>
+                            <li><span class="highlight-term">Effectiveness varies</span> - Depends on availability of substitutes and degree of addiction</li>
+                            <li><span class="highlight-term">Enforcement costs</span> - Combating black markets requires significant resources</li>
+                            <li><span class="highlight-term">Alternative approaches</span> - Education may be more effective for long-term behavior change</li>
+                            <li><span class="highlight-term">Time horizon</span> - Consider immediate tax effect vs gradual education impact</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mark-point" style="background-color: #fff3cd; border-left-color: #f39c12;">
+                        <p><strong>AO3 Marking Guidance:</strong></p>
+                        <p><span class="mark-label">Level 2 (3-4 marks):</span> Justified conclusion + developed evaluative comments</p>
+                        <p><span class="mark-label">Level 1 (1-2 marks):</span> Vague conclusion + simple evaluative comments</p>
+                        <p><span class="mark-label">Level 0 (0 marks):</span> One-sided response gets ZERO evaluation marks</p>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="tab-model" class="tab-content">
+    <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #eee;">
+        <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">Part (a) [8 Marks] - Model Answer</h4>
+        
+        <p>A producer subsidy reduces production costs, shifting the <span class="highlight-term">supply curve</span> rightwards from S to S+Sub. This creates a new <span class="highlight-term">equilibrium</span> at E₁ with a <span class="highlight-term">lower price (P₁)</span> and <span class="highlight-term">higher quantity (Q₁)</span> compared to the original equilibrium E₀. Government expenditure equals the <span class="highlight-term">subsidy per unit × Q₁</span> (the shaded area on the diagram).</p>
+        
+        <p><strong>Critical effect of PED:</strong> When <span class="highlight-term">demand is elastic (PED > 1)</span>, the demand curve is relatively flat, so the subsidy causes a <span class="highlight-term">large increase in quantity</span> demanded, resulting in <span class="highlight-term">high government expenditure</span>. Conversely, when <span class="highlight-term">demand is inelastic (PED < 1)</span>, the steep demand curve means quantity responds minimally to the price fall, so <span class="highlight-term">government cost is lower</span> despite the same subsidy rate.</p>
+        
+        <p><strong>Exam technique:</strong> To achieve full marks, candidates must: (1) correctly draw and label the supply shift; (2) identify both price and quantity changes; (3) calculate/illustrate government spending; (4) explicitly link expenditure size to PED.</p>
+    </div>
+    
+    <div>
+        <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">Part (b) [12 Marks] - Model Answer</h4>
+        
+        <p>While taxes on <span class="highlight-term">demerit goods</span> aim to <span class="highlight-term">internalise negative externalities</span> and reduce consumption, they are not always the optimal policy due to several limitations:</p>
+        
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li><strong>Limited effectiveness with inelastic demand:</strong> For addictive goods like tobacco where <span class="highlight-term">PED < 1</span>, even substantial tax increases cause only minimal quantity reductions, failing to achieve significant health improvements while generating substantial government revenue.</li>
+            
+            <li><strong>Regressive distributional effects:</strong> Such taxes disproportionately burden <span class="highlight-term">low-income households</span> who spend a higher percentage of their income on these goods, worsening <span class="highlight-term">income inequality</span>.</li>
+            
+            <li><strong>Unaddressed information failure:</strong> Taxes do not directly correct the underlying <span class="highlight-term">information asymmetry</span> where consumers underestimate long-term health costs, limiting behavioral change.</li>
+            
+            <li><strong>Potential for unintended consequences:</strong> High taxes may stimulate <span class="highlight-term">black markets</span> and smuggling, undermining policy objectives while creating enforcement costs.</li>
+        </ul>
+        
+        <p><strong>Superior alternatives include:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li><span class="highlight-term">Education campaigns</span> that directly address information failure and change preferences</li>
+            <li><span class="highlight-term">Regulation</span> (advertising bans, sales restrictions, minimum ages) that controls availability</li>
+            <li><span class="highlight-term">Behavioural "nudges"</span> like graphic health warnings that influence choice architecture</li>
+        </ul>
+        
+        <p><strong>Conclusion:</strong> An optimal approach often involves a <span class="highlight-term">policy mix</span> combining moderate taxation (to reflect social costs and fund health programs) with education and regulation, rather than relying solely on tax increases. This balances efficiency in reducing consumption with equity considerations.</p>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 完全修正的绘图引擎
+        const canvas = document.getElementById('econCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        
+        // 状态变量
+        let subsidy = 10;
+        let isExamMode = false;
+        let currentPED = 'elastic'; // elastic或inelastic
+        
+        // 经济学参数 - 修正版本
+        const params = {
+            // 需求曲线参数：P = a - bQ
+            elasticDemand: {
+                intercept: 80,   // 价格截距
+                slope: -0.4,     // 平缓的斜率 (弹性需求)
+                color: '#27ae60',
+                label: 'Elastic Demand (PED > 1)',
+                pedValue: 2.0
+            },
+            inelasticDemand: {
+                intercept: 80,
+                slope: -0.9,     // 陡峭的斜率 (非弹性需求)
+                color: '#e74c3c',
+                label: 'Inelastic Demand (PED < 1)',
+                pedValue: 0.5
+            },
+            // 供给曲线参数：P = c + dQ
+            supply: {
+                intercept: 20,
+                slope: 0.5
+            }
+        };
+        
+        // 获取当前需求曲线参数
+        function getCurrentDemand() {
+            return currentPED === 'elastic' ? params.elasticDemand : params.inelasticDemand;
+        }
+        
+        // 响应式调整
+        function resizeCanvas() {
+            if (!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight || 450;
+            width = canvas.width;
+            height = canvas.height;
+            drawGraph();
+        }
+        
+        // 初始化
+        window.addEventListener('load', function() {
+            resizeCanvas();
+            updateData();
+            drawGraph();
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 更新补贴值
+        function updateSubsidy() {
+            isExamMode = false;
+            subsidy = parseInt(document.getElementById('subsidySlider').value);
+            document.getElementById('subsidyDisplay').textContent = '$' + subsidy;
+            updateData();
+            drawGraph();
+        }
+        
+        // 设置PED类型
+        function setPED(type) {
+            currentPED = type;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.ped-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            updateData();
+            drawGraph();
+        }
+        
+        // 考试模式
+        function showExamMode() {
+            isExamMode = true;
+            subsidy = 15;
+            currentPED = 'inelastic';
+            document.getElementById('subsidySlider').value = subsidy;
+            document.getElementById('subsidyDisplay').textContent = '$' + subsidy;
+            
+            // 更新按钮
+            document.querySelectorAll('.ped-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.classList.contains('inelastic')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            updateData();
+            drawGraph();
+        }
+        
+        // 重置
+        function resetGraph() {
+            isExamMode = false;
+            subsidy = 10;
+            currentPED = 'elastic';
+            document.getElementById('subsidySlider').value = subsidy;
+            document.getElementById('subsidyDisplay').textContent = '$' + subsidy;
+            
+            // 更新按钮
+            document.querySelectorAll('.ped-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.classList.contains('elastic')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            updateData();
+            drawGraph();
+        }
+        
+        // Tab切换
+        function switchTab(tabName) {
+            document.querySelectorAll('.answer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+        
+        // 更新数据
+        function updateData() {
+            const demand = getCurrentDemand();
+            const pedFactor = currentPED === 'elastic' ? 2.0 : 0.5;
+            
+            // 计算新均衡
+            const originalPrice = 60;
+            const originalQuantity = 80;
+            
+            // 补贴效果：价格下降，数量增加
+            const priceDrop = subsidy * 0.3;
+            const quantityIncrease = subsidy * pedFactor;
+            
+            const newPrice = Math.max(30, originalPrice - priceDrop);
+            const newQuantity = Math.min(150, originalQuantity + quantityIncrease);
+            const govCost = subsidy * newQuantity;
+            
+            document.getElementById('priceValue').textContent = '$' + Math.round(newPrice);
+            document.getElementById('quantityValue').textContent = Math.round(newQuantity);
+            document.getElementById('govCost').textContent = '$' + Math.round(govCost);
+            document.getElementById('pedValue').textContent = demand.pedValue.toFixed(1);
+        }
+        
+        // 绘制图表 - 修正版：明显不同的需求曲线斜率
+        function drawGraph() {
+            if (!width || !height) return;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // 图表区域
+            const padding = { top: 50, right: 50, bottom: 70, left: 70 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+            
+            // 原点坐标
+            const originX = padding.left;
+            const originY = height - padding.bottom;
+            
+            // 绘制坐标轴
+            drawAxes(originX, originY, graphWidth, graphHeight, padding);
+            
+            // 获取当前需求参数
+            const demand = getCurrentDemand();
+            
+            // 计算交点
+            const intersect = calculateIntersection(demand);
+            
+            // 绘制需求曲线 - 根据弹性有明显不同的斜率
+            drawDemandCurve(demand, originX, originY, graphWidth, graphHeight);
+            
+            // 绘制原始供给曲线
+            drawSupplyCurve(false, originX, originY, graphWidth, graphHeight, intersect);
+            
+            // 绘制补贴后供给曲线
+            drawSupplyCurve(true, originX, originY, graphWidth, graphHeight, intersect);
+            
+            // 绘制均衡点
+            drawEquilibriumPoints(originX, originY, graphWidth, graphHeight, demand, intersect);
+            
+            // 绘制政府支出区域
+            drawGovernmentExpenditure(originX, originY, graphWidth, graphHeight, demand, intersect);
+            
+            // 添加标注
+            addLabels(originX, originY, graphWidth, graphHeight, demand, intersect);
+            
+            // 考试模式效果
+            if (isExamMode) {
+                drawExamEffects();
+            }
+        }
+        
+        // 绘制坐标轴
+        function drawAxes(originX, originY, graphWidth, graphHeight, padding) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            // Y轴
+            ctx.moveTo(originX, padding.top - 10);
+            ctx.lineTo(originX, originY);
+            
+            // X轴
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(originX + graphWidth + 10, originY);
+            ctx.stroke();
+            
+            // 坐标轴标签
+            ctx.font = 'bold 14px Arial';
+            ctx.fillStyle = '#333';
+            ctx.fillText("Price ($)", originX - 15, padding.top - 15);
+            ctx.fillText("Quantity", originX + graphWidth - 10, originY + 25);
+            
+            // 刻度
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            
+            // Y轴刻度
+            for (let p = 20; p <= 80; p += 20) {
+                const y = originY - ((p - 20) / 60) * graphHeight;
+                ctx.beginPath();
+                ctx.moveTo(originX - 5, y);
+                ctx.lineTo(originX, y);
+                ctx.stroke();
+                ctx.fillText('$' + p, originX - 35, y + 3);
+            }
+            
+            // X轴刻度
+            for (let q = 0; q <= 120; q += 30) {
+                const x = originX + (q / 120) * graphWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, originY);
+                ctx.lineTo(x, originY + 5);
+                ctx.stroke();
+                ctx.fillText(q.toString(), x - 5, originY + 18);
+            }
+        }
+        
+        // 计算交点
+        function calculateIntersection(demand) {
+            // 简化计算：供给曲线 P = 20 + 0.5Q
+            // 需求曲线 P = demand.intercept + demand.slope * Q
+            // 解方程求Q
+            const Q = (demand.intercept - 20) / (0.5 - demand.slope);
+            const P = 20 + 0.5 * Q;
+            
+            // 补贴后的交点
+            const subsidyShift = (subsidy / 30) * 0.3;
+            const Q_sub = (demand.intercept - (20 - subsidy * 0.3)) / (0.5 - demand.slope);
+            const P_sub = 20 + 0.5 * Q_sub - subsidy * 0.3;
+            
+            return {
+                original: { Q: Q, P: P },
+                withSubsidy: { Q: Q_sub, P: P_sub }
+            };
+        }
+        
+        // 绘制需求曲线 - 明显不同的斜率
+        function drawDemandCurve(demand, originX, originY, graphWidth, graphHeight) {
+            ctx.beginPath();
+            ctx.strokeStyle = demand.color;
+            ctx.lineWidth = 3;
+            
+            // 计算曲线上的点
+            const points = [];
+            for (let q = 0; q <= 120; q += 10) {
+                const price = demand.intercept + demand.slope * q;
+                if (price >= 20) { // 确保在图表范围内
+                    const x = originX + (q / 120) * graphWidth;
+                    const y = originY - ((price - 20) / 60) * graphHeight;
+                    points.push({x, y});
+                }
+            }
+            
+            // 绘制曲线
+            if (points.length > 1) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+            
+            // 添加标签
+            ctx.fillStyle = demand.color;
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText("D", points[points.length-1].x + 10, points[points.length-1].y + 5);
+        }
+        
+        // 绘制供给曲线
+        function drawSupplyCurve(withSubsidy, originX, originY, graphWidth, graphHeight, intersect) {
+            ctx.beginPath();
+            ctx.strokeStyle = withSubsidy ? '#27ae60' : '#e74c3c';
+            ctx.lineWidth = 3;
+            
+            // 供给曲线：P = 20 + 0.5Q (无补贴)
+            // 有补贴时：P = (20 - subsidy*0.3) + 0.5Q
+            const basePrice = withSubsidy ? 20 - subsidy * 0.3 : 20;
+            const color = withSubsidy ? '#27ae60' : '#e74c3c';
+            
+            const points = [];
+            for (let q = 0; q <= 120; q += 10) {
+                const price = basePrice + 0.5 * q;
+                if (price <= 80) { // 确保在图表范围内
+                    const x = originX + (q / 120) * graphWidth;
+                    const y = originY - ((price - 20) / 60) * graphHeight;
+                    points.push({x, y});
+                }
+            }
+            
+            // 绘制曲线
+            if (points.length > 1) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+            
+            // 添加标签
+            ctx.fillStyle = color;
+            ctx.font = 'bold 14px Arial';
+            const label = withSubsidy ? "S+Sub" : "S";
+            const lastPoint = points[points.length-1];
+            ctx.fillText(label, lastPoint.x + 10, lastPoint.y - 10);
+        }
+        
+        // 绘制均衡点
+        function drawEquilibriumPoints(originX, originY, graphWidth, graphHeight, demand, intersect) {
+            // 原始均衡点
+            const eqX = originX + (intersect.original.Q / 120) * graphWidth;
+            const eqY = originY - ((intersect.original.P - 20) / 60) * graphHeight;
+            
+            ctx.beginPath();
+            ctx.fillStyle = '#2c3e50';
+            ctx.arc(eqX, eqY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.font = 'bold 14px Arial';
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText("E₀", eqX + 8, eqY - 8);
+            
+            // 虚线
+            ctx.setLineDash([5, 3]);
+            ctx.strokeStyle = '#2c3e5080';
+            ctx.lineWidth = 1;
+            
+            ctx.beginPath();
+            ctx.moveTo(originX, eqY);
+            ctx.lineTo(eqX, eqY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(eqX, eqY);
+            ctx.lineTo(eqX, originY);
+            ctx.stroke();
+            
+            // 新均衡点（有补贴）
+            const newEqX = originX + (intersect.withSubsidy.Q / 120) * graphWidth;
+            const newEqY = originY - ((intersect.withSubsidy.P - 20) / 60) * graphHeight;
+            
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.fillStyle = '#e67e22';
+            ctx.arc(newEqX, newEqY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#e67e22';
+            ctx.fillText("E₁", newEqX + 8, newEqY - 8);
+            
+            // 新虚线
+            ctx.setLineDash([5, 3]);
+            ctx.strokeStyle = '#e67e2280';
+            
+            ctx.beginPath();
+            ctx.moveTo(originX, newEqY);
+            ctx.lineTo(newEqX, newEqY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(newEqX, newEqY);
+            ctx.lineTo(newEqX, originY);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+        
+        // 绘制政府支出区域
+        function drawGovernmentExpenditure(originX, originY, graphWidth, graphHeight, demand, intersect) {
+            if (subsidy <= 0) return;
+            
+            const newEqX = originX + (intersect.withSubsidy.Q / 120) * graphWidth;
+            const newEqY = originY - ((intersect.withSubsidy.P - 20) / 60) * graphHeight;
+            
+            // 计算支出区域高度（补贴金额）
+            const subsidyHeight = (subsidy / 30) * graphHeight * 0.4;
+            const rectWidth = newEqX - originX;
+            
+            ctx.fillStyle = 'rgba(243, 156, 18, 0.25)';
+            ctx.fillRect(originX, newEqY - subsidyHeight, rectWidth, subsidyHeight);
+            
+            // 标注
+            ctx.fillStyle = '#e67e22';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('Gov. Expenditure', originX + rectWidth/2 - 40, newEqY - subsidyHeight/2);
+        }
+        
+        // 添加标注
+        function addLabels(originX, originY, graphWidth, graphHeight, demand, intersect) {
+            const eqX = originX + (intersect.original.Q / 120) * graphWidth;
+            const eqY = originY - ((intersect.original.P - 20) / 60) * graphHeight;
+            const newEqX = originX + (intersect.withSubsidy.Q / 120) * graphWidth;
+            const newEqY = originY - ((intersect.withSubsidy.P - 20) / 60) * graphHeight;
+            
+            // 价格和数量标签
+            ctx.font = 'bold 14px Arial';
+            
+            // 原始
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText('P₀', originX - 25, eqY + 3);
+            ctx.fillText('Q₀', eqX - 10, originY + 20);
+            
+            // 新
+            ctx.fillStyle = '#e67e22';
+            ctx.fillText('P₁', originX - 25, newEqY + 3);
+            ctx.fillText('Q₁', newEqX - 10, originY + 20);
+            
+            // PED标注
+            ctx.fillStyle = demand.color;
+            ctx.font = 'bold 16px Arial';
+            const pedText = currentPED === 'elastic' ? 'Elastic Demand (Flat)' : 'Inelastic Demand (Steep)';
+            ctx.fillText(pedText, width - 250, 40);
+        }
+        
+        // 考试模式效果
+        function drawExamEffects() {
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText("★ EXAM DIAGRAM ★", width/2 - 90, 35);
+            
+            // 边框
+            ctx.strokeStyle = '#f39c12';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(20, 20, width - 40, height - 40);
+            ctx.setLineDash([]);
+        }
+        
+        // 防复制
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // 初始化
+        resizeCanvas();
+    </script>
+</body>
+</html>

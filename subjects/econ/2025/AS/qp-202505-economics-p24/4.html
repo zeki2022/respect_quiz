@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q4: Economic Growth - Interactive</title>
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* --- 布局核心样式 (参考 Sample.pdf) --- */
+        body { 
+            padding-top: 20px; 
+            padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; /* 强制全屏宽度 */
+            margin: 0;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        .container {
+            width: 98%; 
+            max-width: 1800px; /* 允许在宽屏电脑上展开 */
+            margin: 0 auto;
+            display: grid; 
+            grid-template-columns: 1fr 550px; /* 左侧自适应，右侧固定宽(加宽以提升阅读体验) */
+            gap: 25px; 
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) { 
+            .container { grid-template-columns: 1fr; } 
+        }
+
+        .card { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+        }
+
+        /* --- 修复返回按钮 (完全复刻 Sample 代码) --- */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.95);
+            border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            line-height: 1; cursor: pointer; border: 1px solid #eee;
+        }
+        .back-arrow:hover { background: #3498db; color: #fff; }
+
+        /* 题目文本区 */
+        .problem-text { 
+            background: #e8f4fd; 
+            padding: 20px; 
+            border-left: 5px solid #3498db; 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            color: #2c3e50; 
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 画布区 */
+        .canvas-container { 
+            width: 100%; 
+            height: 500px; /* 大屏高度 */
+            position: relative; 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            overflow: hidden; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+        }
+        canvas { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        }
+
+        /* 控制区 */
+        .controls { 
+            display: flex; flex-direction: column; gap: 15px; 
+            background: #f8f9fa; padding: 20px; border-radius: 8px; 
+            border: 1px solid #eee; 
+        }
+        .control-row { 
+            display: flex; align-items: center; gap: 15px; justify-content: space-between; 
+            flex-wrap: wrap;
+        }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; 
+            font-weight: 600; font-size: 14px; transition: all 0.2s;
+        }
+        button.action-btn:hover { background-color: #f1f1f1; }
+        button.action-btn.active { 
+            background-color: #2980b9; color: white; border-color: #2980b9; 
+            box-shadow: 0 2px 5px rgba(41, 128, 185, 0.3);
+        }
+        button.exam-btn { 
+            background-color: #27ae60; color: white; border: none; flex: 2; 
+        }
+        button.exam-btn:hover { background-color: #219150; }
+
+        /* 右侧面板 (Sticky) */
+        .solution-panel { 
+            max-height: 90vh; overflow-y: auto; 
+            position: sticky; top: 20px; 
+        }
+
+        /* Tabs */
+        .tabs { 
+            display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; 
+        }
+        .tab-item { 
+            padding: 12px 20px; cursor: pointer; font-weight: bold; 
+            color: #7f8c8d; border-bottom: 3px solid transparent; 
+            margin-bottom: -2px; font-size: 15px; flex: 1; text-align: center;
+        }
+        .tab-item:hover { color: #3498db; }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; background: linear-gradient(to bottom, transparent, rgba(52,152,219,0.05)); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* 文本内容样式 */
+        .explanation p { margin-bottom: 12px; line-height: 1.6; font-size: 15px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; font-weight: bold; border-bottom: 2px solid #ffeeba; }
+        
+        h4 { 
+            margin: 20px 0 12px 0; color: #2c3e50; 
+            border-left: 5px solid #3498db; padding-left: 10px; font-size: 16px; 
+            background: #fdfdfd; padding-top: 5px; padding-bottom: 5px;
+        }
+
+        .model-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #ccc; }
+        .model-header { font-size: 18px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        .model-sub { font-weight: bold; color: #555; display: block; margin-top: 12px; font-style: italic; }
+        
+        .mark-tag {
+            display: inline-block; background: #e74c3c; color: white; 
+            font-size: 12px; padding: 1px 6px; border-radius: 10px; 
+            vertical-align: middle; margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 修复：严格使用 Sample.pdf 的写法 -->
+    <a href="javascript:history.back()" class="back-arrow" title="Back">‹</a>
+
+    <div class="container">
+        
+        <!-- Left Column -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px; color:#333;">
+                    9708 Econ / Section C / Q4: Economic Growth
+                </h3>
+
+                <!-- Full OCR Text -->
+                <div class="problem-text">
+                    <p><strong>4</strong> <strong>(a)</strong> Explain two causes of economic growth and consider the extent to which their impact can be measured. [8]</p>
+                    <p><strong>(b)</strong> Assess the extent to which economic growth is always beneficial for the people and government in an economy. [12]</p>
+                </div>
+
+                <!-- Canvas -->
+                <div class="canvas-container">
+                    <canvas id="mainCanvas"></canvas>
+                    <div id="legendOverlay" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.95); padding:10px; border-radius:6px; font-size:13px; border:1px solid #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <!-- Legend Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <div class="control-row" style="justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <button class="action-btn active" id="btn-mode-a" onclick="switchMode('a')">4(a) Causes (AD vs LRAS)</button>
+                        <button class="action-btn" id="btn-mode-b" onclick="switchMode('b')">4(b) Benefits vs Costs</button>
+                    </div>
+
+                    <div class="control-row">
+                        <!-- Toggle for Part A -->
+                        <div id="causeToggle" style="display:flex; gap:10px; flex:1;">
+                            <button class="action-btn active" id="btn-cause-ad" onclick="setCause('ad')">Demand-Side (AD)</button>
+                            <button class="action-btn" id="btn-cause-as" onclick="setCause('as')">Supply-Side (LRAS)</button>
+                        </div>
+                    </div>
+
+                    <div class="control-row">
+                        <span id="sliderLabel" style="font-weight:bold; font-size:15px; min-width: 120px;">Growth Level:</span>
+                        <input type="range" id="mainSlider" min="0" max="100" value="0" style="flex:1; cursor:pointer;" oninput="manualSlider()">
+                    </div>
+                    
+                    <div class="control-row">
+                        <button class="action-btn exam-btn" onclick="showExamEffect()">★ Show Solution Diagram</button>
+                        <button class="action-btn" style="background:#95a5a6; color:white; flex:0.3;" onclick="resetGraph()">Reset</button>
+                    </div>
+                    
+                    <div id="statusText" style="text-align:center; color:#666; font-size:13px; font-style:italic; height: 20px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')" id="tab-btn-a">4(a) Logic</div>
+                    <div class="tab-item" onclick="switchTab('b')" id="tab-btn-b">4(b) Logic</div>
+                    <div class="tab-item" onclick="switchTab('model')" id="tab-btn-model">Full Answer</div>
+                </div>
+
+                <!-- Part A Logic -->
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. Definition & Causes (AO1)</h4>
+                    <div class="explanation">
+                        <p><strong>Economic Growth:</strong> An increase in Real GDP (value of goods/services produced) over time.</p>
+                        <p><strong>Cause 1 (Demand-side):</strong> Increase in Aggregate Demand ($AD = C+I+G+(X-M)$). Examples: Lower interest rates, lower tax, higher confidence.</p>
+                        <p><strong>Cause 2 (Supply-side):</strong> Increase in Long Run Aggregate Supply (LRAS). Examples: Better technology, education (productivity), more resources.</p>
+                    </div>
+
+                    <h4>2. Measuring Impact (Evaluation) (AO2/AO3)</h4>
+                    <div class="explanation">
+                        <p>We measure growth using % change in GDP. However, measurement is difficult due to:</p>
+                        <ul>
+                            <li><span class="highlight">Hidden/Shadow Economy:</span> Illegal activities or cash-in-hand work are not recorded.</li>
+                            <li><strong>Inflation:</strong> Nominal GDP must be adjusted for prices to get Real GDP.</li>
+                            <li><strong>Population:</strong> GDP per capita is a better measure of living standards.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Part B Logic -->
+                <div id="tab-b" class="tab-content">
+                    <h4>1. Benefits (The "Good") (AO2)</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Incomes:</span> Higher GDP per capita $\rightarrow$ more consumption $\rightarrow$ higher living standards.</p>
+                        <p>• <span class="term">Employment:</span> Firms produce more $\rightarrow$ hire more labor (Cyclical unemployment falls).</p>
+                        <p>• <span class="term">Fiscal Dividend:</span> Higher tax revenue without raising rates $\rightarrow$ government can invest in public services.</p>
+                    </div>
+
+                    <h4>2. Costs (The "Bad") (AO2)</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Inflation:</span> If Demand grows faster than Supply, Price Level rises (See Diagram red zone).</p>
+                        <p>• <span class="term">Environment:</span> More production $\rightarrow$ pollution, resource depletion (Negative Externalities).</p>
+                        <p>• <span class="term">Inequality:</span> Gains may go to the rich (capital owners) while workers see little benefit.</p>
+                    </div>
+
+                    <h4>3. Judgement (AO3)</h4>
+                    <div class="explanation">
+                        <p>Growth is NOT "always" beneficial. It depends on:</p>
+                        <ul>
+                            <li><strong>Sustainability:</strong> "Green growth" vs "Dirty growth".</li>
+                            <li><strong>Inclusivity:</strong> Do wages rise with profits?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Full Model Answer -->
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif; font-size:16px;">
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (a) [8 Marks]</div>
+                            <p>Economic growth is defined as an increase in the real value of goods and services produced in an economy over time, usually measured by the percentage change in Real GDP. <span class="mark-tag">AO1</span></p>
+                            
+                            <span class="model-sub">Causes:</span>
+                            <p><strong>1. Increase in Aggregate Demand (AD):</strong> A reduction in income tax increases disposable income, boosting Consumption ($C$). Since $AD = C+I+G+(X-M)$, AD shifts right, leading to short-run growth. <span class="mark-tag">AO2</span></p>
+                            <p><strong>2. Increase in LRAS (Potential Growth):</strong> Investment in education improves labor productivity. This increases the quantity and quality of factors of production, shifting the LRAS curve right. <span class="mark-tag">AO2</span></p>
+                            
+                            <span class="model-sub">Measurement Issues (Evaluation):</span>
+                            <p>The impact is measured via GDP stats, but this is often inaccurate due to the <span class="highlight">shadow economy</span> (undeclared transactions). In developing economies, a large informal sector means official GDP under-reports actual living standards. <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                        <div class="model-section" style="border-bottom:none;">
+                            <div class="model-header">Part (b) [12 Marks]</div>
+                            
+                            <span class="model-sub">Benefits:</span>
+                            <p>Economic growth is generally beneficial as it leads to higher <span class="highlight">GDP per capita</span>, allowing households to consume more goods and services. As output rises, firms demand more labor, reducing unemployment. Additionally, the government receives higher tax revenue (fiscal dividend) which can be spent on merit goods like healthcare. <span class="mark-tag">AO2</span></p>
+
+                            <span class="model-sub">Drawbacks (Costs):</span>
+                            <p>However, growth is not <em>always</em> beneficial. If growth is driven by AD shifting faster than LRAS, it causes <span class="term">demand-pull inflation</span>, eroding real incomes. Furthermore, rapid industrialization often leads to negative externalities such as pollution and resource depletion, reducing future welfare (unsustainable growth). Finally, growth may increase inequality if the rewards flow disproportionately to high-income earners. <span class="mark-tag">AO2</span></p>
+
+                            <span class="model-sub">Conclusion:</span>
+                            <p>Growth is beneficial if it is <span class="highlight">sustainable</span> (low inflation, green) and <span class="highlight">inclusive</span>. If it comes at the cost of high inflation or environmental destruction, the net welfare effect on people may be negative. <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let mode = 'a'; // 'a' or 'b'
+    let causeType = 'ad'; // 'ad' or 'as' for Part A
+    let sliderVal = 0;
+    let isExam = false;
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        updateUI();
+    }
+
+    function resize() {
+        if (!canvas.parentElement) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        width = canvas.width;
+        height = canvas.height;
+        draw();
+    }
+
+    // --- Switch Logic ---
+    function switchMode(newMode) {
+        mode = newMode;
+        sliderVal = 0;
+        isExam = false;
+        document.getElementById('mainSlider').value = 0;
+        
+        document.getElementById('btn-mode-a').className = mode === 'a' ? 'action-btn active' : 'action-btn';
+        document.getElementById('btn-mode-b').className = mode === 'b' ? 'action-btn active' : 'action-btn';
+        
+        // Toggle Cause Buttons Visibility
+        document.getElementById('causeToggle').style.display = mode === 'a' ? 'flex' : 'none';
+        
+        switchTab(newMode);
+        updateUI();
+        draw();
+    }
+
+    function setCause(type) {
+        causeType = type;
+        document.getElementById('btn-cause-ad').className = type === 'ad' ? 'action-btn active' : 'action-btn';
+        document.getElementById('btn-cause-as').className = type === 'as' ? 'action-btn active' : 'action-btn';
+        sliderVal = 0;
+        document.getElementById('mainSlider').value = 0;
+        updateUI();
+        draw();
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-btn-' + id).classList.add('active');
+        document.getElementById('tab-' + id).classList.add('active');
+    }
+
+    function manualSlider() {
+        isExam = false;
+        sliderVal = parseInt(document.getElementById('mainSlider').value);
+        draw();
+    }
+
+    function showExamEffect() {
+        isExam = true;
+        sliderVal = 80;
+        document.getElementById('mainSlider').value = 80;
+        draw();
+    }
+
+    function resetGraph() {
+        isExam = false;
+        sliderVal = 0;
+        document.getElementById('mainSlider').value = 0;
+        draw();
+    }
+
+    function updateUI() {
+        const legend = document.getElementById('legendOverlay');
+        const status = document.getElementById('statusText');
+        const label = document.getElementById('sliderLabel');
+
+        if (mode === 'a') {
+            label.innerText = "Growth Extent:";
+            if (causeType === 'ad') {
+                legend.innerHTML = `
+                    <div style="color:#2980b9;">● AD (Shift Right)</div>
+                    <div style="color:#e67e22;">● LRAS (Fixed)</div>
+                `;
+                status.innerText = "Short Run Growth: AD shifts right on SRAS curve.";
+            } else {
+                legend.innerHTML = `
+                    <div style="color:#2980b9;">● AD (Fixed)</div>
+                    <div style="color:#e67e22;">● LRAS (Shift Right)</div>
+                `;
+                status.innerText = "Long Run Growth: Potential Output (Yfe) increases.";
+            }
+        } else {
+            label.innerText = "Growth vs Capacity:";
+            legend.innerHTML = `
+                <div style="color:#27ae60;">● Real GDP Growth</div>
+                <div style="color:#c0392b;">● Inflationary Pressure</div>
+            `;
+            status.innerText = "Slide right to see the trade-off between Growth and Inflation.";
+        }
+    }
+
+    // --- Drawing Engine ---
+    function draw() {
+        if (!width) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        const p = 60;
+        const origin = {x: p, y: height - p};
+        const maxX = width - p;
+        const maxY = p;
+
+        // Axes
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(origin.x, maxY);
+        ctx.lineTo(origin.x, origin.y);
+        ctx.lineTo(maxX, origin.y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#333';
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("Price Level (PL)", origin.x + 10, maxY + 10);
+        ctx.fillText("Real GDP (Y)", maxX - 100, origin.y - 10);
+
+        if (mode === 'a') {
+            drawPartA(origin, width, height, p);
+        } else {
+            drawPartB(origin, width, height, p);
+        }
+    }
+
+    function drawPartA(origin, w, h, p) {
+        // Base LRAS X
+        let lrasX = origin.x + (w - 2*p) * 0.5;
+        // Base AD line points (Top Left to Bottom Right)
+        let adStart = {x: origin.x + 50, y: p + 50};
+        let adEnd = {x: lrasX + 100, y: origin.y - 50};
+
+        const t = sliderVal / 100;
+
+        if (causeType === 'ad') {
+            // Shift AD Right
+            const shift = t * 150;
+            adStart.x += shift;
+            adEnd.x += shift;
+            
+            // Draw LRAS (Fixed)
+            drawVerticalLine(lrasX, origin.y, p, '#e67e22', 'LRAS');
+            
+            // Draw SRAS (Upward curve)
+            drawSRAS(origin, w, h, lrasX);
+
+            // Draw AD (Shifted)
+            drawLine(adStart, adEnd, '#2980b9', 'AD2');
+            
+            // Ghost AD
+            if(t > 0) {
+                 const ghostStart = {x: origin.x + 50, y: p + 50};
+                 const ghostEnd = {x: lrasX + 100, y: origin.y - 50};
+                 drawDashedLineFromPoints(ghostStart, ghostEnd, 'rgba(41, 128, 185, 0.3)', 'AD1');
+                 drawArrow(ghostEnd.x, ghostEnd.y - 50, adEnd.x, adEnd.y - 50);
+            }
+
+        } else {
+            // Shift LRAS Right
+            const shift = t * 150;
+            const newLrasX = lrasX + shift;
+
+            // Draw AD (Fixed)
+            drawLine(adStart, adEnd, '#2980b9', 'AD');
+
+            // Draw Old LRAS
+            if(t > 0) drawVerticalDashedLine(lrasX, origin.y, p, 'LRAS1');
+            
+            // Draw New LRAS
+            drawVerticalLine(newLrasX, origin.y, p, '#e67e22', 'LRAS2');
+            drawArrow(lrasX + 20, p + 100, newLrasX - 20, p + 100);
+            
+            // SRAS follows LRAS shift
+            drawSRAS(origin, w, h, newLrasX);
+        }
+    }
+
+    function drawPartB(origin, w, h, p) {
+        // Visualizing Benefits vs Costs (Inflation)
+        // Static LRAS
+        const lrasX = origin.x + (w - 2*p) * 0.7;
+        drawVerticalLine(lrasX, origin.y, p, '#e67e22', 'Full Capacity');
+
+        // SRAS Curve
+        drawSRAS(origin, w, h, lrasX);
+
+        // AD Shifting
+        const t = sliderVal / 100;
+        const shift = t * (w * 0.5);
+        
+        // AD Points
+        let startX = origin.x + 20 + shift;
+        let startY = p + 40;
+        let endX = startX + 200;
+        let endY = origin.y - 40;
+
+        // Draw AD
+        ctx.beginPath();
+        ctx.strokeStyle = '#2980b9';
+        ctx.lineWidth = 3;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        ctx.fillStyle = '#2980b9';
+        ctx.fillText("AD", endX, endY + 15);
+
+        // Find Intersection with SRAS visually
+        // SRAS curves up near LRAS
+        // Simple visual logic:
+        const eqX = Math.min(lrasX, (startX + endX)/2 + 20); 
+        // If eqX is close to lrasX, Y rises sharply (Inflation)
+        
+        // Calculate closeness to Capacity
+        const capacityUtilization = Math.max(0, (eqX - (lrasX - 100)) / 100); // 0 to 1 as we approach LRAS
+        
+        const eqY = origin.y - 50 - (capacityUtilization * 150); // Price rises
+
+        // Draw PL and Y lines
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#666';
+        
+        // Y line
+        ctx.beginPath(); ctx.moveTo(eqX, origin.y); ctx.lineTo(eqX, eqY); ctx.stroke();
+        ctx.fillText("Y", eqX - 5, origin.y + 15);
+        
+        // PL line
+        ctx.beginPath(); ctx.moveTo(origin.x, eqY); ctx.lineTo(eqX, eqY); ctx.stroke();
+        ctx.fillText("PL", origin.x - 20, eqY + 5);
+        ctx.setLineDash([]);
+
+        // Status Feedback
+        if (eqX >= lrasX - 10) {
+            // Inflationary Gap
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+            ctx.fillRect(origin.x, p, w, h); // Red Tint
+            ctx.fillStyle = '#c0392b';
+            ctx.font = "bold 16px Arial";
+            ctx.fillText("⚠️ HIGH INFLATION (Cost of Growth)", origin.x + 50, p + 50);
+        } else {
+            // Healthy Growth
+            ctx.fillStyle = '#27ae60';
+            ctx.font = "bold 16px Arial";
+            ctx.fillText("✓ Beneficial Growth (Jobs ↑)", origin.x + 50, p + 50);
+        }
+    }
+
+    // --- Helpers ---
+    function drawVerticalLine(x, yBottom, yTop, color, label) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 4;
+        ctx.moveTo(x, yBottom);
+        ctx.lineTo(x, yTop);
+        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.fillText(label, x - 15, yTop - 10);
+    }
+
+    function drawVerticalDashedLine(x, yBottom, yTop, label) {
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, yBottom);
+        ctx.lineTo(x, yTop);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#999';
+        ctx.fillText(label, x - 15, yTop - 10);
+    }
+
+    function drawLine(start, end, color, label) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.fillText(label, end.x, end.y + 15);
+    }
+
+    function drawDashedLineFromPoints(start, end, color, label) {
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawSRAS(origin, w, h, limitX) {
+        // Curve starts low left, goes flat then curves up to vertical at limitX
+        ctx.beginPath();
+        ctx.strokeStyle = '#c0392b';
+        ctx.lineWidth = 3;
+        const startX = origin.x + 20;
+        const startY = origin.y - 20;
+        
+        ctx.moveTo(startX, startY);
+        // Bezier curve to approach limitX
+        ctx.bezierCurveTo(limitX * 0.6, startY, limitX - 20, startY, limitX, p + 50);
+        ctx.stroke();
+        ctx.fillStyle = '#c0392b';
+        ctx.fillText("SRAS", limitX - 30, p + 100);
+    }
+
+    function drawArrow(x1, y1, x2, y2) {
+        const head = 10;
+        const angle = Math.atan2(y2-y1, x2-x1);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2-head*Math.cos(angle-Math.PI/6), y2-head*Math.sin(angle-Math.PI/6));
+        ctx.lineTo(x2-head*Math.cos(angle+Math.PI/6), y2-head*Math.sin(angle+Math.PI/6));
+        ctx.fillStyle = '#333'; ctx.fill();
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

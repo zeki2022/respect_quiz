@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q3: Merit Goods & Healthcare - Interactive</title>
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 布局风格 - 宽屏适配 */
+        body { 
+            padding-top: 20px; 
+            padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; 
+            margin: 0;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        .container {
+            width: 98%; 
+            max-width: 1800px; 
+            margin: 0 auto;
+            display: grid; 
+            grid-template-columns: 1fr 550px; /* 右侧稍宽以容纳长文本 */
+            gap: 20px; 
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) { 
+            .container { grid-template-columns: 1fr; } 
+        }
+
+        .card { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+        }
+
+        /* 返回按钮 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.95);
+            border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            line-height: 1; cursor: pointer; border: 1px solid #eee;
+        }
+        .back-arrow:hover { background: #fff; transform: scale(1.05); }
+
+        /* 题目区 */
+        .problem-text { 
+            background: #e8f4fd; 
+            padding: 20px; 
+            border-left: 5px solid #3498db; 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            color: #2c3e50; 
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 画布区 */
+        .canvas-container { 
+            width: 100%; 
+            height: 500px; 
+            position: relative; 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            overflow: hidden; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+        }
+        canvas { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        }
+
+        /* 控制区 */
+        .controls { 
+            display: flex; flex-direction: column; gap: 15px; 
+            background: #f8f9fa; padding: 20px; border-radius: 8px; 
+            border: 1px solid #eee; 
+        }
+        .control-row { 
+            display: flex; align-items: center; gap: 15px; justify-content: space-between; 
+            flex-wrap: wrap;
+        }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; 
+            font-weight: 600; font-size: 14px; transition: all 0.2s;
+        }
+        button.action-btn:hover { background-color: #f1f1f1; }
+        button.action-btn.active { 
+            background-color: #2980b9; color: white; border-color: #2980b9; 
+            box-shadow: 0 2px 5px rgba(41, 128, 185, 0.3);
+        }
+        button.exam-btn { 
+            background-color: #27ae60; color: white; border: none; flex: 2; 
+        }
+        button.exam-btn:hover { background-color: #219150; }
+
+        /* 右侧面板 */
+        .solution-panel { 
+            max-height: 90vh; overflow-y: auto; 
+            position: sticky; top: 20px; 
+        }
+
+        /* Tabs */
+        .tabs { 
+            display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; 
+        }
+        .tab-item { 
+            padding: 12px 20px; cursor: pointer; font-weight: bold; 
+            color: #7f8c8d; border-bottom: 3px solid transparent; 
+            margin-bottom: -2px; font-size: 15px; flex: 1; text-align: center;
+        }
+        .tab-item:hover { color: #3498db; }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; background: linear-gradient(to bottom, transparent, rgba(52,152,219,0.05)); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* 内容样式 */
+        .explanation p { margin-bottom: 12px; line-height: 1.6; font-size: 15px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; font-weight: bold; border-bottom: 2px solid #ffeeba; }
+        
+        h4 { 
+            margin: 20px 0 12px 0; color: #2c3e50; 
+            border-left: 5px solid #3498db; padding-left: 10px; font-size: 16px; 
+            background: #fdfdfd; padding-top: 5px; padding-bottom: 5px;
+        }
+
+        .model-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #ccc; }
+        .model-header { font-size: 18px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        .model-sub { font-weight: bold; color: #555; display: block; margin-top: 12px; font-style: italic; }
+        
+        .mark-tag {
+            display: inline-block; background: #e74c3c; color: white; 
+            font-size: 12px; padding: 1px 6px; border-radius: 10px; 
+            vertical-align: middle; margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="../index.html" class="back-arrow" title="Back to Menu">‹</a>
+
+    <div class="container">
+        
+        <!-- Left Column -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px; color:#333;">
+                    9708 Econ / Section B / Q3: Healthcare & Merit Goods
+                </h3>
+
+                <!-- Full OCR Text -->
+                <div class="problem-text">
+                    <p><strong>3</strong> <strong>(a)</strong> Explain what is meant by a merit good and why governments provide merit goods such as healthcare free of charge and consider why such provision may not always be successful. [8]</p>
+                    <p><strong>(b)</strong> Assess whether a charge made for healthcare at the point of use is likely to be more beneficial to consumers and providers than if healthcare is available to all free of charge. [12]</p>
+                </div>
+
+                <!-- Canvas -->
+                <div class="canvas-container">
+                    <canvas id="mainCanvas"></canvas>
+                    <div id="legendOverlay" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.95); padding:10px; border-radius:6px; font-size:13px; border:1px solid #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <!-- Dynamic Legend -->
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <div class="control-row" style="justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <button class="action-btn active" id="btn-mode-a" onclick="switchMode('a')">3(a) Merit Good Failure</button>
+                        <button class="action-btn" id="btn-mode-b" onclick="switchMode('b')">3(b) Free vs Charged</button>
+                    </div>
+
+                    <div class="control-row">
+                        <span id="sliderLabel" style="font-weight:bold; font-size:15px; min-width: 150px;">Consumption Level:</span>
+                        <input type="range" id="mainSlider" min="0" max="100" value="0" style="flex:1; cursor:pointer;" oninput="manualSlider()">
+                    </div>
+                    
+                    <div class="control-row">
+                        <button class="action-btn exam-btn" onclick="showExamEffect()">★ Show Solution Diagram</button>
+                        <button class="action-btn" style="background:#95a5a6; color:white; flex:0.3;" onclick="resetGraph()">Reset</button>
+                    </div>
+                    
+                    <div id="statusText" style="text-align:center; color:#666; font-size:13px; font-style:italic; height: 20px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')" id="tab-btn-a">3(a) Logic</div>
+                    <div class="tab-item" onclick="switchTab('b')" id="tab-btn-b">3(b) Logic</div>
+                    <div class="tab-item" onclick="switchTab('model')" id="tab-btn-model">Full Answer</div>
+                </div>
+
+                <!-- Part A Logic -->
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. What is a Merit Good? (AO1)</h4>
+                    <div class="explanation">
+                        <p>A merit good (e.g., healthcare, education) is one that has <strong>two key characteristics</strong>:</p>
+                        <ul>
+                            <li>It generates <span class="highlight">positive externalities in consumption</span> (Social Benefit > Private Benefit).</li>
+                            <li>It is <span class="term">under-consumed</span> due to <strong>information failure</strong> (people underestimate the long-term benefits).</li>
+                        </ul>
+                    </div>
+
+                    <h4>2. Why Provide Free of Charge? (AO2)</h4>
+                    <div class="explanation">
+                        <p>To increase consumption to the <span class="highlight">socially optimum level</span> ($Q_{soc}$).</p>
+                        <p>• Removing the price barrier ($P=0$) ensures access regardless of income (Equity).</p>
+                        <p>• It prevents the welfare loss associated with under-consumption.</p>
+                    </div>
+
+                    <h4>3. Why it might FAIL (Evaluation)</h4>
+                    <div class="explanation">
+                        <p>• <strong>Excess Demand:</strong> At $P=0$, demand is huge. If supply is limited, this leads to <span class="highlight">waiting lists</span> and delays.</p>
+                        <p>• <strong>Opportunity Cost:</strong> Funds used for healthcare cannot be used for education/infrastructure.</p>
+                    </div>
+                </div>
+
+                <!-- Part B Logic -->
+                <div id="tab-b" class="tab-content">
+                    <h4>1. Argument for Charging (P > 0)</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Efficiency:</span> A price reduces "unnecessary" visits (moral hazard), reducing waiting times for those truly ill.</p>
+                        <p>• <span class="term">Revenue:</span> Generates funds that can be reinvested to improve quality or supply capacity.</p>
+                    </div>
+
+                    <h4>2. Argument for Free (P = 0)</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Equity:</span> Charges act as a regressive tax. The poor may skip essential preventative care.</p>
+                        <p>• <span class="term">Public Health:</span> Early treatment (encouraged by free access) prevents spread of disease (Positive Externality).</p>
+                    </div>
+
+                    <h4>3. The Trade-off (Visual)</h4>
+                    <div class="explanation">
+                        <p>Check the diagram: Moving from $P=0$ to $P>0$ eliminates the <strong>Shortage</strong> but reduces <strong>Quantity Consumed</strong> below the potential maximum.</p>
+                    </div>
+                </div>
+
+                <!-- Full Model Answer -->
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif; font-size:16px;">
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (a) [8 Marks]</div>
+                            <p>A <span class="term">merit good</span> is a good that is socially desirable but under-consumed by the free market, often due to information failure (consumers unaware of benefits) and positive externalities in consumption (e.g., a healthy workforce boosts productivity). <span class="mark-tag">AO1</span></p>
+                            
+                            <span class="model-sub">Why Free of Charge?</span>
+                            <p>Governments provide healthcare free of charge to encourage consumption. In a free market, individuals equate their Marginal Private Benefit (MPB) to the price. By making the price zero, the government aims to extend consumption to the <span class="highlight">Social Optimum</span> ($MSB = MSC$), improving overall welfare. <span class="mark-tag">AO2</span></p>
+                            
+                            <span class="model-sub">Why Unsuccessful?</span>
+                            <p>However, provision may not be successful due to <span class="highlight">excess demand</span>. At a price of zero, demand often exceeds supply (waiting lists). Furthermore, the quality of service may suffer due to lack of competition or funding constraints (Government Failure). <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                        <div class="model-section" style="border-bottom:none;">
+                            <div class="model-header">Part (b) [12 Marks]</div>
+                            
+                            <span class="model-sub">Benefits of Charging (Consumers & Providers):</span>
+                            <p>Charging a fee at the point of use acts as a rationing mechanism. It discourages unnecessary visits (reducing moral hazard), which shortens <span class="highlight">waiting times</span> for patients with serious conditions. For providers, the revenue generated can be reinvested into better equipment and higher staff wages, potentially improving the quality of care. <span class="mark-tag">AO2</span></p>
+
+                            <span class="model-sub">Drawbacks (Why Free is Better):</span>
+                            <p>However, healthcare is a merit good. A charge creates a financial barrier, particularly for low-income households. This may lead to under-consumption of preventative care, worsening long-term public health outcomes (loss of positive externalities). Free provision ensures <span class="term">equity</span> of access. <span class="mark-tag">AO2</span></p>
+
+                            <span class="model-sub">Assessment (Evaluation):</span>
+                            <p>Whether a charge is "more beneficial" depends on the system's capacity. In a system plagued by infinite waiting lists, a small nominal charge might improve efficiency. However, for essential/emergency care, the social costs of exclusion (due to price) likely outweigh the revenue benefits. Thus, a hybrid system (free for poor/emergency, charged for elective) may be optimal. <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let mode = 'a'; // 'a' = Merit Good, 'b' = Free vs Charge
+    let sliderVal = 0;
+    let isExam = false;
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        updateUI();
+    }
+
+    function resize() {
+        if (!canvas.parentElement) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        width = canvas.width;
+        height = canvas.height;
+        draw();
+    }
+
+    function switchMode(newMode) {
+        mode = newMode;
+        sliderVal = 0;
+        isExam = false;
+        document.getElementById('mainSlider').value = 0;
+        
+        document.getElementById('btn-mode-a').className = mode === 'a' ? 'action-btn active' : 'action-btn';
+        document.getElementById('btn-mode-b').className = mode === 'b' ? 'action-btn active' : 'action-btn';
+        
+        switchTab(newMode);
+        updateUI();
+        draw();
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-btn-' + id).classList.add('active');
+        document.getElementById('tab-' + id).classList.add('active');
+    }
+
+    function manualSlider() {
+        isExam = false;
+        sliderVal = parseInt(document.getElementById('mainSlider').value);
+        draw();
+    }
+
+    function showExamEffect() {
+        isExam = true;
+        sliderVal = 100;
+        document.getElementById('mainSlider').value = 100;
+        draw();
+    }
+
+    function resetGraph() {
+        isExam = false;
+        sliderVal = 0;
+        document.getElementById('mainSlider').value = 0;
+        draw();
+    }
+
+    function updateUI() {
+        const label = document.getElementById('sliderLabel');
+        const legend = document.getElementById('legendOverlay');
+        const status = document.getElementById('statusText');
+
+        if (mode === 'a') {
+            label.innerText = "Intervention Level:";
+            legend.innerHTML = `
+                <div style="color:#2980b9;">● MPB (Private Demand)</div>
+                <div style="color:#27ae60;">● MSB (Social Benefit)</div>
+                <div style="color:#e74c3c;">● Welfare Loss</div>
+            `;
+            status.innerText = "Slider moves consumption from Market Equilibrium to Social Optimum.";
+        } else {
+            label.innerText = "Fee at Point of Use:";
+            legend.innerHTML = `
+                <div style="color:#2980b9;">● Demand</div>
+                <div style="color:#7f8c8d;">● Supply Capacity</div>
+                <div style="color:#e74c3c;">● Shortage (Waiting List)</div>
+            `;
+            status.innerText = "Increasing Price reduces Shortage but also reduces Access.";
+        }
+    }
+
+    function draw() {
+        if (!width) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        const p = 60;
+        const origin = {x: p, y: height - p};
+        const maxX = width - p;
+        const maxY = p;
+
+        // Axes
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(origin.x, maxY);
+        ctx.lineTo(origin.x, origin.y);
+        ctx.lineTo(maxX, origin.y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#333';
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("Price / Cost / Benefit", origin.x + 10, maxY + 10);
+        ctx.fillText("Quantity (Healthcare)", maxX - 140, origin.y - 10);
+
+        if (mode === 'a') {
+            drawPartA(origin, width, height, p);
+        } else {
+            drawPartB(origin, width, height, p);
+        }
+    }
+
+    function drawPartA(origin, w, h, p) {
+        // Merit Good: MSB > MPB
+        // Supply = MPC = MSC (Assume no production externalities)
+        
+        // Coordinates
+        const startX = origin.x;
+        const endX = w - p;
+        
+        // Supply (MPC) - Upward sloping
+        const mpcStart = {x: startX, y: origin.y - 40};
+        const mpcEnd = {x: endX - 50, y: p + 50};
+        
+        // MPB (Private Benefit) - Downward
+        const mpbStart = {x: startX, y: p + 50};
+        const mpbEnd = {x: endX - 100, y: origin.y - 20};
+        
+        // MSB (Social Benefit) - Higher than MPB
+        const msbStart = {x: startX + 50, y: p}; // Shifted right/up
+        const msbEnd = {x: endX - 50, y: origin.y - 20}; // Parallel shift right roughly
+
+        // Draw MPC
+        drawLine(mpcStart, mpcEnd, '#7f8c8d', 'MPC = Supply');
+        
+        // Draw MPB
+        drawLine(mpbStart, mpbEnd, '#2980b9', 'MPB (Demand)');
+        
+        // Draw MSB
+        drawLine(msbStart, msbEnd, '#27ae60', 'MSB (Social)');
+
+        // Intersections
+        // Market Eq (MPB = MPC)
+        const qMarketX = (mpcStart.x + mpcEnd.x + mpbStart.x + mpbEnd.x) / 4; // Approx center left
+        const qMarketY = (mpcStart.y + mpcEnd.y + mpbStart.y + mpbEnd.y) / 4; // Approx center
+        
+        // Social Eq (MSB = MPC)
+        const qSocX = qMarketX + 60; // Approx shift right
+        const qSocY = qMarketY - 30; // Approx shift up
+
+        // Slider Logic: "Effective" Consumption
+        // t=0 -> Market. t=1 -> Social Opt.
+        const t = sliderVal / 100;
+        const currentQ = qMarketX + t * (qSocX - qMarketX);
+        const currentY = origin.y; // For vertical line
+
+        // Draw Vertical lines for Qm and Qsoc
+        drawDashedLine(qMarketX, qMarketY, origin.y, 'Qm');
+        drawDashedLine(qSocX, qSocY, origin.y, 'Qopt');
+
+        // Draw Area of Welfare Loss (Triangle between Qm and Qsoc, bounded by MSB and MPC)
+        if (t < 0.1) {
+            ctx.beginPath();
+            ctx.moveTo(qMarketX, qMarketY); // MPB=MPC intersection
+            // Find point on MSB at Qm
+            const msbAtQmY = qMarketY - 40; // Visual approx
+            ctx.lineTo(qMarketX, msbAtQmY);
+            ctx.lineTo(qSocX, qSocY); // MSB=MPC intersection
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+            ctx.fill();
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillText("Potential Welfare Loss", qMarketX + 5, qMarketY - 10);
+        }
+
+        // Draw Current Position
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(currentQ, origin.y);
+        ctx.lineTo(currentQ, p + 20);
+        ctx.stroke();
+        
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillText(t < 0.5 ? "Market Failure" : "Gov Intervention", currentQ + 5, p + 40);
+
+        if (t > 0.8) {
+             ctx.fillStyle = '#27ae60';
+             ctx.fillText("✓ Social Optimum Reached", w/2, h-20);
+        }
+    }
+
+    function drawPartB(origin, w, h, p) {
+        // Free vs Charged
+        // Supply: Vertical (Fixed Capacity in Short Run) or Inelastic
+        // Let's use Vertical for "Capacity Constraint" visual
+        const capacityX = origin.x + (w - 2*p) * 0.6;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#7f8c8d';
+        ctx.lineWidth = 4;
+        ctx.moveTo(capacityX, origin.y);
+        ctx.lineTo(capacityX, p);
+        ctx.stroke();
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillText("Supply Capacity", capacityX - 40, p - 10);
+
+        // Demand: Downward
+        const dStart = {x: origin.x + 20, y: p + 20};
+        const dEnd = {x: w - p, y: origin.y};
+        drawLine(dStart, dEnd, '#2980b9', 'Demand');
+
+        // Logic:
+        // Price controlled by slider.
+        // P=0 (Slider 0) -> Q_demanded is at dEnd.x (Huge). Supply is capacityX. Shortage = dEnd.x - capacityX.
+        // P=High (Slider 100) -> Q_demanded < capacityX.
+        
+        // Calculate Price Y based on slider
+        // Map slider 0->100 to y from origin.y(0) to p(High)
+        const priceY = origin.y - (sliderVal / 100) * (origin.y - p - 50);
+        
+        // Calculate Q Demanded at this Price
+        // Linear interpolation inverse
+        // Slope = (dEnd.y - dStart.y) / (dEnd.x - dStart.x)
+        const slope = (dEnd.y - dStart.y) / (dEnd.x - dStart.x);
+        // y - y1 = m(x - x1) -> x = (y - y1)/m + x1
+        const qDemandedX = (priceY - dStart.y) / slope + dStart.x;
+
+        // Draw Price Line
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(origin.x, priceY);
+        ctx.lineTo(Math.max(qDemandedX, capacityX), priceY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#333';
+        ctx.fillText(sliderVal === 0 ? "Price = 0 (Free)" : `Price > 0 (Fee)`, origin.x + 10, priceY - 5);
+
+        // Draw Shortage Area
+        if (qDemandedX > capacityX) {
+            ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+            ctx.fillRect(capacityX, priceY, qDemandedX - capacityX, origin.y - priceY);
+            
+            ctx.fillStyle = '#c0392b';
+            ctx.font = "bold 14px Arial";
+            ctx.fillText("SHORTAGE / WAITING LIST", capacityX + 10, origin.y - 50);
+            
+            // Draw Q Demanded Point
+            ctx.beginPath();
+            ctx.arc(qDemandedX, origin.y, 4, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillText("Qd", qDemandedX - 10, origin.y + 15);
+        } else {
+            // Surplus / Access denied
+            ctx.beginPath();
+            ctx.arc(qDemandedX, origin.y, 4, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#333';
+            ctx.fillText("Qd", qDemandedX - 10, origin.y + 15);
+            
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText("No Shortage", capacityX + 10, origin.y - 50);
+        }
+
+        // Draw Revenue Box (Price * Q_supplied)
+        const qSold = Math.min(qDemandedX, capacityX);
+        if (sliderVal > 0) {
+            ctx.fillStyle = 'rgba(46, 204, 113, 0.2)';
+            ctx.fillRect(origin.x, priceY, qSold - origin.x, origin.y - priceY);
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText("Revenue", origin.x + 20, origin.y - 20);
+        }
+    }
+
+    // Helpers
+    function drawLine(start, end, color, label) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        if(label) {
+            ctx.fillStyle = color;
+            ctx.fillText(label, end.x - 50, end.y - 10);
+        }
+    }
+
+    function drawDashedLine(x, yStart, yEnd, label) {
+        ctx.beginPath();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#7f8c8d';
+        ctx.lineWidth = 1;
+        ctx.moveTo(x, yStart);
+        ctx.lineTo(x, yEnd);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if(label) {
+            ctx.fillStyle = '#333';
+            ctx.fillText(label, x - 10, yEnd + 15);
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

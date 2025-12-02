@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q2 - Public Goods & Merit/Demerit Goods</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f4fd;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .goods-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .goods-table th, .goods-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .goods-table th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .goods-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .characteristic-box {
+            background: #f0f4ff;
+            border: 2px solid #7b61ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .characteristic-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .char-icon {
+            width: 24px;
+            height: 24px;
+            background: #7b61ff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section B / Question 2</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>EITHER</strong></p>
+                    
+                    <p><strong>2 (a)</strong> With the help of examples, explain the difference between public goods and free goods and consider whether a market economy can ever produce public goods. [8]</p>
+                    
+                    <p><strong>(b)</strong> Assess the extent to which a government can ensure that both merit and demerit goods are produced in desirable quantities. [12]</p>
+                    
+                    <div class="characteristic-box">
+                        <h4 style="margin-top: 0; color: #7b61ff;">Key Economic Concepts for Q2</h4>
+                        <div class="characteristic-item">
+                            <div class="char-icon">P</div>
+                            <div><strong>Public Goods:</strong> Non-excludable and non-rivalrous</div>
+                        </div>
+                        <div class="characteristic-item">
+                            <div class="char-icon">F</div>
+                            <div><strong>Free Goods:</strong> No scarcity, zero opportunity cost</div>
+                        </div>
+                        <div class="characteristic-item">
+                            <div class="char-icon">M</div>
+                            <div><strong>Merit Goods:</strong> Under-consumed, positive externalities</div>
+                        </div>
+                        <div class="characteristic-item">
+                            <div class="char-icon">D</div>
+                            <div><strong>Demerit Goods:</strong> Over-consumed, negative externalities</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品类型对比表格 -->
+                    <table class="goods-table">
+                        <tr>
+                            <th>Type of Good</th>
+                            <th>Key Characteristics</th>
+                            <th>Examples</th>
+                            <th>Market Outcome</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Public Goods</strong></td>
+                            <td>Non-excludable, Non-rivalrous</td>
+                            <td>National defense, Street lighting</td>
+                            <td>Market failure - underproduced</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Free Goods</strong></td>
+                            <td>No scarcity, Zero opportunity cost</td>
+                            <td>Air, Sunshine</td>
+                            <td>Not traded in markets</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Merit Goods</strong></td>
+                            <td>Positive externalities, Under-consumed</td>
+                            <td>Education, Healthcare</td>
+                            <td>Under-consumption</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Demerit Goods</strong></td>
+                            <td>Negative externalities, Over-consumed</td>
+                            <td>Cigarettes, Alcohol</td>
+                            <td>Over-consumption</td>
+                        </tr>
+                    </table>
+                    
+                    <p><strong>Mark Scheme Information:</strong></p>
+                    <ul>
+                        <li><strong>Part (a):</strong> 8 marks total (AO1: 3, AO2: 3, AO3: 2)</li>
+                        <li><strong>Part (b):</strong> 12 marks total (AO1/AO2: 8, AO3: 4)</li>
+                        <li>For part (b), one-sided responses cannot gain any marks for evaluation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Market Failure Analysis: Merit vs Demerit Goods</h4>
+                <p>This interactive diagram shows how markets fail to allocate merit and demerit goods efficiently, and how government intervention can correct these market failures.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="marketCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● MPB = Marginal Private Benefit</div>
+                        <div style="color: #27ae60">● MSB = Marginal Social Benefit</div>
+                        <div style="color: #e74c3c">● MSC = Marginal Social Cost</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Select Good Type:</span>
+                        <button class="action-btn active" id="meritBtn" onclick="setGoodType('merit')">Merit Good</button>
+                        <button class="action-btn" id="demeritBtn" onclick="setGoodType('demerit')">Demerit Good</button>
+                    </div>
+                    
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Government Intervention:</span>
+                        <input type="range" id="interventionSlider" min="0" max="100" value="30" style="flex: 1; cursor: pointer;" oninput="updateMarketChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>No Intervention</span>
+                        <span>Strong Intervention</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Market Failure</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetMarketChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Good Type:</span>
+                        <span id="goodType" style="color: #7b61ff; font-weight: bold;">Merit Good (Education)</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Market Equilibrium Quantity:</span>
+                        <span id="marketQ">Qₘ = 60 units</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Socially Optimal Quantity:</span>
+                        <span id="socialQ" style="color: #27ae60; font-weight: bold;">Q* = 90 units</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Allocative Efficiency:</span>
+                        <span id="efficiency" style="color: #e74c3c; font-weight: bold;">Not Achieved</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Welfare Loss (DWL):</span>
+                        <span id="dwl" style="color: #d35400; font-weight: bold;">△ Area ABC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Public Goods vs Free Goods [8 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>AO1 Knowledge and Understanding (max 3 marks):</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Free Goods Definition (1 mark):</strong> Goods that are <span class="highlight-term">not scarce</span> and have <span class="highlight-term">zero opportunity cost</span>. No factors of production are involved in producing them.</p>
+                            <p><strong>Example:</strong> Fresh air, sunlight, sea water (in most contexts).</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Public Goods Definition (1 mark):</strong> Goods that have two key characteristics:</p>
+                            <ul>
+                                <li><span class="highlight-term">Non-excludability</span>: Impossible or extremely costly to exclude non-payers from consuming the good.</li>
+                                <li><span class="highlight-term">Non-rivalry</span>: One person's consumption does not reduce availability for others.</li>
+                            </ul>
+                            <p><strong>Example:</strong> National defense, street lighting, lighthouses.</p>
+                            <p><em>Note:</em> Do NOT accept examples like roads, education, or health services, as these are not pure public goods.</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>AO2 Analysis (max 3 marks):</strong> Why markets fail to provide public goods</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Free Rider Problem (1 mark):</strong> Due to non-excludability, consumers can benefit from public goods without paying for them. This makes it impossible for private firms to charge a price and earn revenue.</p>
+                            <p><strong>Mathematical representation:</strong> If a good is non-excludable, then for any consumer $i$, $MB_i > 0$ but $Payment_i = 0$, leading to underprovision where $\sum MB_i > MC$ but no private production occurs.</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Non-rivalry and Marginal Cost (1 mark):</strong> For non-rival goods, the marginal cost of providing the good to an additional consumer is zero ($MC = 0$). Efficient pricing would require $P = MC = 0$, but firms cannot survive with zero revenue.</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Market Failure Conclusion (1 mark):</strong> Due to these characteristics, <span class="highlight-term">a market economy is unlikely to provide public goods</span> in efficient quantities, if at all. Private firms have no profit incentive to produce them.</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>AO3 Evaluation (max 2 marks):</strong> Can markets EVER produce public goods?</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Possible exceptions (1 mark):</strong> Markets might produce public goods if:</p>
+                            <ul>
+                                <li>Goods can be made excludable through technology (e.g., toll roads with electronic charging)</li>
+                                <li>Government provides subsidies to make production profitable</li>
+                                <li>Firms are motivated by corporate social responsibility rather than pure profit</li>
+                                <li>Goods are provided as "loss leaders" to attract customers for other products</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Conclusion (1 mark):</strong> While <span class="highlight-term">pure public goods</span> are unlikely to be produced by markets, <span class="highlight-term">impure public goods</span> or goods with some degree of excludability might be provided, especially with government support or technological solutions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Merit & Demerit Goods [12 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>AO1 Knowledge and Understanding:</strong> Definitions and market failures</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Merit Goods:</strong> Goods that are <span class="highlight-term">under-consumed</span> in a free market because consumers undervalue their benefits. They generate <span class="highlight-term">positive externalities</span>.</p>
+                            <p><strong>Examples:</strong> Education, healthcare, vaccinations, museums.</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Demerit Goods:</strong> Goods that are <span class="highlight-term">over-consumed</span> in a free market because consumers overvalue their benefits or ignore costs. They generate <span class="highlight-term">negative externalities</span>.</p>
+                            <p><strong>Examples:</strong> Cigarettes, alcohol, junk food, gambling.</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>AO2 Analysis:</strong> How government intervention can work</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>For Merit Goods (increasing consumption):</strong></p>
+                            <ul>
+                                <li><span class="highlight-term">Subsidies:</span> Reduce price to consumers, increasing quantity demanded. Shifts supply curve right or demand curve left.</li>
+                                <li><span class="highlight-term">Direct Provision:</span> Government provides goods directly (e.g., state schools, public hospitals).</li>
+                                <li><span class="highlight-term">Regulation:</span> Minimum consumption requirements (e.g., compulsory education).</li>
+                                <li><span class="highlight-term">Information Campaigns:</span> Educate consumers about benefits.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>For Demerit Goods (decreasing consumption):</strong></p>
+                            <ul>
+                                <li><span class="highlight-term">Taxation:</span> Increase price to reduce quantity demanded (e.g., excise taxes on cigarettes).</li>
+                                <li><span class="highlight-term">Regulation:</span> Age restrictions, advertising bans, consumption limits.</li>
+                                <li><span class="highlight-term">Minimum Prices:</span> Set price floors above market equilibrium.</li>
+                                <li><span class="highlight-term">Information Campaigns:</span> Highlight health risks.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Diagram Analysis:</strong> As shown in the interactive chart:</p>
+                            <ul>
+                                <li>For merit goods: $MSB > MPB$, leading to underconsumption at $Q_m$ where $MPB = MPC$, while socially optimal quantity is $Q^*$ where $MSB = MSC$.</li>
+                                <li>For demerit goods: $MSC > MPC$, leading to overconsumption at $Q_m$ where $MPB = MPC$, while socially optimal quantity is $Q^*$ where $MSB = MSC$.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation [2 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Blurred Boundaries Between Goods:</strong> Many goods exist on a spectrum rather than in clear categories:</span>
+                            <ul>
+                                <li><strong>Impure Public Goods:</strong> Some goods have one characteristic but not both (e.g., roads are non-rival up to congestion point but can be made excludable).</li>
+                                <li><strong>Club Goods:</strong> Excludable but non-rival (e.g., subscription TV, private parks).</li>
+                                <li><strong>Common Pool Resources:</strong> Rival but non-excludable (e.g., fisheries, groundwater).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Technological Solutions:</strong> Advances in technology can change the nature of goods:</span>
+                            <ul>
+                                <li>Digital goods (software, media) have near-zero marginal cost and can be made excludable.</li>
+                                <li>Smart technology allows for more precise charging (e.g., congestion pricing).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Conclusion:</strong> While <span class="highlight-term">pure public goods</span> are unlikely to be produced efficiently by markets, the real world contains many <span class="highlight-term">mixed goods</span> that markets can provide with appropriate institutional arrangements.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Critical Evaluation [4 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Effectiveness Depends on Elasticities:</strong></span>
+                            <ul>
+                                <li><strong>Price Elasticity of Demand (PED):</strong> If demand is inelastic (e.g., addictive demerit goods like cigarettes), taxes may raise revenue but have limited effect on consumption.</li>
+                                <li>Mathematically: $\text{Effect on quantity} = \text{tax} \times PED$. If $|PED| < 1$, quantity reduction is proportionally less than price increase.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Information Problems:</strong></span>
+                            <ul>
+                                <li>Government may lack perfect information about true social costs/benefits.</li>
+                                <li>Consumers may resist information campaigns due to cognitive biases or addiction.</li>
+                                <li>Time lags in recognizing benefits of merit goods (e.g., education returns take decades).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Unintended Consequences:</strong></span>
+                            <ul>
+                                <li><strong>Black Markets:</strong> High taxes on demerit goods can create illegal markets.</li>
+                                <li><strong>Regulatory Capture:</strong> Industries may influence regulations to protect their interests.</li>
+                                <li><strong>Crowding Out:</strong> Government provision of merit goods may reduce private sector innovation.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Fiscal Constraints:</strong> Government policies have opportunity costs:</span>
+                            <ul>
+                                <li>Subsidies for merit goods require taxation or borrowing.</li>
+                                <li>Enforcement of regulations (e.g., monitoring age restrictions) has administrative costs.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>Distributional Effects:</strong> Policies may have regressive impacts:</span>
+                            <ul>
+                                <li>Taxes on demerit goods disproportionately affect low-income groups.</li>
+                                <li>Subsidies for merit goods may be captured by middle-class groups.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Government intervention <span class="highlight-term">can improve</span> the allocation of merit and demerit goods, but achieving the <span class="highlight-term">"desirable quantity"</span> is challenging due to:</span>
+                            <ol>
+                                <li>Measurement difficulties in determining optimal quantities</li>
+                                <li>Implementation challenges and unintended consequences</li>
+                                <li>Political and budgetary constraints</li>
+                                <li>Behavioral responses of consumers and producers</li>
+                            </ol>
+                            <p>The most effective approach often combines multiple policy instruments (taxes/subsidies + regulation + information) tailored to specific market failures.</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Requirements for AO3 (4 marks):</strong></p>
+                            <p>Level 2 (3-4 marks): Provides a justified conclusion/judgement addressing the specific question, with developed, reasoned evaluative comments.</p>
+                            <p>Level 1 (1-2 marks): Provides vague/general conclusion with simple evaluative comments.</p>
+                            <p><em>Note: One-sided responses cannot gain any marks for evaluation.</em></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Model Answer [8 Marks]</div>
+                            
+                            <p>Public goods and free goods represent distinct categories in economics with fundamentally different characteristics and implications for market provision.</p>
+                            
+                            <p><span class="model-sub">Definitions and Differences:</span></p>
+                            <p><strong>Free goods</strong> are characterized by the absence of scarcity – they are available in such abundance that there is <span class="highlight-term">no opportunity cost</span> to their consumption. Examples include air, sunlight, and sea water (in coastal areas). These goods are not traded in markets because they have zero price and unlimited supply at zero marginal cost.</p>
+                            
+                            <p>In contrast, <strong>public goods</strong> possess two defining characteristics: <span class="highlight-term">non-excludability</span> (impossible or prohibitively costly to prevent non-payers from consuming) and <span class="highlight-term">non-rivalry</span> (one person's consumption does not diminish availability for others). Pure public goods include national defense, street lighting, and basic scientific research. The key difference is that while free goods have zero cost, public goods are costly to produce but difficult to finance through market mechanisms.</p>
+                            
+                            <p><span class="model-sub">Market Provision of Public Goods:</span></p>
+                            <p>Market economies face fundamental challenges in providing public goods due to the <span class="highlight-term">free rider problem</span>. Because consumers cannot be excluded, they have no incentive to reveal their true willingness to pay. This creates a market failure where, despite potential social benefits exceeding costs ($\sum MB_i > MC$), no private firm can profitably produce the good. The non-rival nature further complicates pricing – efficient allocation would require $P = MC = 0$, which is incompatible with covering fixed costs.</p>
+                            
+                            <p><span class="model-sub">Evaluation of Market Production:</span></p>
+                            <p>While <span class="highlight-term">pure public goods</span> are unlikely to be produced by markets, several qualifications exist. First, technological innovations can transform goods: toll roads with electronic collection represent impure public goods that markets can provide. Second, some goods exhibit only one characteristic – club goods (excludable but non-rival) like subscription services are efficiently provided by markets. Third, corporate social responsibility or government subsidies might enable some provision. However, these exceptions typically involve <span class="highlight-term">impure rather than pure public goods</span>.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span></p>
+                            <p>A market economy is <span class="highlight-term">unlikely to produce pure public goods</span> in socially optimal quantities due to the fundamental free rider problem and non-excludability. While impure public goods or those made excludable through technology might be provided, the theoretical case for government provision of pure public goods remains strong, explaining why services like national defense are almost universally provided by states rather than markets.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Model Answer [12 Marks]</div>
+                            
+                            <p>Governments face significant but surmountable challenges in steering consumption of merit and demerit goods toward socially optimal levels, though perfect alignment with "desirable quantities" is rarely achievable in practice.</p>
+                            
+                            <p><span class="model-sub">Theoretical Framework and Policy Tools:</span></p>
+                            <p>Merit goods (e.g., education, healthcare) are characterized by <span class="highlight-term">positive consumption externalities</span> and information failures leading to under-consumption. Demerit goods (e.g., cigarettes, alcohol) generate <span class="highlight-term">negative externalities</span> and are typically over-consumed due to imperfect information or addiction. The divergence between private and social valuations creates market failures where $MSB \neq MPB$ for merit goods and $MSC \neq MPC$ for demerit goods.</p>
+                            
+                            <p>Governments possess an array of policy instruments to address these failures. For merit goods, <span class="highlight-term">subsidies</span> lower effective prices, shifting the supply curve rightward ($S \rightarrow S_1$) and increasing equilibrium quantity toward the social optimum. Direct provision (state schools, public healthcare) ensures minimum consumption levels. For demerit goods, <span class="highlight-term">specific taxes</span> (e.g., $£2$ per pack of cigarettes) internalize external costs by shifting the supply curve leftward ($S \rightarrow S_2$), reducing equilibrium quantity.</p>
+                            
+                            <p><span class="model-sub">Effectiveness and Limitations:</span></p>
+                            <p>The success of these interventions depends critically on <span class="highlight-term">elasticities of demand</span>. For addictive demerit goods with inelastic demand ($|PED| < 1$), substantial price increases through taxation yield modest quantity reductions but generate significant government revenue. Conversely, for merit goods with elastic demand, modest subsidies can substantially increase consumption. Information campaigns complement price mechanisms by shifting demand curves through changed preferences.</p>
+                            
+                            <p>However, achieving precisely "desirable quantities" faces multiple constraints. First, <span class="highlight-term">measurement challenges</span> make determining optimal consumption levels difficult – estimating the true social value of education or the full social cost of smoking involves considerable uncertainty. Second, <span class="highlight-term">implementation problems</span> arise: high taxes may create black markets for demerit goods, while universal subsidies for merit goods involve substantial fiscal costs with regressive distributional effects if captured by middle-class groups.</p>
+                            
+                            <p><span class="model-sub">Comparative Policy Analysis:</span></p>
+                            <p>Evidence suggests that <span class="highlight-term">policy combinations</span> outperform single instruments. For tobacco control, Australia's multifaceted approach combining high taxation, plain packaging, advertising bans, and smoking cessation programs reduced adult smoking from 24% in 1991 to 13% in 2019. Similarly, Finland's education system combines free provision, transportation subsidies, and parental information to achieve near-universal secondary enrollment.</p>
+                            
+                            <p>Nevertheless, <span class="highlight-term">government failure</span> risks must be acknowledged. Regulatory capture by interest groups, information asymmetries facing policymakers, and administrative costs all limit intervention effectiveness. The choice between "nudge" approaches (default enrollment in pension plans) and "shove" methods (compulsory education) involves trade-offs between autonomy and effectiveness.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span></p>
+                            <p>While governments <span class="highlight-term">can significantly improve</span> upon market outcomes for merit and demerit goods through judicious application of taxes, subsidies, regulation, and information, achieving <span class="highlight-term">precisely optimal quantities</span> remains elusive. The most realistic goal is moving consumption closer to socially desirable levels through evidence-based, multi-pronged policies that account for behavioral responses, fiscal constraints, and distributional considerations. Markets left entirely to themselves will systematically misallocate these goods, but government intervention, while imperfect, represents a necessary corrective to these fundamental market failures.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const MARKET_PARAMS = {
+            // 商品类型
+            goodType: "merit", // "merit" or "demerit"
+            
+            // 干预强度 (0-100)
+            interventionLevel: 30,
+            
+            // 是否显示考试模式
+            isExamMode: false,
+            
+            // 市场参数
+            marketParams: {
+                merit: {
+                    label: "Merit Good (Education)",
+                    mpcIntercept: 40,
+                    mpcSlope: 0.4,
+                    mscIntercept: 20,
+                    mscSlope: 0.4,
+                    mpbIntercept: 100,
+                    mpbSlope: -0.6,
+                    msbIntercept: 120,
+                    msbSlope: -0.6,
+                    marketQ: 60,
+                    socialQ: 90
+                },
+                demerit: {
+                    label: "Demerit Good (Cigarettes)",
+                    mpcIntercept: 20,
+                    mpcSlope: 0.3,
+                    mscIntercept: 50,
+                    mscSlope: 0.3,
+                    mpbIntercept: 80,
+                    mpbSlope: -0.5,
+                    msbIntercept: 60,
+                    msbSlope: -0.5,
+                    marketQ: 100,
+                    socialQ: 60
+                }
+            }
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            document.querySelector(`.tab:nth-child(${tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 市场图表功能 ====================
+        const marketCanvas = document.getElementById('marketCanvas');
+        const marketCtx = marketCanvas.getContext('2d');
+        let marketCanvasWidth, marketCanvasHeight;
+        
+        // 响应式重绘机制
+        function resizeMarketCanvas() {
+            if (!marketCanvas.parentElement) return;
+            
+            marketCanvasWidth = marketCanvas.parentElement.clientWidth;
+            marketCanvasHeight = marketCanvas.parentElement.clientHeight;
+            marketCanvas.width = marketCanvasWidth;
+            marketCanvas.height = marketCanvasHeight;
+            
+            drawMarketChart();
+        }
+        
+        // 三重重绘保障
+        function ensureMarketRedraw() {
+            // 1. 立即重绘
+            resizeMarketCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeMarketCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeMarketCanvas, 300);
+            setTimeout(resizeMarketCanvas, 1000);
+        }
+        
+        // 设置商品类型
+        function setGoodType(type) {
+            MARKET_PARAMS.goodType = type;
+            
+            // 更新按钮状态
+            document.getElementById('meritBtn').classList.remove('active');
+            document.getElementById('demeritBtn').classList.remove('active');
+            document.getElementById(`${type}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateMarketChart();
+        }
+        
+        // 更新图表（滑块变动时调用）
+        function updateMarketChart() {
+            MARKET_PARAMS.interventionLevel = parseInt(document.getElementById('interventionSlider').value);
+            MARKET_PARAMS.isExamMode = false;
+            drawMarketChart();
+            updateMarketDataPanel();
+        }
+        
+        // 显示考试模式（市场失灵）
+        function showExamMode() {
+            MARKET_PARAMS.isExamMode = true;
+            MARKET_PARAMS.interventionLevel = 70;
+            document.getElementById('interventionSlider').value = 70;
+            drawMarketChart();
+            updateMarketDataPanel();
+        }
+        
+        // 重置图表
+        function resetMarketChart() {
+            MARKET_PARAMS.isExamMode = false;
+            MARKET_PARAMS.interventionLevel = 30;
+            document.getElementById('interventionSlider').value = 30;
+            drawMarketChart();
+            updateMarketDataPanel();
+        }
+        
+        // 绘制市场图表
+        function drawMarketChart() {
+            if (!marketCanvasWidth || !marketCanvasHeight) return;
+            
+            // 清除画布
+            marketCtx.clearRect(0, 0, marketCanvasWidth, marketCanvasHeight);
+            
+            // 当前商品参数
+            const params = MARKET_PARAMS.marketParams[MARKET_PARAMS.goodType];
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = marketCanvasWidth - padding.left - padding.right;
+            const graphHeight = marketCanvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            marketCtx.beginPath();
+            marketCtx.strokeStyle = '#333';
+            marketCtx.lineWidth = 2;
+            
+            // Y轴（价格/成本/效益）
+            marketCtx.moveTo(padding.left, padding.top);
+            marketCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量）
+            marketCtx.moveTo(padding.left, padding.top + graphHeight);
+            marketCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            marketCtx.stroke();
+            
+            // 坐标轴标签
+            marketCtx.font = 'bold 14px Arial';
+            marketCtx.fillStyle = '#333';
+            marketCtx.textAlign = 'center';
+            
+            // Y轴标签
+            marketCtx.save();
+            marketCtx.translate(20, padding.top + graphHeight / 2);
+            marketCtx.rotate(-Math.PI / 2);
+            marketCtx.fillText("Price/Cost/Benefit ($)", 0, 0);
+            marketCtx.restore();
+            
+            // X轴标签
+            marketCtx.fillText("Quantity (units)", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            marketCtx.strokeStyle = '#eee';
+            marketCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                marketCtx.beginPath();
+                marketCtx.moveTo(padding.left, y);
+                marketCtx.lineTo(padding.left + graphWidth, y);
+                marketCtx.stroke();
+                
+                // Y轴刻度标签
+                const price = 100 - (i * 20);
+                marketCtx.fillStyle = '#666';
+                marketCtx.font = '12px Arial';
+                marketCtx.textAlign = 'right';
+                marketCtx.fillText(`$${price}`, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                marketCtx.beginPath();
+                marketCtx.moveTo(x, padding.top);
+                marketCtx.lineTo(x, padding.top + graphHeight);
+                marketCtx.stroke();
+                
+                // X轴刻度标签
+                const qty = i * 25;
+                marketCtx.fillStyle = '#666';
+                marketCtx.font = '12px Arial';
+                marketCtx.textAlign = 'center';
+                marketCtx.fillText(qty, x, padding.top + graphHeight + 20);
+            }
+            
+            // 绘制边际私人成本 (MPC) - 供给曲线
+            marketCtx.beginPath();
+            marketCtx.strokeStyle = '#7b61ff';
+            marketCtx.lineWidth = 2;
+            marketCtx.setLineDash([]);
+            
+            const mpcStartY = padding.top + graphHeight - (params.mpcIntercept / 100) * graphHeight;
+            const mpcEndY = padding.top + graphHeight - ((params.mpcIntercept + params.mpcSlope * 125) / 100) * graphHeight;
+            
+            marketCtx.moveTo(padding.left, mpcStartY);
+            marketCtx.lineTo(padding.left + graphWidth, mpcEndY);
+            marketCtx.stroke();
+            
+            // MPC标签
+            marketCtx.fillStyle = '#7b61ff';
+            marketCtx.font = 'bold 14px Arial';
+            marketCtx.textAlign = 'left';
+            marketCtx.fillText("MPC = Supply", padding.left + 10, mpcStartY - 10);
+            
+            // 绘制边际社会成本 (MSC)
+            marketCtx.beginPath();
+            marketCtx.strokeStyle = '#e74c3c';
+            marketCtx.lineWidth = 2;
+            marketCtx.setLineDash([]);
+            
+            const mscStartY = padding.top + graphHeight - (params.mscIntercept / 100) * graphHeight;
+            const mscEndY = padding.top + graphHeight - ((params.mscIntercept + params.mscSlope * 125) / 100) * graphHeight;
+            
+            marketCtx.moveTo(padding.left, mscStartY);
+            marketCtx.lineTo(padding.left + graphWidth, mscEndY);
+            marketCtx.stroke();
+            
+            // MSC标签
+            marketCtx.fillStyle = '#e74c3c';
+            marketCtx.fillText("MSC", padding.left + 10, mscStartY - 10);
+            
+            // 绘制边际私人效益 (MPB) - 需求曲线
+            marketCtx.beginPath();
+            marketCtx.strokeStyle = '#2980b9';
+            marketCtx.lineWidth = 2;
+            marketCtx.setLineDash([]);
+            
+            const mpbStartY = padding.top + graphHeight - (params.mpbIntercept / 100) * graphHeight;
+            const mpbEndY = padding.top + graphHeight - ((params.mpbIntercept + params.mpbSlope * 125) / 100) * graphHeight;
+            
+            marketCtx.moveTo(padding.left, mpbStartY);
+            marketCtx.lineTo(padding.left + graphWidth, mpbEndY);
+            marketCtx.stroke();
+            
+            // MPB标签
+            marketCtx.fillStyle = '#2980b9';
+            marketCtx.fillText("MPB = Demand", padding.left + graphWidth - 120, mpbEndY + 20);
+            
+            // 绘制边际社会效益 (MSB)
+            marketCtx.beginPath();
+            marketCtx.strokeStyle = '#27ae60';
+            marketCtx.lineWidth = 2;
+            marketCtx.setLineDash([]);
+            
+            const msbStartY = padding.top + graphHeight - (params.msbIntercept / 100) * graphHeight;
+            const msbEndY = padding.top + graphHeight - ((params.msbIntercept + params.msbSlope * 125) / 100) * graphHeight;
+            
+            marketCtx.moveTo(padding.left, msbStartY);
+            marketCtx.lineTo(padding.left + graphWidth, msbEndY);
+            marketCtx.stroke();
+            
+            // MSB标签
+            marketCtx.fillStyle = '#27ae60';
+            marketCtx.fillText("MSB", padding.left + graphWidth - 120, msbEndY - 10);
+            
+            // 计算市场均衡点 (MPB = MPC)
+            const marketQX = padding.left + (params.marketQ / 125) * graphWidth;
+            const marketQY = padding.top + graphHeight - ((params.mpbIntercept + params.mpbSlope * params.marketQ) / 100) * graphHeight;
+            
+            // 标记市场均衡点
+            marketCtx.beginPath();
+            marketCtx.arc(marketQX, marketQY, 6, 0, Math.PI * 2);
+            marketCtx.fillStyle = '#e67e22';
+            marketCtx.fill();
+            marketCtx.strokeStyle = '#2c3e50';
+            marketCtx.lineWidth = 2;
+            marketCtx.stroke();
+            
+            marketCtx.fillStyle = '#2c3e50';
+            marketCtx.font = 'bold 12px Arial';
+            marketCtx.textAlign = 'center';
+            marketCtx.fillText("Qₘ", marketQX, marketQY - 15);
+            
+            // 计算社会最优点 (MSB = MSC)
+            const socialQX = padding.left + (params.socialQ / 125) * graphWidth;
+            let socialQY;
+            
+            if (MARKET_PARAMS.goodType === "merit") {
+                socialQY = padding.top + graphHeight - ((params.msbIntercept + params.msbSlope * params.socialQ) / 100) * graphHeight;
+            } else {
+                socialQY = padding.top + graphHeight - ((params.mscIntercept + params.mscSlope * params.socialQ) / 100) * graphHeight;
+            }
+            
+            // 标记社会最优点
+            marketCtx.beginPath();
+            marketCtx.arc(socialQX, socialQY, 6, 0, Math.PI * 2);
+            marketCtx.fillStyle = '#27ae60';
+            marketCtx.fill();
+            marketCtx.strokeStyle = '#2c3e50';
+            marketCtx.lineWidth = 2;
+            marketCtx.stroke();
+            
+            marketCtx.fillStyle = '#2c3e50';
+            marketCtx.fillText("Q*", socialQX, socialQY - 15);
+            
+            // 绘制无谓损失区域 (Deadweight Loss)
+            marketCtx.beginPath();
+            marketCtx.fillStyle = MARKET_PARAMS.goodType === "merit" ? 'rgba(231, 76, 60, 0.2)' : 'rgba(231, 76, 60, 0.2)';
+            
+            if (MARKET_PARAMS.goodType === "merit") {
+                // 优值品的无谓损失 (三角形)
+                marketCtx.moveTo(marketQX, marketQY);
+                
+                // 找到MSB与MPB在Qm处的差值
+                const msbAtQm = params.msbIntercept + params.msbSlope * params.marketQ;
+                const mpbAtQm = params.mpbIntercept + params.mpbSlope * params.marketQ;
+                const y1 = padding.top + graphHeight - (msbAtQm / 100) * graphHeight;
+                
+                marketCtx.lineTo(marketQX, y1);
+                
+                // 找到Q*处MSB与MPC的交点
+                const mpcAtQs = params.mpcIntercept + params.mpcSlope * params.socialQ;
+                const y2 = padding.top + graphHeight - (mpcAtQs / 100) * graphHeight;
+                
+                marketCtx.lineTo(socialQX, y2);
+                marketCtx.closePath();
+                marketCtx.fill();
+                
+                // 标注无谓损失
+                marketCtx.fillStyle = '#e74c3c';
+                marketCtx.font = 'italic 12px Arial';
+                marketCtx.textAlign = 'center';
+                marketCtx.fillText("Deadweight Loss", (marketQX + socialQX) / 2, (marketQY + y1 + y2) / 3);
+                
+            } else {
+                // 劣值品的无谓损失
+                marketCtx.moveTo(marketQX, marketQY);
+                
+                // 找到MSC与MPC在Qm处的差值
+                const mscAtQm = params.mscIntercept + params.mscSlope * params.marketQ;
+                const mpcAtQm = params.mpcIntercept + params.mpcSlope * params.marketQ;
+                const y1 = padding.top + graphHeight - (mscAtQm / 100) * graphHeight;
+                
+                marketCtx.lineTo(marketQX, y1);
+                
+                // 找到Q*处MPB与MSC的交点
+                const mpbAtQs = params.mpbIntercept + params.mpbSlope * params.socialQ;
+                const y2 = padding.top + graphHeight - (mpbAtQs / 100) * graphHeight;
+                
+                marketCtx.lineTo(socialQX, y2);
+                marketCtx.closePath();
+                marketCtx.fill();
+                
+                // 标注无谓损失
+                marketCtx.fillStyle = '#e74c3c';
+                marketCtx.font = 'italic 12px Arial';
+                marketCtx.textAlign = 'center';
+                marketCtx.fillText("Deadweight Loss", (marketQX + socialQX) / 2, (marketQY + y1 + y2) / 3);
+            }
+            
+            // 显示商品类型和市场失灵类型
+            marketCtx.fillStyle = '#2c3e50';
+            marketCtx.font = 'bold 16px Arial';
+            marketCtx.textAlign = 'center';
+            marketCtx.fillText(params.label, marketCanvasWidth / 2, padding.top - 20);
+            
+            marketCtx.fillStyle = MARKET_PARAMS.goodType === "merit" ? '#27ae60' : '#e74c3c';
+            marketCtx.font = 'bold 14px Arial';
+            const failureType = MARKET_PARAMS.goodType === "merit" ? "UNDER-CONSUMPTION" : "OVER-CONSUMPTION";
+            marketCtx.fillText(`Market Failure: ${failureType}`, marketCanvasWidth / 2, padding.top - 5);
+            
+            // 如果处于考试模式，显示政府干预
+            if (MARKET_PARAMS.isExamMode) {
+                const interventionX = padding.left + ((params.marketQ + (params.socialQ - params.marketQ) * 0.7) / 125) * graphWidth;
+                
+                marketCtx.fillStyle = '#e67e22';
+                marketCtx.font = 'italic 13px Arial';
+                marketCtx.textAlign = 'center';
+                marketCtx.fillText("Government Intervention: Subsidy/Tax", interventionX, padding.top + graphHeight + 60);
+                
+                // 绘制干预箭头
+                if (MARKET_PARAMS.goodType === "merit") {
+                    // 优值品：补贴使供给曲线右移
+                    drawArrow(marketCtx, marketQX - 30, marketQY + 30, socialQX - 10, socialQY + 10, '#e67e22');
+                } else {
+                    // 劣值品：税收使供给曲线左移
+                    drawArrow(marketCtx, marketQX + 30, marketQY + 30, socialQX + 10, socialQY + 10, '#e67e22');
+                }
+            }
+            
+            // 图例
+            const legendX = marketCanvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            marketCtx.fillStyle = '#7b61ff';
+            marketCtx.fillRect(legendX, legendY, 15, 15);
+            marketCtx.fillStyle = '#333';
+            marketCtx.font = '12px Arial';
+            marketCtx.textAlign = 'left';
+            marketCtx.fillText("MPC = Private Supply", legendX + 25, legendY + 12);
+            
+            marketCtx.fillStyle = '#e74c3c';
+            marketCtx.fillRect(legendX, legendY + 25, 15, 15);
+            marketCtx.fillStyle = '#333';
+            marketCtx.fillText("MSC = Social Cost", legendX + 25, legendY + 37);
+            
+            marketCtx.fillStyle = '#2980b9';
+            marketCtx.fillRect(legendX, legendY + 50, 15, 15);
+            marketCtx.fillStyle = '#333';
+            marketCtx.fillText("MPB = Private Demand", legendX + 25, legendY + 62);
+            
+            marketCtx.fillStyle = '#27ae60';
+            marketCtx.fillRect(legendX, legendY + 75, 15, 15);
+            marketCtx.fillStyle = '#333';
+            marketCtx.fillText("MSB = Social Benefit", legendX + 25, legendY + 87);
+            
+            marketCtx.fillStyle = '#e67e22';
+            marketCtx.beginPath();
+            marketCtx.arc(legendX + 7, legendY + 105, 6, 0, Math.PI * 2);
+            marketCtx.fill();
+            marketCtx.fillStyle = '#333';
+            marketCtx.fillText("Market Equilibrium (Qₘ)", legendX + 25, legendY + 110);
+            
+            marketCtx.fillStyle = '#27ae60';
+            marketCtx.beginPath();
+            marketCtx.arc(legendX + 7, legendY + 125, 6, 0, Math.PI * 2);
+            marketCtx.fill();
+            marketCtx.fillStyle = '#333';
+            marketCtx.fillText("Social Optimum (Q*)", legendX + 25, legendY + 130);
+        }
+        
+        // 绘制箭头函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 12;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 更新数据面板
+        function updateMarketDataPanel() {
+            const params = MARKET_PARAMS.marketParams[MARKET_PARAMS.goodType];
+            
+            // 更新显示
+            document.getElementById('goodType').textContent = params.label;
+            document.getElementById('marketQ').textContent = `Qₘ = ${params.marketQ} units`;
+            document.getElementById('socialQ').textContent = `Q* = ${params.socialQ} units`;
+            
+            const efficiencyElement = document.getElementById('efficiency');
+            if (params.marketQ === params.socialQ) {
+                efficiencyElement.textContent = "Achieved";
+                efficiencyElement.style.color = '#27ae60';
+            } else {
+                efficiencyElement.textContent = "Not Achieved";
+                efficiencyElement.style.color = '#e74c3c';
+            }
+            
+            const dwlElement = document.getElementById('dwl');
+            if (MARKET_PARAMS.goodType === "merit") {
+                dwlElement.textContent = "△ Area ABC (Under-consumption)";
+            } else {
+                dwlElement.textContent = "△ Area ABC (Over-consumption)";
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置商品类型
+            setGoodType('merit');
+            
+            // 初始化市场图表
+            ensureMarketRedraw();
+            
+            // 更新数据面板
+            updateMarketDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Econ Q3: Subsidy</title>
+    
+    <!-- 1. 引用公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- 2. MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 3. 布局修正 */
+        body { 
+            padding-top: 60px; padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; 
+        }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 450px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        .orig-img { max-width: 100%; display: block; margin-bottom: 10px; border: 1px solid #eee; }
+
+        /* 画布固定高度 */
+        .canvas-container { 
+            width: 100%; 
+            height: 450px; /* 锁死高度 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .controls { 
+            display: flex; flex-direction: column; gap: 12px; 
+            background: #f8f9fa; padding: 15px; border-radius: 8px; border:1px solid #eee;
+        }
+        .control-row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:13px;
+        }
+        button.action-btn.active { background-color: #2980b9; color: white; border-color: #2980b9; }
+        button.exam-btn { background-color: #27ae60; color: white; border: none; flex: 2; }
+        
+        /* Tabs & Answer Panel */
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right: 5px; }
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .tab-item { 
+            padding: 10px 15px; cursor: pointer; font-weight: bold; color: #7f8c8d; 
+            border-bottom: 2px solid transparent; margin-bottom: -2px; font-size: 14px;
+        }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        /* 文本样式优化 */
+        .explanation p { margin-bottom: 8px; line-height: 1.5; font-size: 14px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 1px 4px; border-radius: 3px; }
+        h4 { margin: 15px 0 8px 0; color: #2c3e50; border-left: 4px solid #3498db; padding-left: 8px; font-size: 15px; }
+        
+        .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：图表 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Econ / Section B / Q3</h3>
+                
+                <div class="problem-text">
+                    <img src="q3_orig.png" class="orig-img" onerror="this.style.display='none'">
+                    <p><strong>(a)</strong> With the help of a diagram, explain how changes in a subsidy can influence the price and quantity sold of a product in a market and consider how expenditure on a subsidy is affected by the price elasticity of demand for the product. [8]</p>
+                    <p><strong>(b)</strong> Assess whether an increase in the tax on a demerit good is always the best way to reduce the consumption of such a product. [12]</p>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight:bold; font-size:14px;">PED:</span>
+                        <button class="action-btn active" id="btnInelastic" onclick="setPED(0.5)">Inelastic (<1)</button>
+                        <button class="action-btn" id="btnElastic" onclick="setPED(1.5)">Elastic (>1)</button>
+                    </div>
+                    <div class="control-row">
+                        <span style="font-weight:bold; font-size:14px;">Subsidy:</span>
+                        <input type="range" id="sliderSubsidy" min="0" max="100" value="0" style="flex:1; cursor:pointer;">
+                    </div>
+                    <div class="control-row">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Exam Diagram</button>
+                        <button class="action-btn" style="background:#95a5a6; color:white; flex:0.5;" onclick="resetGraph()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：解析 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')">Part (a)</div>
+                    <div class="tab-item" onclick="switchTab('b')">Part (b)</div>
+                    <div class="tab-item" onclick="switchTab('model')">Full Answer</div>
+                </div>
+
+                <!-- Part A Logic -->
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. Diagram Analysis (AO1/AO2)</h4>
+                    <div class="explanation">
+                        <ul>
+                            <li><strong>Shift:</strong> Subsidy reduces costs $\rightarrow$ Supply shifts <strong>Right</strong> ($S \rightarrow S_1$).</li>
+                            <li><strong>Equilibrium:</strong> Price falls ($P \rightarrow P_1$), Quantity rises ($Q \rightarrow Q_1$).</li>
+                            <li><strong>Vertical Distance:</strong> Represents the subsidy per unit.</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>2. Evaluation: Impact of PED (AO3)</h4>
+                    <div class="explanation">
+                        <p>The cost to government = $Subsidy \times Quantity (Q_1)$.</p>
+                        <p><span class="term">Inelastic Demand:</span> $Q$ rises slightly. Price drops significantly. <span class="highlight">Gov Spending is smaller.</span></p>
+                        <p><span class="term">Elastic Demand:</span> $Q$ rises significantly. Price drops slightly. <span class="highlight">Gov Spending is larger.</span></p>
+                    </div>
+                </div>
+
+                <!-- Part B Logic -->
+                <div id="tab-b" class="tab-content">
+                    <h4>1. Arguments FOR Tax</h4>
+                    <div class="explanation">
+                        <p>• Increases price and reduces quantity consumed.</p>
+                        <p>• Internalizes the negative externality (makes polluter pay).</p>
+                        <p>• Generates government revenue.</p>
+                    </div>
+
+                    <h4>2. Limitations (Why not "Always Best")</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Inelastic Demand:</span> For addictive goods (cigarettes), price rise causes little drop in $Q$. Tax is ineffective at reducing consumption.</p>
+                        <p>• <span class="term">Black Markets:</span> High tax may lead to smuggling or illegal production.</p>
+                        <p>• <span class="term">Regressive:</span> Burdens low-income groups more.</p>
+                    </div>
+
+                    <h4>3. Conclusion</h4>
+                    <div class="explanation">
+                        Tax is effective but not "always the best" on its own. A <span class="highlight">multi-policy approach</span> (e.g., Education + Regulation) is often better to address root causes.
+                    </div>
+                </div>
+
+                <!-- Model Answer -->
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif;">
+                        <p><strong>(a) Analysis:</strong> A subsidy is a payment to producers that lowers marginal costs, shifting the supply curve right ($S$ to $S_1$). This creates excess supply at the original price, forcing price down to $P_1$ and quantity up to $Q_1$. Consumers benefit from lower prices, producers from higher revenues.</p>
+                        <p><strong>Evaluation:</strong> Government expenditure ($Subsidy \times Q_1$) depends on PED. If demand is price elastic, the % rise in Q is large, causing high expenditure. If inelastic, Q rises little, limiting costs.</p>
+                        <hr style="border-top:1px dashed #ccc; margin:15px 0;">
+                        <p><strong>(b) Assessment:</strong> Indirect taxes raise the price of demerit goods, which should reduce consumption according to the law of demand. This helps internalize negative externalities.</p>
+                        <p>However, demand for demerit goods is often <strong>price inelastic</strong> due to addiction (e.g., tobacco). A tax will raise price but reduce quantity very little, failing its primary objective. Additionally, high taxes may encourage <strong>black markets</strong>.</p>
+                        <p><strong>Conclusion:</strong> Therefore, tax is not always the best single solution. It is most effective when combined with <strong>education</strong> (to shift demand left) and <strong>regulation</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Graph State
+        let ped = 0.5; 
+        let subsidy = 0; 
+        let isExamMode = false;
+        
+        // Layout
+        let origin = {x: 0, y: 0};
+        let width = 0, height = 0;
+
+        // Listeners
+        document.getElementById('sliderSubsidy').addEventListener('input', function(e) {
+            isExamMode = false;
+            subsidy = parseInt(e.target.value);
+            drawFrame();
+        });
+
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 450; // 锁死高度
+            width = canvas.width;
+            height = canvas.height;
+            origin = { x: 50, y: height - 40 }; // Bottom Left origin
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function setPED(val) {
+            ped = val;
+            document.getElementById('btnInelastic').className = val < 1 ? 'action-btn active' : 'action-btn';
+            document.getElementById('btnElastic').className = val > 1 ? 'action-btn active' : 'action-btn';
+            drawFrame();
+        }
+        
+        function resetGraph() {
+            isExamMode = false; subsidy = 0;
+            document.getElementById('sliderSubsidy').value = 0;
+            drawFrame();
+        }
+        
+        function showExamMode() {
+            isExamMode = true; subsidy = 40; setPED(0.8);
+            drawFrame();
+        }
+        
+        // 【修复】Tab 切换逻辑
+        function switchTab(id) {
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            
+            const index = id === 'a' ? 0 : (id === 'b' ? 1 : 2);
+            document.querySelectorAll('.tab-item')[index].classList.add('active');
+            document.getElementById('tab-'+id).classList.add('active');
+        }
+
+        // --- 绘图逻辑 ---
+        function drawFrame() {
+            ctx.clearRect(0, 0, width, height);
+            
+            const graphW = width - 80;
+            const graphH = height - 80;
+            
+            // Curves
+            const dStart = { x: origin.x, y: 40 };
+            const dEnd = { x: origin.x + graphW * (ped > 1 ? 0.9 : 0.5), y: origin.y };
+            
+            const sStart = { x: origin.x, y: origin.y };
+            const sEnd = { x: origin.x + graphW * 0.8, y: 40 };
+            
+            // Draw Axes
+            ctx.beginPath(); ctx.lineWidth=2; ctx.strokeStyle='#333';
+            ctx.moveTo(origin.x, 20); ctx.lineTo(origin.x, origin.y); ctx.lineTo(width-20, origin.y); ctx.stroke();
+            ctx.fillText("Price", 10, 30); ctx.fillText("Quantity", width-60, origin.y-10);
+            
+            // Draw Demand
+            ctx.beginPath(); ctx.strokeStyle='#3498db'; ctx.lineWidth=3;
+            ctx.moveTo(dStart.x, dStart.y); ctx.lineTo(dEnd.x, dEnd.y); ctx.stroke();
+            ctx.fillStyle='#3498db'; ctx.fillText("D", dEnd.x, dEnd.y-10);
+
+            // Draw Supply Original
+            ctx.beginPath(); ctx.strokeStyle='#e74c3c';
+            ctx.moveTo(sStart.x, sStart.y); ctx.lineTo(sEnd.x, sEnd.y); ctx.stroke();
+            ctx.fillStyle='#e74c3c'; ctx.fillText("S", sEnd.x, sEnd.y-10);
+            
+            // Intersection 1
+            const eq1 = getIntersection(dStart, dEnd, sStart, sEnd);
+            
+            // Shifted Supply
+            const shiftPx = subsidy * (graphH / 150);
+            
+            // Let's just perform visual offset. 
+            const xShift = subsidy * (graphW / 150);
+            const s1Start_x = sStart.x + xShift; const s1Start_y = sStart.y;
+            const s1End_x = sEnd.x + xShift; const s1End_y = sEnd.y;
+            
+            if(subsidy > 0) {
+                ctx.beginPath(); ctx.strokeStyle='#e67e22';
+                ctx.moveTo(s1Start_x, s1Start_y); ctx.lineTo(s1End_x, s1End_y); ctx.stroke();
+                ctx.fillStyle='#e67e22'; ctx.fillText("S1", s1End_x, s1End_y-10);
+                
+                // Intersection 2
+                const eq2 = getIntersection(dStart, dEnd, {x:s1Start_x, y:s1Start_y}, {x:s1End_x, y:s1End_y});
+                
+                // Points
+                drawPoint(eq1); drawPoint(eq2);
+                
+                // Dotted Lines
+                drawDotted(eq1, "P", "Q");
+                drawDotted(eq2, "P1", "Q1");
+                
+                // Gov Box (Only if exam mode or large subsidy)
+                if(isExamMode || subsidy > 10) {
+                    // Find point on Old S at Q1
+                    // Line eq for S: 
+                    const mS = (sEnd.y - sStart.y) / (sEnd.x - sStart.x);
+                    const cS = sStart.y - mS * sStart.x;
+                    const topY = mS * eq2.x + cS;
+                    
+                    ctx.fillStyle = 'rgba(241, 196, 15, 0.3)';
+                    ctx.fillRect(origin.x, topY, eq2.x - origin.x, eq2.y - topY);
+                    ctx.fillStyle = '#d35400'; ctx.fillText("Gov Spend", origin.x+10, (topY+eq2.y)/2);
+                }
+                
+                if(isExamMode) {
+                    drawArrow((sStart.x+sEnd.x)/2, (sStart.y+sEnd.y)/2, (s1Start_x+s1End_x)/2, (s1Start_y+s1End_y)/2);
+                }
+            } else {
+                drawPoint(eq1);
+                drawDotted(eq1, "P", "Q");
+            }
+        }
+        
+        function getIntersection(p1, p2, p3, p4) {
+            const m1 = (p2.y - p1.y) / (p2.x - p1.x); const c1 = p1.y - m1 * p1.x;
+            const m2 = (p4.y - p3.y) / (p4.x - p3.x); const c2 = p3.y - m2 * p3.x;
+            const x = (c2 - c1) / (m1 - m2);
+            const y = m1 * x + c1;
+            return {x,y};
+        }
+        
+        function drawPoint(p, label) {
+            ctx.beginPath(); ctx.fillStyle='#333'; ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
+        }
+        
+        function drawDotted(p, yLab, xLab) {
+            ctx.beginPath(); ctx.setLineDash([5,5]); ctx.strokeStyle='#7f8c8d'; ctx.lineWidth=1;
+            ctx.moveTo(p.x, p.y); ctx.lineTo(origin.x, p.y);
+            ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, origin.y);
+            ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle='#333'; 
+            ctx.fillText(yLab, origin.x-20, p.y+5);
+            ctx.fillText(xLab, p.x-5, origin.y+20);
+        }
+        
+        function drawArrow(x1, y1, x2, y2) {
+            const angle = Math.atan2(y2-y1, x2-x1);
+            const head = 10;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.strokeStyle='#333'; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x2, y2); 
+            ctx.lineTo(x2-head*Math.cos(angle-Math.PI/6), y2-head*Math.sin(angle-Math.PI/6));
+            ctx.lineTo(x2-head*Math.cos(angle+Math.PI/6), y2-head*Math.sin(angle+Math.PI/6));
+            ctx.fillStyle='#333'; ctx.fill();
+        }
+
+        setTimeout(() => { resize(); resetGraph(); }, 200);
+    </script>
+</body>
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q5 - Exchange Rate & Balance of Payments</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f4fd;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .model-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 8px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 10px 0 5px 0;
+            font-size: 14px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .concise-point {
+            margin: 8px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .concise-point:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section C / Question 5</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 - 只显示第5题 -->
+                    <p><strong>5 (a)</strong> With the help of a diagram(s), explain two ways in which a fall in the balance of trade in goods may affect the value of a floating exchange rate and consider the extent to which a change in the relative rate of interest between two countries may have a greater impact on the exchange rate. [8]</p>
+                    
+                    <p><strong>(b)</strong> Assess whether an improvement in the terms of trade or a surplus on the current account of the balance of payments is of more benefit to an economy. [12]</p>
+                    
+                    <!-- 原图占位符 -->
+                    <div class="orig-img">
+                        <div style="text-align: center; padding: 20px; background: #f9f9f9;">
+                            <strong>Foreign Exchange Market Diagram</strong><br>
+                            <span style="color: #666; font-size: 14px;">
+                                Required for part (a) - shows demand and supply of currency
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Mark Scheme 信息 -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #1abc9c;">
+                        <strong>Mark Scheme Summary:</strong>
+                        <ul style="margin: 10px 0 0 20px; font-size: 14px;">
+                            <li><strong>5(a) - 8 marks:</strong> Diagram (1), Explanation of two ways (2×2), Interest rate comparison (2), Evaluation (1)</li>
+                            <li><strong>5(b) - 12 marks:</strong> Definitions (2), Benefits analysis (2×3), Evaluation (3), Conclusion (1)</li>
+                            <li>One-sided responses cannot gain evaluation marks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Foreign Exchange Market Interactive Diagram</h4>
+                <p>How trade balance and interest rates affect a floating exchange rate</p>
+                
+                <div class="canvas-container">
+                    <canvas id="forexCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● Demand for Currency</div>
+                        <div style="color: #c0392b">● Supply of Currency</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Trade Balance:</span>
+                        <input type="range" id="tradeBalanceSlider" min="-100" max="100" value="0" style="flex: 1; cursor: pointer;" oninput="updateForexChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>Deficit</span>
+                        <span>Balanced</span>
+                        <span>Surplus</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <span style="font-weight: bold; font-size: 14px;">Interest Rate Differential:</span>
+                        <input type="range" id="interestRateSlider" min="-5" max="5" value="0" style="flex: 1; cursor: pointer;" oninput="updateForexChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>-5% (Lower)</span>
+                        <span>0% (Same)</span>
+                        <span>+5% (Higher)</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn" id="tradeEffectBtn" onclick="setScenario('trade')">Trade Effect</button>
+                        <button class="action-btn active" id="interestEffectBtn" onclick="setScenario('interest')">Interest Effect</button>
+                        <button class="action-btn exam-btn" onclick="showBothEffects()">★ Exam Scenario</button>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn" style="background: #95a5a6; color: white;" onclick="resetForexChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Exchange Rate (USD/GBP):</span>
+                        <span id="exchangeRate">1.250</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Trade Balance Effect:</span>
+                        <span id="tradeBalance">Neutral</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Interest Rate Effect:</span>
+                        <span id="interestEffect">Neutral</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Currency Change:</span>
+                        <span id="currencyChange">No change</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>5(a) Analysis: Trade Balance & Exchange Rate</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Diagram requirement:</strong> Draw foreign exchange market with demand and supply curves for domestic currency.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>First way (exports decrease):</strong> Fall in exports → less foreign demand for domestic currency → demand curve shifts left → exchange rate depreciates.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Second way (imports increase):</strong> Rise in imports → more domestic supply of currency → supply curve shifts right → exchange rate depreciates.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Interest rate comparison:</strong> Higher interest rates attract <span class="highlight-term">hot money</span> flows → increased demand for currency → appreciation effect.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Points (8 marks):</strong></p>
+                            <p>1. Correct diagram (1 mark)</p>
+                            <p>2. Explanation of export effect (2 marks)</p>
+                            <p>3. Explanation of import effect (2 marks)</p>
+                            <p>4. Interest rate effect analysis (2 marks)</p>
+                            <p>5. Comparative evaluation (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>5(b) Analysis: Terms of Trade vs Current Account</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Terms of Trade (ToT):</strong> $$ToT = \frac{\text{Export Price Index}}{\text{Import Price Index}} \times 100$$ Improvement means higher export prices relative to import prices.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Current Account Surplus:</strong> $(X - M) + \text{net income} + \text{net transfers} > 0$. Country is net lender to world.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Benefits of improved ToT:</strong> Higher purchasing power for imports, potential real income gains, may reduce inflation.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Benefits of CA surplus:</strong> Indicates competitiveness, creates jobs in export sectors, accumulates foreign reserves.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>5(a) Evaluation: Which has greater impact?</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Short-term vs long-term:</strong> Interest rates affect <span class="highlight-term">hot money</span> immediately; trade balance effects are slower due to contracts and habits.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Capital mobility:</strong> With high capital mobility, interest rates dominate. With low mobility, trade balance matters more.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Interest rates usually have greater short-term impact, but sustained trade imbalances pressure exchange rates long-term.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>5(b) Evaluation: Which is more beneficial?</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Context dependence:</strong> For developing economies needing imports, improved ToT may be better. For export-led economies, CA surplus may be preferable.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Causes matter:</strong> ToT improvement from strong demand is better than from weak imports. CA surplus from exports is better than from recession.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Sustainability:</strong> Persistent CA surplus can cause trade tensions. ToT gains may be temporary if based on commodity cycles.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Balanced judgement:</strong> Improved ToT generally benefits living standards directly, but CA surplus provides stability and reserves.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab - 英文版，控制在200字以内 -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">5(a) Model Answer [8 marks] - ~180 words</div>
+                            
+                            <p>A <span class="highlight-term">floating exchange rate</span> is determined by demand and supply in the forex market. A trade balance fall affects it in two ways:</p>
+                            
+                            <div class="concise-point">Exports decrease: Less foreign demand for domestic currency shifts the demand curve left, causing <span class="highlight-term">depreciation</span>.</div>
+                            
+                            <div class="concise-point">Imports increase: More domestic supply of currency shifts the supply curve right, also causing <span class="highlight-term">depreciation</span>.</div>
+                            
+                            <p><span class="highlight-term">Interest rates have greater short-term impact</span>: Higher rates attract <span class="highlight-term">hot money flows</span>, increasing currency demand and causing appreciation. Capital is more mobile than trade flows, so interest differentials affect exchange rates faster and more significantly in the short run.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">5(b) Model Answer [12 marks] - ~190 words</div>
+                            
+                            <p><span class="highlight-term">Terms of Trade (ToT) improvement</span> (export prices/import prices rising) increases import purchasing power, directly raising living standards.</p>
+                            
+                            <p>A <span class="highlight-term">current account (CA) surplus</span> (X-M>0) indicates international competitiveness, creates export jobs, and accumulates foreign reserves.</p>
+                            
+                            <div class="concise-point"><span class="highlight-term">Evaluation:</span> ToT improvement benefits consumers more directly but may be temporary due to commodity price volatility.</div>
+                            
+                            <div class="concise-point"><span class="highlight-term">Evaluation:</span> CA surplus provides economic stability but may reflect weak domestic demand or cause trade tensions.</div>
+                            
+                            <p><span class="highlight-term">Conclusion:</span> For import-dependent developing economies, ToT improvement is more beneficial. For mature export economies, CA surplus is more advantageous. The relative benefit depends on economic structure and development stage.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            initialExchangeRate: 1.25,
+            currentScenario: "interest",
+            tradeBalanceChange: 0,
+            interestRateChange: 0
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab:nth-child(${tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3})`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 外汇图表功能 ====================
+        const forexCanvas = document.getElementById('forexCanvas');
+        const forexCtx = forexCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        function resizeForexCanvas() {
+            if (!forexCanvas.parentElement) return;
+            
+            canvasWidth = forexCanvas.parentElement.clientWidth;
+            canvasHeight = forexCanvas.parentElement.clientHeight;
+            forexCanvas.width = canvasWidth;
+            forexCanvas.height = canvasHeight;
+            
+            drawForexChart();
+        }
+        
+        function ensureRedraw() {
+            resizeForexCanvas();
+            window.addEventListener('load', resizeForexCanvas);
+            setTimeout(resizeForexCanvas, 300);
+            setTimeout(resizeForexChart, 1000);
+        }
+        
+        function setScenario(scenario) {
+            ECONOMIC_PARAMS.currentScenario = scenario;
+            
+            document.getElementById('tradeEffectBtn').classList.remove('active');
+            document.getElementById('interestEffectBtn').classList.remove('active');
+            document.getElementById(`${scenario}EffectBtn`).classList.add('active');
+            
+            if (scenario === 'trade') {
+                document.getElementById('interestRateSlider').value = 0;
+                ECONOMIC_PARAMS.interestRateChange = 0;
+            }
+            if (scenario === 'interest') {
+                document.getElementById('tradeBalanceSlider').value = 0;
+                ECONOMIC_PARAMS.tradeBalanceChange = 0;
+            }
+            
+            updateForexChart();
+        }
+        
+        function showBothEffects() {
+            ECONOMIC_PARAMS.tradeBalanceChange = -60;
+            ECONOMIC_PARAMS.interestRateChange = 3;
+            document.getElementById('tradeBalanceSlider').value = -60;
+            document.getElementById('interestRateSlider').value = 3;
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        function updateForexChart() {
+            ECONOMIC_PARAMS.tradeBalanceChange = parseInt(document.getElementById('tradeBalanceSlider').value);
+            ECONOMIC_PARAMS.interestRateChange = parseFloat(document.getElementById('interestRateSlider').value);
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        function resetForexChart() {
+            ECONOMIC_PARAMS.tradeBalanceChange = 0;
+            ECONOMIC_PARAMS.interestRateChange = 0;
+            document.getElementById('tradeBalanceSlider').value = 0;
+            document.getElementById('interestRateSlider').value = 0;
+            setScenario('interest');
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        function drawForexChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            forexCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 坐标轴
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#333';
+            forexCtx.lineWidth = 2;
+            forexCtx.moveTo(padding.left, padding.top);
+            forexCtx.lineTo(padding.left, padding.top + graphHeight);
+            forexCtx.moveTo(padding.left, padding.top + graphHeight);
+            forexCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            forexCtx.stroke();
+            
+            // 标签
+            forexCtx.font = 'bold 14px Arial';
+            forexCtx.fillStyle = '#333';
+            forexCtx.textAlign = 'center';
+            forexCtx.save();
+            forexCtx.translate(20, padding.top + graphHeight / 2);
+            forexCtx.rotate(-Math.PI / 2);
+            forexCtx.fillText("Exchange Rate (USD/GBP)", 0, 0);
+            forexCtx.restore();
+            forexCtx.fillText("Quantity of GBP", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 网格
+            forexCtx.strokeStyle = '#eee';
+            forexCtx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                forexCtx.beginPath();
+                forexCtx.moveTo(padding.left, y);
+                forexCtx.lineTo(padding.left + graphWidth, y);
+                forexCtx.stroke();
+                
+                const rate = (1.35 - (i * 0.2 / 5)).toFixed(2);
+                forexCtx.fillStyle = '#666';
+                forexCtx.font = '12px Arial';
+                forexCtx.textAlign = 'right';
+                forexCtx.fillText(rate, padding.left - 10, y + 4);
+            }
+            
+            // 初始曲线
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#2980b9';
+            forexCtx.lineWidth = 3;
+            const demandStartY = padding.top + graphHeight * 0.2;
+            const demandEndY = padding.top + graphHeight * 0.8;
+            const demandStartX = padding.left + graphWidth * 0.1;
+            const demandEndX = padding.left + graphWidth * 0.9;
+            forexCtx.moveTo(demandStartX, demandStartY);
+            forexCtx.lineTo(demandEndX, demandEndY);
+            forexCtx.stroke();
+            
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#c0392b';
+            forexCtx.lineWidth = 3;
+            const supplyStartY = padding.top + graphHeight * 0.8;
+            const supplyEndY = padding.top + graphHeight * 0.2;
+            const supplyStartX = padding.left + graphWidth * 0.1;
+            const supplyEndX = padding.left + graphWidth * 0.9;
+            forexCtx.moveTo(supplyStartX, supplyStartY);
+            forexCtx.lineTo(supplyEndX, supplyEndY);
+            forexCtx.stroke();
+            
+            // 初始均衡
+            const equilibriumX = padding.left + graphWidth * 0.5;
+            const equilibriumY = padding.top + graphHeight * 0.5;
+            forexCtx.beginPath();
+            forexCtx.arc(equilibriumX, equilibriumY, 6, 0, Math.PI * 2);
+            forexCtx.fillStyle = '#27ae60';
+            forexCtx.fill();
+            
+            // 计算变化
+            const tradeEffect = ECONOMIC_PARAMS.tradeBalanceChange / 100;
+            const interestEffect = ECONOMIC_PARAMS.interestRateChange / 2.5;
+            const demandShift = (-tradeEffect * 0.4 + interestEffect * 0.6) * graphWidth * 0.3;
+            const supplyShift = (tradeEffect * 0.4 - interestEffect * 0.2) * graphWidth * 0.3;
+            
+            // 新曲线
+            if (demandShift !== 0) {
+                forexCtx.beginPath();
+                forexCtx.strokeStyle = '#2980b9';
+                forexCtx.setLineDash([5, 5]);
+                forexCtx.lineWidth = 3;
+                forexCtx.moveTo(demandStartX + demandShift, demandStartY);
+                forexCtx.lineTo(demandEndX + demandShift, demandEndY);
+                forexCtx.stroke();
+                forexCtx.setLineDash([]);
+            }
+            
+            if (supplyShift !== 0) {
+                forexCtx.beginPath();
+                forexCtx.strokeStyle = '#c0392b';
+                forexCtx.setLineDash([5, 5]);
+                forexCtx.lineWidth = 3;
+                forexCtx.moveTo(supplyStartX + supplyShift, supplyStartY);
+                forexCtx.lineTo(supplyEndX + supplyShift, supplyEndY);
+                forexCtx.stroke();
+                forexCtx.setLineDash([]);
+            }
+            
+            // 新均衡
+            if (demandShift !== 0 || supplyShift !== 0) {
+                const newEqX = equilibriumX + (demandShift + supplyShift) / 3;
+                const newEqY = equilibriumY - (demandShift - supplyShift) / 6;
+                forexCtx.beginPath();
+                forexCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+                forexCtx.fillStyle = '#e74c3c';
+                forexCtx.fill();
+                
+                // 箭头
+                drawArrow(forexCtx, equilibriumX, equilibriumY, newEqX, newEqY, '#7b61ff');
+            }
+        }
+        
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 15;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        function updateDataPanel() {
+            const tradeEffect = ECONOMIC_PARAMS.tradeBalanceChange / 100;
+            const interestEffect = ECONOMIC_PARAMS.interestRateChange / 2.5;
+            const exchangeRateChange = (-tradeEffect * 0.15 + interestEffect * 0.25);
+            const newExchangeRate = (ECONOMIC_PARAMS.initialExchangeRate * (1 + exchangeRateChange)).toFixed(3);
+            
+            document.getElementById('exchangeRate').textContent = newExchangeRate;
+            
+            let tradeText = "Neutral";
+            if (ECONOMIC_PARAMS.tradeBalanceChange > 20) tradeText = "Surplus → Appreciation";
+            if (ECONOMIC_PARAMS.tradeBalanceChange < -20) tradeText = "Deficit → Depreciation";
+            document.getElementById('tradeBalance').textContent = tradeText;
+            
+            let interestText = "Neutral";
+            if (ECONOMIC_PARAMS.interestRateChange > 1) interestText = "Higher → Appreciation";
+            if (ECONOMIC_PARAMS.interestRateChange < -1) interestText = "Lower → Depreciation";
+            document.getElementById('interestEffect').textContent = interestText;
+            
+            const currencyElement = document.getElementById('currencyChange');
+            if (exchangeRateChange > 0.01) {
+                currencyElement.textContent = "Appreciating";
+                currencyElement.style.color = '#27ae60';
+            } else if (exchangeRateChange < -0.01) {
+                currencyElement.textContent = "Depreciating";
+                currencyElement.style.color = '#e74c3c';
+            } else {
+                currencyElement.textContent = "No change";
+                currencyElement.style.color = '#666';
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            switchTab('analysis');
+            setScenario('interest');
+            ensureRedraw();
+            updateDataPanel();
+            
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+        
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

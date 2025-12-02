@@ -10,18 +10,61 @@ const ECON_DATA = [
         "questions": [
             {
                 "qNum": "1",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 1",
+                "url": "2025/AS/qp-202505-economics-p21/1.html"
             },
             {
                 "qNum": "2",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 2",
+                "url": "2025/AS/qp-202505-economics-p21/2.html"
             },
             {
                 "qNum": "3",
                 "title": "Question 3",
                 "url": "2025/AS/qp-202505-economics-p21/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/AS/qp-202505-economics-p21/4.html"
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/AS/qp-202505-economics-p21/5.html"
+            }
+        ]
+    },
+    {
+        "id": "qp-202505-economics-p22",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P22.PDF",
+        "questions": [
+            {
+                "qNum": "1",
+                "title": "Question 1",
+                "url": "2025/AS/qp-202505-economics-p22/1.html"
+            },
+            {
+                "qNum": "2",
+                "title": "Question 2",
+                "url": "2025/AS/qp-202505-economics-p22/2.html"
+            },
+            {
+                "qNum": "3",
+                "title": "Question 3",
+                "url": "2025/AS/qp-202505-economics-p22/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/AS/qp-202505-economics-p22/4.html"
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/AS/qp-202505-economics-p22/5.html"
             }
         ]
     },
@@ -33,19 +76,34 @@ const ECON_DATA = [
         "questions": [
             {
                 "qNum": "1",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 1",
+                "url": "2025/AS/qp-202505-economics-p24/1.html"
             },
             {
                 "qNum": "2",
-                "title": "题目暂未录入",
-                "url": ""
+                "title": "Question 2",
+                "url": "2025/AS/qp-202505-economics-p24/2.html"
+            },
+            {
+                "qNum": "3",
+                "title": "Question 3",
+                "url": "2025/AS/qp-202505-economics-p24/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/AS/qp-202505-economics-p24/4.html"
             },
             {
                 "qNum": "5",
                 "title": "Question 5",
                 "url": "2025/AS/qp-202505-economics-p24/5.html",
                 "isNew": true
+            },
+            {
+                "qNum": "6",
+                "title": "Question 6",
+                "url": "2025/AS/qp-202505-economics-p24/6.html"
             }
         ]
     }

@@ -3,203 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A-Level Econ: Subsidy Master (Fixed)</title>
+    <title>Econ Q3: Subsidy</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
-        /* --- 返回箭头 --- */
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 450px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
         .back-arrow {
-            position: fixed; top: 10px; left: 10px; z-index: 9999;
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
             width: 40px; height: 40px; background: rgba(255,255,255,0.9);
             border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
             font-family: sans-serif; line-height: 1; cursor: pointer;
         }
+        
+        .orig-img { max-width: 100%; display: block; margin-bottom: 10px; border: 1px solid #eee; }
 
-        /* --- 原版样式 --- */
-        :root { --primary: #2c3e50; --accent: #e67e22; --highlight: #27ae60; --demand-blue: #2980b9; --bg-color: #f4f7f6; --paper-bg: #fff; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: #333; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 15px; }
-        .q-box { background: #fff; border-left: 5px solid var(--primary); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-family: "Times New Roman", serif; font-size: 16px; }
-        .viz-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; display: flex; flex-direction: column; }
-        .canvas-wrap { position: relative; width: 100%; padding-bottom: 60%; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; background: #fff; }
+        .canvas-container { 
+            width: 100%; height: 450px; 
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: #f9f9f9; padding: 12px; border-radius: 8px; justify-content: space-between; }
-        .control-group-slider { flex: 2; display: flex; align-items: center; gap: 10px; min-width: 200px; }
-        input[type=range] { flex: 1; cursor: pointer; }
-        .ped-toggle-group { display: flex; background: #e0e0e0; border-radius: 6px; padding: 3px; flex: 1.5; min-width: 220px; }
-        .ped-btn { flex: 1; border: none; background: transparent; padding: 6px 4px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; transition: all 0.2s; text-align: center; }
-        .ped-btn:hover { color: #333; }
-        .ped-btn.active { background-color: var(--demand-blue); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .action-btn { padding: 8px 12px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: 600; transition: 0.2s; flex: 1; min-width: 100px; }
-        .action-btn:hover { background: #eee; }
-        .exam-btn { background: var(--highlight); color: white; border: none; flex: 1.5; box-shadow: 0 2px 5px rgba(39, 174, 96, 0.3); }
-        .exam-btn:hover { background: #219150; transform: translateY(-1px); }
-        .answer-section { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); min-height: 400px; }
-        .tabs { display: flex; background: #ecf0f1; border-bottom: 1px solid #ddd; }
-        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; color: #7f8c8d; font-weight: 600; }
-        .tab.active { background: white; color: var(--accent); border-top: 3px solid var(--accent); }
-        .content { display: none; padding: 20px; line-height: 1.6; }
-        .content.active { display: block; }
-        h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px;}
-        .model-essay { font-family: 'Georgia', serif; font-size: 15px; color: #2c3e50; }
-        .model-essay strong { color: #d35400; }
-        .note { font-size: 13px; color: #7f8c8d; background: #fdf2e9; padding: 8px; border-radius: 4px; margin-bottom: 10px; border-left: 3px solid #e67e22;}
-        .sym { font-family: 'Times New Roman', serif; font-style: italic; }
-        @media (max-width: 700px) { .controls { flex-direction: column; align-items: stretch; gap: 15px; } .canvas-wrap { padding-bottom: 75%; } }
+        
+        .controls { display: flex; flex-direction: column; gap: 12px; background: #f8f9fa; padding: 15px; border-radius: 8px; border:1px solid #eee; }
+        .control-row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:13px;
+        }
+        button.action-btn.active { background-color: #2980b9; color: white; border-color: #2980b9; }
+        button.exam-btn { background-color: #27ae60; color: white; border: none; flex: 2; transition: transform 0.1s;}
+        button.exam-btn:active { transform: scale(0.98); }
+        
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right: 5px; }
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .tab-item { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #7f8c8d; border-bottom: 2px solid transparent; margin-bottom: -2px; font-size: 14px; }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        .explanation p { margin-bottom: 8px; line-height: 1.6; font-size: 14px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 1px 4px; border-radius: 3px; font-weight:bold; color:#d35400; }
+        h4 { margin: 15px 0 8px 0; color: #2c3e50; border-left: 4px solid #3498db; padding-left: 8px; font-size: 15px; }
+        .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
+        
+        /* 范文优化样式 */
+        .model-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
+        .model-header { font-size: 16px; font-weight: bold; color: #2980b9; margin-bottom: 8px; }
+        .model-sub { font-weight: bold; color: #555; display: block; margin-top: 8px; }
     </style>
 </head>
 <body>
 
-<!-- 【核心修复】使用 history.back() -->
-<a href="javascript:history.back()" class="back-arrow">‹</a>
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
 
-<div class="container">
-    <div class="q-box">
-        <strong>9708 Economics / Section B / Q3</strong><br><br>
-        (a) With the help of a diagram, explain how changes in a subsidy can influence the price and quantity sold of a product... consider how expenditure is affected by PED. [8]<br><br>
-        (b) Assess whether an increase in the tax on a demerit good is always the best way to reduce consumption. [12]
+    <div class="container">
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Econ / Section B / Q3</h3>
+                <div class="problem-text">
+                    <img src="q3_orig.png" class="orig-img" onerror="this.style.display='none'">
+                    <p><strong>(a)</strong> With the help of a diagram, explain how changes in a subsidy can influence the price and quantity sold of a product in a market and consider how expenditure on a subsidy is affected by the price elasticity of demand for the product. [8]</p>
+                    <p><strong>(b)</strong> Assess whether an increase in the tax on a demerit good is always the best way to reduce the consumption of such a product. [12]</p>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight:bold; font-size:14px;">PED:</span>
+                        <button class="action-btn active" id="btnInelastic" onclick="setPED(0.5)">Inelastic (<1)</button>
+                        <button class="action-btn" id="btnElastic" onclick="setPED(1.5)">Elastic (>1)</button>
+                    </div>
+                    <div class="control-row">
+                        <span style="font-weight:bold; font-size:14px;">Subsidy:</span>
+                        <input type="range" id="sliderSubsidy" min="0" max="100" value="0" style="flex:1; cursor:pointer;" oninput="manualMode()">
+                    </div>
+                    <div class="control-row">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Exam Diagram</button>
+                        <button class="action-btn" style="background:#95a5a6; color:white; flex:0.5;" onclick="resetGraph()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')">Part (a)</div>
+                    <div class="tab-item" onclick="switchTab('b')">Part (b)</div>
+                    <div class="tab-item" onclick="switchTab('model')">Full Answer</div>
+                </div>
+
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. Diagram Analysis (AO1/AO2)</h4>
+                    <div class="explanation">
+                        <ul>
+                            <li><strong>Shift:</strong> Subsidy reduces costs $\rightarrow$ Supply shifts <strong>Right</strong> ($S \rightarrow S_1$).</li>
+                            <li><strong>Equilibrium:</strong> Price falls ($P \rightarrow P_1$), Quantity rises ($Q \rightarrow Q_1$).</li>
+                            <li><strong>Vertical Distance:</strong> Represents the subsidy per unit.</li>
+                        </ul>
+                    </div>
+                    <h4>2. Evaluation: Impact of PED (AO3)</h4>
+                    <div class="explanation">
+                        <p>The cost to government = $Subsidy \times Quantity (Q_1)$.</p>
+                        <p><span class="term">Inelastic Demand:</span> $Q$ rises slightly. Price drops significantly. <span class="highlight">Gov Spending is smaller.</span></p>
+                        <p><span class="term">Elastic Demand:</span> $Q$ rises significantly. Price drops slightly. <span class="highlight">Gov Spending is larger.</span></p>
+                    </div>
+                </div>
+
+                <div id="tab-b" class="tab-content">
+                    <h4>1. Arguments FOR Tax</h4>
+                    <div class="explanation">
+                        <p>• Increases price and reduces quantity consumed.</p>
+                        <p>• Internalizes the negative externality (makes polluter pay).</p>
+                        <p>• Generates government revenue.</p>
+                    </div>
+                    <h4>2. Limitations (Why not "Always Best")</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Inelastic Demand:</span> For addictive goods (cigarettes), price rise causes little drop in $Q$. Tax is ineffective at reducing consumption.</p>
+                        <p>• <span class="term">Black Markets:</span> High tax may lead to smuggling or illegal production.</p>
+                        <p>• <span class="term">Regressive:</span> Burdens low-income groups more.</p>
+                    </div>
+                    <h4>3. Conclusion</h4>
+                    <div class="explanation">
+                        Tax is effective but not "always the best" on its own. A <span class="highlight">multi-policy approach</span> (e.g., Education + Regulation) is often better to address root causes.
+                    </div>
+                </div>
+
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif; font-size:15px;">
+                        
+                        <!-- Part A 范文优化 -->
+                        <div class="model-section">
+                            <div class="model-header">Part (a) [8 Marks]</div>
+                            <p>A <span class="highlight">subsidy</span> is a government payment to producers that lowers marginal costs. As shown in the diagram, this shifts the supply curve to the right (from $S$ to $S_1$).</p>
+                            <span class="model-sub">Market Impact:</span>
+                            <p>This creates excess supply at the original price, forcing the market price down to $P_1$ and quantity up to $Q_1$. Consumers benefit from lower prices.</p>
+                            <span class="model-sub">Evaluation (Expenditure):</span>
+                            <p>Government expenditure ($Subsidy \times Q_1$) depends on <span class="highlight">PED</span>. If demand is <span class="term">price elastic</span>, the % rise in quantity is large, causing high expenditure. If demand is <span class="term">inelastic</span>, quantity rises little, limiting the cost.</p>
+                        </div>
+
+                        <!-- Part B 范文优化 -->
+                        <div class="model-section" style="border-bottom:none;">
+                            <div class="model-header">Part (b) [12 Marks]</div>
+                            <p>A tax on demerit goods (e.g., tobacco) aims to raise prices and reduce consumption to fix market failure.</p>
+                            <span class="model-sub">Arguments For:</span>
+                            <p>Indirect taxes shift supply left, raising price. According to the law of demand, this reduces consumption and internalizes negative externalities.</p>
+                            <span class="model-sub">Limitations (Why not always best):</span>
+                            <p>However, demand for demerit goods is often <span class="highlight">price inelastic</span> due to addiction. A tax raises price but reduces quantity very little, failing its objective. High taxes may also encourage <span class="highlight">black markets</span>.</p>
+                            <span class="model-sub">Conclusion:</span>
+                            <p>Therefore, tax is <span class="highlight">not always the best way</span> on its own. It is most effective when combined with <span class="highlight">education</span> (to reduce demand) and <span class="highlight">regulation</span>.</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="viz-card">
-        <div class="canvas-wrap">
-            <canvas id="graphCanvas"></canvas>
-            <div style="position:absolute; top:10px; right:10px; font-size:12px; background:rgba(255,255,255,0.9); padding:5px; border:1px solid #ccc; border-radius:4px;">
-                <span style="color:#2980b9">● Demand (D)</span> <br> 
-                <span style="color:#c0392b">● Supply (S)</span>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="control-group-slider">
-                <label>Move Subsidy:</label>
-                <input type="range" id="slider" min="0" max="100" value="0" oninput="manualMode()">
-            </div>
-            <div class="ped-toggle-group">
-                <button class="ped-btn active" id="btn-inelastic" onclick="setPED(false)">Inelastic</button>
-                <button class="ped-btn" id="btn-elastic" onclick="setPED(true)">Elastic</button>
-            </div>
-        </div>
-        <div class="controls" style="margin-top:0; padding-top:0; background:transparent;">
-            <button class="action-btn exam-btn" onclick="setExamMode()">★ Show Exam Diagram (考生必画图)</button>
-            <button class="action-btn" onclick="resetGraph()">Reset</button>
-        </div>
-    </div>
-    <div class="answer-section">
-        <div class="tabs">
-            <div class="tab active" onclick="setTab('a')">Part (a) Logic</div>
-            <div class="tab" onclick="setTab('b')">Part (b) Logic</div>
-            <div class="tab" onclick="setTab('c')">★ Model Answer (范文)</div>
-        </div>
-        <div id="tab-a" class="content active">
-            <h3>Part (a) Diagram & Analysis Checklist</h3>
-            <div class="note"><strong>Teacher's Note:</strong> The "Exam Diagram" button above shows exactly what students must draw to get AO1 marks.</div>
-            <ul>
-                <li><strong>Axes:</strong> Price (Vertical), Quantity (Horizontal).</li>
-                <li><strong>Curves:</strong> D downward, S upward.</li>
-                <li><strong>Shift:</strong> Subsidy moves S to the right (<span class="sym">S</span> to <span class="sym">S<sub>1</sub></span>).</li>
-                <li><strong>Equilibrium:</strong> Price falls (<span class="sym">P</span> → <span class="sym">P<sub>1</sub></span>), Quantity rises (<span class="sym">Q</span> → <span class="sym">Q<sub>1</sub></span>).</li>
-                <li><strong>Evaluation (PED):</strong>
-                    <ul>
-                        <li>If <strong>Inelastic</strong> (Steep D): Gov spending (Yellow Box) is small.</li>
-                        <li>If <strong>Elastic</strong> (Flat D): Gov spending is large.</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <div id="tab-b" class="content">
-            <h3>Part (b) Evaluation Structure</h3>
-            <ul>
-                <li><strong>Argument For Tax:</strong><br>Tax → Price ↑ → Quantity ↓ (Internalize Externality)</li>
-                <li><strong>Counter-Argument (Why it fails):</strong><br><strong>Inelastic Demand:</strong> Addictive goods (cigarettes). Tax raises price, but people keep buying. → <strong>Ineffective</strong>.<br><strong>Black Markets:</strong> High taxes encourage smuggling.</li>
-                <li><strong>Alternative Policies:</strong><br>Information/Education (Change mindset).<br>Regulation (Bans/Age limits).</li>
-            </ul>
-        </div>
-        <div id="tab-c" class="content">
-            <h3>Full Model Answer (20/20 Marks)</h3>
-            <div class="model-essay">
-                <p><strong>Part (a) [8 Marks]</strong></p>
-                <p>A <strong>subsidy</strong> is a payment by the government to producers to reduce costs and encourage output.</p>
-                <p><strong>Diagram Analysis:</strong><br>As shown in the diagram (see "Exam Mode" above), a subsidy reduces production costs, causing the <strong>Supply curve to shift to the right</strong> (from <span class="sym">S</span> to <span class="sym">S<sub>1</sub></span>). This creates a surplus at the original price, forcing the market equilibrium to change. Consequently, the <strong>market price falls</strong> from <span class="sym">P</span> to <span class="sym">P<sub>1</sub></span>, and the <strong>quantity traded increases</strong> from <span class="sym">Q</span> to <span class="sym">Q<sub>1</sub></span>.</p>
-                <p><strong>Evaluation (Expenditure):</strong><br>The cost to the government depends on the <strong>Price Elasticity of Demand (PED)</strong>. If demand is <strong>Price Inelastic</strong> (PED < 1), consumers are unresponsive to price drops, so <span class="sym">Q</span> rises only slightly, leading to <strong>smaller government expenditure</strong>. However, if demand is <strong>Price Elastic</strong>, <span class="sym">Q</span> rises significantly, causing a much <strong>larger expenditure</strong>.</p>
-                <hr>
-                <p><strong>Part (b) [12 Marks]</strong></p>
-                <p>A tax on demerit goods aims to raise prices and discourage consumption to fix market failure.</p>
-                <p><strong>Advantages:</strong> An increase in indirect tax shifts supply to the left, raising price. According to the law of demand, this should reduce the quantity consumed, thereby reducing negative externalities.</p>
-                <p><strong>Limitations (Why not always best):</strong> However, demerit goods like tobacco are often addictive, meaning demand is <strong>Price Inelastic</strong>. A tax will significantly raise price but result in only a <strong>small reduction in consumption</strong>. Furthermore, high taxes may encourage <strong>black markets</strong>, bypassing quality controls.</p>
-                <p><strong>Conclusion:</strong> Therefore, tax is <strong>not always the best way</strong> on its own. It is most effective when used in a <strong>multi-policy approach</strong> alongside <strong>information campaigns</strong> and <strong>regulation</strong> to address the root causes of consumption.</p>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-    const canvas = document.getElementById('graphCanvas');
-    const ctx = canvas.getContext('2d');
-    let width, height, subsidy = 0, isElastic = false, isExamMode = false;
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, subsidy=0, isElastic=false, isExamMode=false;
 
-    function resize() {
-        if (!canvas.parentElement) return;
-        width = canvas.parentElement.clientWidth;
-        height = canvas.parentElement.clientHeight;
-        canvas.width = width; canvas.height = height;
-        draw();
-    }
-    window.addEventListener('resize', resize);
-    window.addEventListener('load', resize);
-
-    function manualMode() { isExamMode = false; subsidy = parseInt(document.getElementById('slider').value); draw(); }
-    function setExamMode() { isExamMode = true; subsidy = 35; setPED(false, false); document.getElementById('slider').value = 35; draw(); }
-    function setPED(e, shouldDraw = true) {
-        isElastic = e;
-        document.getElementById('btn-elastic').classList.toggle('active', isElastic);
-        document.getElementById('btn-inelastic').classList.toggle('active', !isElastic);
-        if(shouldDraw) draw();
-    }
-    function resetGraph() { isExamMode = false; subsidy = 0; document.getElementById('slider').value = 0; draw(); }
-
-    function draw() {
-        if (!width) return;
-        ctx.clearRect(0, 0, width, height);
-        const p = 40, W = width - 2*p, H = height - 2*p, O = {x: p, y: height - p}; 
-        
-        ctx.beginPath(); ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
-        ctx.moveTo(p, p); ctx.lineTo(p, height-p); ctx.lineTo(width-p, height-p); ctx.stroke();
-        ctx.fillStyle = '#333'; ctx.font = 'bold 14px Arial';
-        ctx.fillText('Price (P)', 10, 20); ctx.fillText('Quantity (Q)', width-90, height-15);
-        ctx.fillText('0', p-15, height-p+15);
-
-        let dStart, dEnd;
-        if(isElastic) { dStart = {x: p, y: O.y - H*0.6}; dEnd = {x: width-p, y: O.y - H*0.4}; } 
-        else { dStart = {x: p + W*0.1, y: p}; dEnd = {x: p + W*0.7, y: height-p}; }
-        let sStart = {x: p + W*0.1, y: height-p - H*0.2}; let sEnd = {x: p + W*0.8, y: p + H*0.1};
-
-        drawLine(dStart, dEnd, '#2980b9', 'D'); drawLine(sStart, sEnd, '#c0392b', 'S');
-
-        let shiftPx = (subsidy/100) * (H*0.3);
-        let s2Start = {x: sStart.x, y: sStart.y + shiftPx}; let s2End = {x: sEnd.x, y: sEnd.y + shiftPx};
-
-        if(subsidy > 0) {
-            drawLine(s2Start, s2End, '#c0392b', isExamMode ? 'S1' : 'S+Sub');
-            if(isExamMode) drawArrow((sStart.x + sEnd.x)/2, (sStart.y + sEnd.y)/2, (s2Start.x + s2End.x)/2, (s2Start.y + s2End.y)/2);
-            let eq1 = getIntersection(dStart, dEnd, sStart, sEnd); let eq2 = getIntersection(dStart, dEnd, s2Start, s2End);
-            drawPoint(eq1); drawPoint(eq2);
-            drawDotted(eq1, isExamMode ? 'P' : 'P0', isExamMode ? 'Q' : 'Q0'); drawDotted(eq2, 'P1', 'Q1');
-            if(!isExamMode) {
-                let pOnOldS = getYAtX(sStart, sEnd, eq2.x);
-                ctx.fillStyle = 'rgba(241, 196, 15, 0.4)'; ctx.fillRect(O.x, pOnOldS, eq2.x - O.x, eq2.y - pOnOldS); 
-                if (subsidy > 10) { ctx.fillStyle = '#b7950b'; ctx.font = '12px Arial'; ctx.fillText("Gov Spending", O.x + 5, (pOnOldS+eq2.y)/2); }
-            }
-        } else {
-             let eq1 = getIntersection(dStart, dEnd, sStart, sEnd); drawPoint(eq1); drawDotted(eq1, 'P', 'Q');
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 450; 
+            width = canvas.width; height = canvas.height;
+            draw();
         }
-    }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
 
-    function drawLine(p1, p2, c, l) { ctx.beginPath(); ctx.strokeStyle = c; ctx.lineWidth = 3; ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); ctx.fillStyle = c; ctx.font = 'bold 16px Arial'; ctx.fillText(l, p2.x+5, p2.y); }
-    function drawPoint(p) { ctx.beginPath(); ctx.fillStyle = '#333'; ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill(); }
-    function drawDotted(p, lp, lq) { ctx.beginPath(); ctx.setLineDash([5,5]); ctx.strokeStyle = '#777'; ctx.lineWidth = 1; ctx.moveTo(p.x, p.y); ctx.lineTo(40, p.y); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, canvas.height-40); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#000'; ctx.font = 'bold 14px Arial'; ctx.fillText(lp, 15, p.y+5); ctx.fillText(lq, p.x-10, canvas.height-20); }
-    function drawArrow(x1,y1,x2,y2) { let angle = Math.atan2(y2-y1, x2-x1); ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = '#000'; ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(angle-Math.PI/6), y2-10*Math.sin(angle-Math.PI/6)); ctx.lineTo(x2-10*Math.cos(angle+Math.PI/6), y2-10*Math.sin(angle+Math.PI/6)); ctx.stroke(); }
-    function getIntersection(p1, p2, p3, p4) { let m1 = (p2.y-p1.y)/(p2.x-p1.x), c1 = p1.y - m1*p1.x, m2 = (p4.y-p3.y)/(p4.x-p3.x), c2 = p3.y - m2*p3.x, x = (c2-c1)/(m1-m2), y = m1*x + c1; return {x,y}; }
-    function getYAtX(p1,p2,x) { let m = (p2.y-p1.y)/(p2.x-p1.x); return m*x + (p1.y - m*p1.x); }
-    function setTab(t) { document.querySelectorAll('.content').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); let idx = t==='a'?0:t==='b'?1:2; document.querySelectorAll('.tab')[idx].classList.add('active'); }
-    setTimeout(function() { resize(); resetGraph(); }, 100);
-</script>
+        // 手动拖动滑块
+        function manualMode() { 
+            isExamMode = false; 
+            subsidy = parseInt(document.getElementById('sliderSubsidy').value); 
+            draw(); 
+        }
+
+        // 考试模式：强制设置参数，并刷新画布
+        function showExamMode() { 
+            isExamMode = true; 
+            subsidy = 40; // 给一个明显的偏移量
+            document.getElementById('sliderSubsidy').value = 40; // 同步滑块视觉
+            
+            // 强制设为无弹性 (标准图一般画无弹性较清晰)，并高亮按钮
+            isElastic = false;
+            updatePedButtons();
+            
+            draw(); 
+        }
+
+        function setPED(val) { 
+            isElastic = (val > 1); 
+            updatePedButtons();
+            draw(); 
+        }
+
+        function updatePedButtons() {
+            document.getElementById('btnInelastic').className = !isElastic ? 'action-btn active' : 'action-btn'; 
+            document.getElementById('btnElastic').className = isElastic ? 'action-btn active' : 'action-btn'; 
+        }
+
+        function resetGraph() { 
+            isExamMode = false; 
+            subsidy = 0; 
+            document.getElementById('sliderSubsidy').value = 0; 
+            draw(); 
+        }
+        
+        function switchTab(id) {
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const index = id==='a'?0:(id==='b'?1:2);
+            document.querySelectorAll('.tab-item')[index].classList.add('active');
+            document.getElementById('tab-'+id).classList.add('active');
+        }
+
+        function draw() {
+            if(!width) return;
+            ctx.clearRect(0,0,width,height);
+            const p=40, W=width-2*p, H=height-2*p, O={x:p, y:height-p};
+            
+            // Axes
+            ctx.beginPath(); ctx.strokeStyle='#333'; ctx.lineWidth=2;
+            ctx.moveTo(p,p); ctx.lineTo(p,height-p); ctx.lineTo(width-p,height-p); ctx.stroke();
+            ctx.fillStyle='#333'; ctx.font='bold 14px Arial';
+            ctx.fillText("Price",10,20); ctx.fillText("Quantity",width-60,height-10);
+
+            // Curves Config
+            let dStart, dEnd;
+            if(isElastic) { dStart={x:p, y:O.y-H*0.6}; dEnd={x:width-p, y:O.y-H*0.4}; } 
+            else { dStart={x:p+W*0.1, y:p}; dEnd={x:p+W*0.7, y:height-p}; }
+            
+            let sStart={x:p+W*0.1, y:height-p-H*0.2}; let sEnd={x:p+W*0.8, y:p+H*0.1};
+
+            // Draw Base Curves
+            drawLine(dStart, dEnd, '#2980b9', 'D');
+            drawLine(sStart, sEnd, '#c0392b', 'S');
+
+            // Shift Logic
+            // Subsidy shifts Supply Right (looks like Down on Price axis)
+            // shiftPx represents the vertical drop in price for same Q
+            let shiftPx = subsidy/100 * (H*0.25);
+            
+            // Intersection 1 (Original)
+            let eq1 = getIntersection(dStart,dEnd,sStart,sEnd);
+
+            if(subsidy > 0) {
+                // Shifted Supply Coordinates (Parallel shift)
+                // Supply: y = mx + c. New Supply: y = mx + (c + shift)  [Canvas Y increases down]
+                let s2Start={x:sStart.x, y:sStart.y+shiftPx}; 
+                let s2End={x:sEnd.x, y:sEnd.y+shiftPx};
+
+                drawLine(s2Start, s2End, '#e67e22', isExamMode?'S1':'S+Sub');
+                
+                let eq2 = getIntersection(dStart,dEnd,s2Start,s2End);
+                
+                drawPoint(eq1); drawPoint(eq2);
+                drawDotted(eq1, isExamMode?'P':'P0', isExamMode?'Q':'Q0');
+                drawDotted(eq2, 'P1', 'Q1');
+                
+                // Gov Box
+                // Top of box is on OLD supply curve directly above Q1
+                // We need Y on line S at x = eq2.x
+                let mS = (sEnd.y - sStart.y) / (sEnd.x - sStart.x);
+                let cS = sStart.y - mS * sStart.x;
+                let topY = mS * eq2.x + cS;
+                
+                // 无论是否 ExamMode，只要有 subsidy 就画阴影
+                ctx.fillStyle='rgba(241,196,15,0.3)';
+                ctx.fillRect(O.x, topY, eq2.x-O.x, eq2.y-topY);
+                
+                if(subsidy>10 || isExamMode) { 
+                    ctx.fillStyle='#d35400'; ctx.font='bold 12px Arial';
+                    ctx.fillText("Gov Spend", O.x+10, (topY+eq2.y)/2); 
+                }
+
+                if(isExamMode) {
+                    // Draw Arrow indicating Shift
+                    drawArrow((sStart.x+sEnd.x)/2, (sStart.y+sEnd.y)/2, (s2Start.x+s2End.x)/2, (s2Start.y+s2End.y)/2);
+                }
+            } else {
+                drawPoint(eq1); drawDotted(eq1, 'P', 'Q');
+            }
+        }
+
+        function drawLine(p1,p2,c,l) { ctx.beginPath(); ctx.strokeStyle=c; ctx.lineWidth=3; ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); ctx.fillStyle=c; ctx.fillText(l,p2.x-20,p2.y-10); }
+        function drawPoint(p) { ctx.beginPath(); ctx.fillStyle='#333'; ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fill(); }
+        function drawDotted(p,yl,xl) { ctx.beginPath(); ctx.setLineDash([5,5]); ctx.strokeStyle='#7f8c8d'; ctx.lineWidth=1; ctx.moveTo(p.x,p.y); ctx.lineTo(40,p.y); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x,450-40); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#333'; ctx.fillText(yl,20,p.y+5); ctx.fillText(xl,p.x-5,450-20); }
+        function drawArrow(x1,y1,x2,y2) { let a=Math.atan2(y2-y1,x2-x1); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.stroke(); ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-Math.PI/6), y2-10*Math.sin(a-Math.PI/6)); ctx.lineTo(x2-10*Math.cos(a+Math.PI/6), y2-10*Math.sin(a+Math.PI/6)); ctx.fillStyle='#000'; ctx.fill(); }
+        function getIntersection(p1,p2,p3,p4) { let m1=(p2.y-p1.y)/(p2.x-p1.x), c1=p1.y-m1*p1.x, m2=(p4.y-p3.y)/(p4.x-p3.x), c2=p3.y-m2*p3.x; let x=(c2-c1)/(m1-m2), y=m1*x+c1; return {x,y}; }
+
+        setTimeout(()=>{ resize(); resetGraph(); }, 200);
+    </script>
 </body>
 </html>

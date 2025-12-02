@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9708/23 Q1: Onions in Philippines (Final Split Layout)</title>
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* --- 基础设置 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 桌面端禁止 Body 滚动 */
+        }
+
+        /* --- 顶部导航栏 (节省空间) --- */
+        header {
+            background: #fff;
+            height: 60px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn { text-decoration: none; font-size: 24px; color: #333; font-weight: bold; }
+        .title { font-size: 18px; font-weight: 600; color: #111827; }
+
+        /* 题目切换按钮组 */
+        .nav-pills { display: flex; gap: 8px; }
+        .nav-btn {
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: #4b5563;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .nav-btn:hover { background: #e5e7eb; }
+        .nav-btn.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+
+        /* --- 主分屏布局 (核心) --- */
+        .split-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* 左侧：题目 + 图表 (60%) */
+        .left-panel {
+            flex: 6;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 右侧：答案解析 (40%) */
+        .right-panel {
+            flex: 4;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- 左侧内容组件 --- */
+        .context-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #111827;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .mark-label {
+            display: inline-block;
+            background: #e5e7eb;
+            color: #374151;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
+        /* 动画画布容器 */
+        .canvas-wrapper {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            flex-shrink: 0; /* 防止被压缩 */
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 450px; /* 电脑端给足高度 */
+            background: #ffffff;
+        }
+
+        canvas { width: 100%; height: 100%; display: block; }
+
+        .controls {
+            padding: 15px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .slider-group {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider-label { font-size: 14px; font-weight: 600; color: #475569; min-width: 100px; }
+        input[type="range"] { flex-grow: 1; cursor: pointer; }
+
+        .btn-exam {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        .btn-exam:hover { background: #059669; }
+
+        /* --- 右侧内容组件 --- */
+        .tabs-header {
+            display: flex;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { background: #f3f4f6; }
+        .tab.active { color: #2563eb; border-bottom-color: #2563eb; background: #eff6ff; }
+
+        .tab-content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 答案样式 */
+        .logic-step { margin-bottom: 15px; }
+        .logic-title { font-weight: bold; color: #1f2937; margin-bottom: 5px; }
+        .logic-text { color: #4b5563; font-size: 14px; line-height: 1.6; }
+        
+        .ms-list { list-style: none; padding: 0; margin: 0; }
+        .ms-item { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 12px; 
+            border-bottom: 1px dashed #e5e7eb; 
+            padding-bottom: 10px; 
+        }
+        .tick { color: #16a34a; font-weight: bold; font-size: 1.1em; }
+        .ms-desc { flex: 1; font-size: 14px; color: #374151; line-height: 1.5; }
+        .score { 
+            background: #fee2e2; color: #991b1b; 
+            font-size: 12px; padding: 2px 6px; 
+            border-radius: 4px; font-weight: bold; height: fit-content; 
+        }
+        .highlight { background: #fef08a; padding: 0 4px; border-radius: 2px; }
+
+        /* --- 响应式适配 (手机端) --- */
+        @media (max-width: 768px) {
+            body { overflow: auto; height: auto; }
+            .split-container { flex-direction: column; height: auto; }
+            .left-panel { border-right: none; border-bottom: 1px solid #e5e7eb; padding: 15px; }
+            .right-panel { min-height: 400px; }
+            .canvas-container { height: 300px; } /* 手机上稍微矮一点 */
+            header { flex-direction: column; height: auto; padding: 10px; gap: 10px; }
+            .header-left { width: 100%; justify-content: space-between; }
+            .nav-pills { width: 100%; justify-content: space-between; overflow-x: auto; }
+            .nav-btn { flex: 1; text-align: center; padding: 8px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <a href="#" class="back-btn">‹</a>
+        <span class="title">9708/23 Q1 Data Response</span>
+    </div>
+    <!-- 顶部导航，解决空间问题 -->
+    <div class="nav-pills">
+        <div class="nav-btn active" onclick="switchQ('a')">1(a)</div>
+        <div class="nav-btn" onclick="switchQ('b')">1(b)</div>
+        <div class="nav-btn" onclick="switchQ('c')">1(c)</div>
+        <div class="nav-btn" onclick="switchQ('d')">1(d)</div>
+        <div class="nav-btn" onclick="switchQ('e')">1(e)</div>
+    </div>
+</header>
+
+<div class="split-container">
+    <!-- 左侧：题目 + 交互区 -->
+    <div class="left-panel">
+        <!-- 固定 Context -->
+        <div class="context-box">
+            <strong>Context:</strong> "Series of typhoons" hit Southeast Asia (Jan 2023). Onions became more expensive than meat in Philippines. Gov experimenting with universities.
+        </div>
+
+        <!-- 动态题目内容 -->
+        <div id="q-content">
+            <!-- JS 注入题目文本 -->
+        </div>
+
+        <!-- 统一画布区域 -->
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <div class="canvas-container">
+                <canvas id="main-canvas"></canvas>
+            </div>
+            <div class="controls" id="controls">
+                <div class="slider-group">
+                    <span class="slider-label" id="slider-label">Variable:</span>
+                    <input type="range" id="main-slider" min="0" max="1" step="0.01" value="0">
+                </div>
+                <button class="btn-exam" onclick="showExam()">
+                    ★ Show Exam Diagram
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：答案区 -->
+    <div class="right-panel">
+        <div class="tabs-header">
+            <div class="tab active" onclick="switchTab('logic')">Analysis Logic</div>
+            <div class="tab" onclick="switchTab('ms')">Model Answer</div>
+        </div>
+        <div class="tab-content-area" id="tab-content">
+            <!-- JS 注入答案 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 题目数据 (完整复刻 PDF) ---
+    const QUESTIONS = {
+        'a': {
+            text: "(a) Use a demand and supply diagram to demonstrate how ‘a series of typhoons’ affected the market price of food crops in Southeast Asia in January 2023.",
+            marks: 2,
+            hasGraph: true,
+            sliderLabel: "Typhoon Impact",
+            logic: `
+                <div class="logic-step">
+                    <div class="logic-title">1. Identify the Shock</div>
+                    <div class="logic-text">The text mentions "a series of typhoons" destroyed crops. In economics, this is a negative <span class="highlight">Supply Shock</span> (Determinant of Supply: Environmental factors).</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">2. Shift the Curve</div>
+                    <div class="logic-text">Since supply decreases, the Supply Curve shifts to the <strong>Left</strong> (from $S_1$ to $S_2$).</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">3. Market Mechanism</div>
+                    <div class="logic-text">At the original price, quantity demanded exceeds quantity supplied (Shortage). This puts upward pressure on price.</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">4. Result</div>
+                    <div class="logic-text">New Equilibrium is established at a <span class="highlight">Higher Price</span> ($P_2$) and <span class="highlight">Lower Quantity</span> ($Q_2$).</div>
+                </div>
+            `,
+            ms: `
+                <ul class="ms-list">
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">An accurate/fully labelled supply and demand diagram showing a <span class="highlight">shift to the left of the supply curve</span>.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">New equilibrium showing <span class="highlight">higher equilibrium price</span> and lower equilibrium quantity.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                </ul>
+            `
+        },
+        'b': {
+            text: "(b) Is the short-run price elasticity of supply of red onions elastic or inelastic? Justify your answer.",
+            marks: 2,
+            hasGraph: true, // Use graph for visual aid (Steep S curve)
+            isStatic: true, // No slider needed
+            logic: `
+                <div class="logic-step">
+                    <div class="logic-title">Concept: PES</div>
+                    <div class="logic-text">Price Elasticity of Supply (PES) depends on how quickly producers can adjust output.</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">Application</div>
+                    <div class="logic-text">Onions are agricultural goods with a long growing cycle. You cannot simply produce more instantly when price rises. The typhoons also physically destroyed stock, making supply unresponsive.</div>
+                </div>
+            `,
+            ms: `
+                <ul class="ms-list">
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Inelastic</strong> (accept perfectly inelastic).</div>
+                        <span class="score">[1]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">Reference to typhoons (volatile) OR nature of agricultural goods (cannot grow immediately). Explanation must refer to responsiveness.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                </ul>
+            `
+        },
+        'c': {
+            text: "(c) With the help of a production possibility curve (PPC) diagram, consider the impact on the opportunity cost to a farmer in the Philippines of starting to grow red onions.",
+            marks: 4,
+            hasGraph: true,
+            sliderLabel: "Grow More Onions",
+            logic: `
+                <div class="logic-step">
+                    <div class="logic-title">1. Setup PPC</div>
+                    <div class="logic-text">Axes: 'Red Onions' vs 'Other Goods'. Curve represents finite resources (Land/Labor).</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">2. "Starting to Grow"</div>
+                    <div class="logic-text">This implies moving from a point of <strong>Zero Onions</strong> (Point A on the axis) to a point of positive production (Point B).</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">3. Opportunity Cost</div>
+                    <div class="logic-text">To produce the first batch of onions, the farmer must divert land from 'Other Goods'. The output of 'Other Goods' falls. This loss is the Opportunity Cost.</div>
+                </div>
+            `,
+            ms: `
+                <ul class="ms-list">
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">Correctly labelled axes (one must be red onions) PPC diagram. Touches both axes.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">An <span class="highlight">initial production combination</span> showing zero onions being produced.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc">A second production combination showing increased output of ‘onions’ and reduced output of the ‘other good’.</div>
+                        <span class="score">[1]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Evaluation:</strong> e.g., opportunity cost rises as volume increases (concave shape).</div>
+                        <span class="score">[1]</span>
+                    </li>
+                </ul>
+            `
+        },
+        'd': {
+            text: "(d) Assess whether a ‘suggested retail price’ is the best way of stabilising onion prices in the Philippines.",
+            marks: 6,
+            hasGraph: true,
+            sliderLabel: "Price Cap Level",
+            logic: `
+                <div class="logic-step">
+                    <div class="logic-title">Policy Identification</div>
+                    <div class="logic-text">'Suggested retail price' functions as a <strong>Maximum Price (Price Ceiling)</strong>. To work, it must be below equilibrium ($P_e$).</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">Benefits</div>
+                    <div class="logic-text">Makes food affordable for the poor; Prevents hoarding; Reduces inflation expectations.</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">The Problem (See Graph)</div>
+                    <div class="logic-text">At $P_{max}$, Quantity Demanded > Quantity Supplied. This creates a <span class="highlight">Shortage</span>. It may lead to black markets or discourage farmers from planting next season.</div>
+                </div>
+            `,
+            ms: `
+                <ul class="ms-list">
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Benefits (Max 3):</strong> Affordable for low-income; Stops hoarding; Stabilises expectations.</div>
+                        <span class="score">[Max 3]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Drawbacks (Max 3):</strong> Shortages (excess demand); Black markets (illegal selling); Farmers cut production.</div>
+                        <span class="score">[Max 3]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Alternatives (Max 3):</strong> Subsidies (shift Supply right); Buffer stocks; Imports (remove tariffs).</div>
+                        <span class="score">[Max 3]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Evaluation:</strong> Clear comparison and reasoned conclusion (e.g. Subsidy might be better as it solves shortage).</div>
+                        <span class="score">[2]</span>
+                    </li>
+                </ul>
+            `
+        },
+        'e': {
+            text: "(e) Assess the extent to which the increase in onion prices is likely to have affected all households equally in the Philippines.",
+            marks: 6,
+            hasGraph: false, // Text based
+            logic: `
+                <div class="logic-step">
+                    <div class="logic-title">Thesis</div>
+                    <div class="logic-text">The impact depends on income levels and consumption habits.</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">Argument: Equal Impact</div>
+                    <div class="logic-text">Onions are a staple ingredient in Filipino cooking. Demand is <span class="highlight">Inelastic</span>. Most households cannot substitute them, so everyone pays the higher price.</div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-title">Argument: Unequal Impact</div>
+                    <div class="logic-text">1. <strong>Income Effect:</strong> Poor households spend a larger % of income on food. A price hike hurts them more (Regressive).<br>2. <strong>Rural vs Urban:</strong> Farmers may grow their own onions (impact = 0), while city dwellers must buy them.</div>
+                </div>
+            `,
+            ms: `
+                 <ul class="ms-list">
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Likely (Equal):</strong> Widely used in cooking; Basic necessity (inelastic); Cultural preferences.</div>
+                        <span class="score">[Max 3]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Unlikely (Unequal):</strong> Lower-income hit harder (higher % of budget); Rural farming households grow their own; Wealthier can afford substitutes.</div>
+                        <span class="score">[Max 3]</span>
+                    </li>
+                    <li class="ms-item">
+                        <span class="tick">✓</span>
+                        <div class="ms-desc"><strong>Evaluation:</strong> Consideration of both viewpoints + reasoned conclusion.</div>
+                        <span class="score">[2]</span>
+                    </li>
+                </ul>
+            `
+        }
+    };
+
+    // --- 全局状态 ---
+    let currentQ = 'a';
+    let currentTab = 'logic';
+    let examMode = false;
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+    const slider = document.getElementById('main-slider');
+
+    // --- 初始化 ---
+    function switchQ(qId) {
+        currentQ = qId;
+        examMode = false;
+        slider.value = (qId === 'd') ? 1 : 0; // Default slider positions
+        slider.disabled = false;
+
+        // 1. UI Buttons Update
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.nav-btn[onclick="switchQ('${qId}')"]`).classList.add('active');
+
+        // 2. Question Text Update
+        const qData = QUESTIONS[qId];
+        document.getElementById('q-content').innerHTML = `
+            <div class="question-text">${qData.text}<span class="mark-label">[${qData.marks} marks]</span></div>
+        `;
+
+        // 3. Canvas Visibility Update
+        const wrapper = document.getElementById('canvas-wrapper');
+        const controls = document.getElementById('controls');
+        
+        if (qData.hasGraph) {
+            wrapper.style.display = 'block';
+            resizeCanvas(); // Trigger Draw
+            
+            if (qData.isStatic) {
+                controls.style.display = 'none'; // No slider for (b)
+                draw(); // Draw static
+            } else {
+                controls.style.display = 'flex';
+                document.getElementById('slider-label').textContent = qData.sliderLabel;
+            }
+        } else {
+            wrapper.style.display = 'none'; // Hide graph for (e)
+        }
+
+        // 4. Update Tab Content
+        updateTabContent();
+    }
+
+    function switchTab(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        updateTabContent();
+    }
+
+    function updateTabContent() {
+        const contentArea = document.getElementById('tab-content');
+        const data = QUESTIONS[currentQ];
+        
+        if (currentTab === 'logic') {
+            contentArea.innerHTML = data.logic;
+        } else {
+            contentArea.innerHTML = data.ms;
+        }
+        
+        if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function showExam() {
+        examMode = true;
+        slider.disabled = true;
+        draw();
+    }
+
+    // --- 绘图引擎 (Canvas Engine) ---
+    const C = {
+        axis: '#374151', grid: '#e5e7eb',
+        D: '#2563eb', S: '#16a34a', S2: '#dc2626',
+        PPC: '#9333ea', Eq: '#6b7280',
+        Area: 'rgba(239, 68, 68, 0.2)'
+    };
+
+    function resizeCanvas() {
+        const parent = canvas.parentElement;
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+        draw();
+    }
+
+    function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0,0,w,h);
+
+        const pad = 50;
+        const q = currentQ;
+        const val = examMode ? (q === 'd' ? 0.7 : 0.6) : parseFloat(slider.value);
+
+        if (q === 'a') drawA(w, h, pad, val);
+        if (q === 'b') drawB(w, h, pad);
+        if (q === 'c') drawC(w, h, pad, val);
+        if (q === 'd') drawD(w, h, pad, val);
+    }
+
+    // Drawing Helpers
+    function line(x1, y1, x2, y2, color, width=2, dash=[]) {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+        ctx.setLineDash(dash); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+    }
+    function text(str, x, y, color='#000', font='14px sans-serif') {
+        ctx.fillStyle = color; ctx.font = font; ctx.fillText(str, x, y);
+    }
+    function circle(x, y, r, color) {
+        ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Q1(a): Supply Shift
+    function drawA(w, h, pad, shift) {
+        // Axes
+        line(pad, pad, pad, h-pad, C.axis);
+        line(pad, h-pad, w-pad, h-pad, C.axis);
+        text('Price', pad, pad-10); text('Qty', w-pad-20, h-pad+5);
+
+        // Demand
+        line(pad+20, pad+20, w-pad-20, h-pad-20, C.D, 3);
+        text('D', w-pad-20, h-pad-30, C.D);
+
+        // Supply 1
+        line(pad+20, h-pad-20, w-pad-20, pad+20, C.S, 3, shift > 0 ? [5,5] : []);
+        if(shift === 0) text('S1', w-pad-20, pad+10, C.S);
+
+        if(shift > 0) {
+            const offset = shift * (w * 0.2);
+            // Supply 2
+            line(pad+20, h-pad-20-offset, w-pad-20, pad+20-offset, C.S2, 3);
+            text('S2', w-pad-30, pad+20-offset, C.S2);
+
+            // Equilibrium
+            const cx = pad + (w-2*pad)/2;
+            const cy = pad + (h-2*pad)/2;
+            const nx = cx - offset/2;
+            const ny = cy - offset/2;
+
+            // P1 Q1
+            text('P1', pad-25, cy); text('Q1', cx, h-pad+20);
+            
+            // P2 Q2
+            text('P2', pad-25, ny, C.S2); text('Q2', nx, h-pad+20, C.S2);
+            circle(nx, ny, 4, C.S2);
+            
+            // Arrow
+            ctx.beginPath(); ctx.moveTo(cx+10, cy); ctx.lineTo(nx+10, ny); 
+            ctx.strokeStyle = '#000'; ctx.stroke();
+        }
+    }
+
+    // Q1(b): Inelastic Supply
+    function drawB(w, h, pad) {
+        line(pad, pad, pad, h-pad, C.axis);
+        line(pad, h-pad, w-pad, h-pad, C.axis);
+        text('Price', pad, pad-10); text('Qty', w-pad-20, h-pad+5);
+        
+        // Steep Line
+        const cx = w/2;
+        line(cx-20, h-pad-20, cx+20, pad+20, C.S2, 3);
+        text('Supply (Inelastic)', cx+25, pad+40, C.S2);
+        
+        ctx.fillStyle = '#666';
+        ctx.font = 'italic 14px sans-serif';
+        ctx.fillText("Steep curve = Low Responsiveness", cx+50, h/2);
+    }
+
+    // Q1(c): PPC
+    function drawC(w, h, pad, t) {
+        line(pad, pad, pad, h-pad, C.axis);
+        line(pad, h-pad, w-pad, h-pad, C.axis);
+        text('Other Goods', pad-40, pad); text('Red Onions', w-pad-80, h-pad+20);
+
+        // Curve (Concave)
+        ctx.beginPath(); ctx.strokeStyle = C.PPC; ctx.lineWidth = 3;
+        ctx.moveTo(pad, pad+20);
+        ctx.quadraticCurveTo(pad + (w-pad)*0.3, h-pad - (h-pad)*0.3, w-pad-20, h-pad);
+        ctx.stroke();
+
+        // Point A (Start)
+        circle(pad, pad+20, 5, '#666');
+        text('A (0 Onions)', pad+10, pad+20);
+
+        if (t > 0) {
+            // Approx Point B
+            const bx = pad + t * (w-pad-40) * 0.7;
+            const by = (pad+20) + t * (h-pad-40) * 0.5; // Visual approx
+            
+            circle(bx, by, 5, C.S2);
+            text('B', bx+10, by-10);
+            
+            // Dotted Lines
+            line(pad, by, bx, by, '#666', 1, [5,5]);
+            line(bx, by, bx, h-pad, '#666', 1, [5,5]);
+            
+            // Opp Cost
+            ctx.beginPath(); ctx.moveTo(pad+5, pad+25); ctx.lineTo(pad+5, by);
+            ctx.strokeStyle = C.S2; ctx.stroke();
+            text('Opp Cost', pad+10, (pad+20+by)/2, C.S2);
+        }
+    }
+
+    // Q1(d): Price Ceiling
+    function drawD(w, h, pad, ratio) {
+        line(pad, pad, pad, h-pad, C.axis);
+        line(pad, h-pad, w-pad, h-pad, C.axis);
+        text('Price', pad, pad-10); text('Qty', w-pad-20, h-pad+5);
+
+        const cx = pad + (w-2*pad)/2;
+        const cy = pad + (h-2*pad)/2;
+
+        // X lines
+        line(pad+20, pad+20, w-pad-20, h-pad-20, C.D, 3);
+        line(pad+20, h-pad-20, w-pad-20, pad+20, C.S, 3);
+        text('Pe', pad-25, cy, '#666');
+        line(pad, cy, cx, cy, '#999', 1, [5,5]);
+
+        // Ceiling
+        if(ratio < 0.95) {
+            const py = cy + (1-ratio) * 100;
+            line(pad, py, w-pad, py, C.S2, 2);
+            text('Max Price', w-pad-80, py-5, C.S2);
+
+            const diff = py - cy;
+            const qs = cx - diff;
+            const qd = cx + diff;
+
+            ctx.fillStyle = C.Area;
+            ctx.fillRect(qs, h-pad-10, qd-qs, 10); // Bar on axis
+            text('SHORTAGE', cx-35, h-pad-20, C.S2);
+        }
+    }
+
+    // Init
+    window.addEventListener('resize', resizeCanvas);
+    slider.addEventListener('input', () => { examMode = false; draw(); });
+    switchQ('a'); // Start
+
+</script>
+</body>
+</html>

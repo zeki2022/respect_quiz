@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q2: Semi-conductors - Interactive</title>
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* Sample.pdf 风格还原 */
+        body { 
+            padding-top: 20px; 
+            padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; /* 核心：强制取消窄屏限制 */
+            margin: 0;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        .container {
+            width: 98%; 
+            max-width: 1800px; /* 超大屏适配 */
+            margin: 0 auto;
+            display: grid; 
+            grid-template-columns: 1fr 500px; /* 左侧自适应，右侧固定宽（比sample稍宽以容纳文字） */
+            gap: 20px; 
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) { 
+            .container { grid-template-columns: 1fr; } 
+        }
+
+        .card { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+        }
+
+        /* 悬浮返回按钮 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.95);
+            border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            line-height: 1; cursor: pointer; border: 1px solid #eee;
+        }
+        .back-arrow:hover { background: #fff; transform: scale(1.05); }
+
+        /* 题目文本区 */
+        .problem-text { 
+            background: #e8f4fd; 
+            padding: 20px; 
+            border-left: 5px solid #3498db; 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            color: #2c3e50; 
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 画布区 */
+        .canvas-container { 
+            width: 100%; 
+            height: 500px; /* 大屏高度 */
+            position: relative; 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            overflow: hidden; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+        }
+        canvas { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        }
+
+        /* 控制区 */
+        .controls { 
+            display: flex; flex-direction: column; gap: 15px; 
+            background: #f8f9fa; padding: 20px; border-radius: 8px; 
+            border: 1px solid #eee; 
+        }
+        .control-row { 
+            display: flex; align-items: center; gap: 15px; justify-content: space-between; 
+            flex-wrap: wrap;
+        }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 10px 15px; border-radius: 6px; cursor: pointer; 
+            font-weight: 600; font-size: 14px; transition: all 0.2s;
+        }
+        button.action-btn:hover { background-color: #f1f1f1; }
+        button.action-btn.active { 
+            background-color: #2980b9; color: white; border-color: #2980b9; 
+            box-shadow: 0 2px 5px rgba(41, 128, 185, 0.3);
+        }
+        button.exam-btn { 
+            background-color: #27ae60; color: white; border: none; flex: 2; 
+        }
+        button.exam-btn:hover { background-color: #219150; }
+
+        /* 右侧面板 */
+        .solution-panel { 
+            max-height: 90vh; overflow-y: auto; 
+            position: sticky; top: 20px; /* 随动 */
+        }
+
+        /* Tabs */
+        .tabs { 
+            display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; 
+        }
+        .tab-item { 
+            padding: 12px 20px; cursor: pointer; font-weight: bold; 
+            color: #7f8c8d; border-bottom: 3px solid transparent; 
+            margin-bottom: -2px; font-size: 15px; flex: 1; text-align: center;
+        }
+        .tab-item:hover { color: #3498db; }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; background: linear-gradient(to bottom, transparent, rgba(52,152,219,0.05)); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* 文本样式 */
+        .explanation p { margin-bottom: 12px; line-height: 1.6; font-size: 15px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; font-weight: bold; border-bottom: 2px solid #ffeeba; }
+        
+        h4 { 
+            margin: 20px 0 12px 0; color: #2c3e50; 
+            border-left: 5px solid #3498db; padding-left: 10px; font-size: 16px; 
+            background: #fdfdfd; padding-top: 5px; padding-bottom: 5px;
+        }
+
+        /* Model Answer Specifics */
+        .model-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #ccc; }
+        .model-header { font-size: 18px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        .model-sub { font-weight: bold; color: #555; display: block; margin-top: 12px; font-style: italic; }
+        
+        /* MS Marks */
+        .mark-tag {
+            display: inline-block; background: #e74c3c; color: white; 
+            font-size: 12px; padding: 1px 6px; border-radius: 10px; 
+            vertical-align: middle; margin-left: 5px;
+        }
+        .method-tag {
+            display: inline-block; background: #f39c12; color: white; 
+            font-size: 12px; padding: 1px 6px; border-radius: 10px; 
+            vertical-align: middle; margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Back Button -->
+    <a href="../index.html" class="back-arrow" title="Back to Menu">‹</a>
+
+    <div class="container">
+        
+        <!-- Left Column: Problem & Visualization -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px; color:#333;">
+                    9708 Econ / Section B / Q2: Semi-conductors
+                </h3>
+
+                <!-- Full OCR Text -->
+                <div class="problem-text">
+                    <p><strong>2</strong> Semi-conductors are widely used in the production of many types of electronic goods such as smartphones. It has been estimated that the price elasticity of supply for semi-conductors is <strong>0.2 in the short run</strong> and <strong>0.8 in the long run</strong>.</p>
+                    
+                    <p><strong>(a)</strong> Explain what these estimates mean for producers of smartphones that use semi-conductors and consider the significance of the long-run estimate. [8]</p>
+                    
+                    <p><strong>(b)</strong> Assess the likely effects on resource allocation of a continuing increase in demand for semi-conductors. [12]</p>
+                </div>
+
+                <!-- Canvas Area -->
+                <div class="canvas-container">
+                    <canvas id="mainCanvas"></canvas>
+                    
+                    <!-- Dynamic Legend Overlay -->
+                    <div id="legendOverlay" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.95); padding:10px; border-radius:6px; font-size:13px; border:1px solid #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <!-- Injected by JS based on mode -->
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <!-- Mode Switcher -->
+                    <div class="control-row" style="justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <button class="action-btn active" id="btn-mode-a" onclick="switchMode('a')">Question 2(a): PES Time Horizon</button>
+                        <button class="action-btn" id="btn-mode-b" onclick="switchMode('b')">Question 2(b): Demand & Resources</button>
+                    </div>
+
+                    <!-- Sliders & Actions -->
+                    <div class="control-row">
+                        <span id="sliderLabel" style="font-weight:bold; font-size:15px; min-width: 150px;">Time (SR → LR):</span>
+                        <input type="range" id="mainSlider" min="0" max="100" value="0" style="flex:1; cursor:pointer;" oninput="manualSlider()">
+                    </div>
+                    
+                    <div class="control-row">
+                        <button class="action-btn exam-btn" onclick="showExamEffect()">★ Show Exam Answer Diagram</button>
+                        <button class="action-btn" style="background:#95a5a6; color:white; flex:0.3;" onclick="resetGraph()">Reset</button>
+                    </div>
+                    
+                    <div id="statusText" style="text-align:center; color:#666; font-size:13px; font-style:italic; height: 20px;">
+                        <!-- Dynamic Status -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Logic & Model Answer -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')" id="tab-btn-a">Part (a) Logic</div>
+                    <div class="tab-item" onclick="switchTab('b')" id="tab-btn-b">Part (b) Logic</div>
+                    <div class="tab-item" onclick="switchTab('model')" id="tab-btn-model">Full Answer</div>
+                </div>
+
+                <!-- Part A Logic -->
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. Decoding the Estimates (AO1/AO2)</h4>
+                    <div class="explanation">
+                        <p><strong>PES Formula:</strong> $$PES = \frac{\% \Delta Q_s}{\% \Delta P}$$</p>
+                        <p>• <strong>0.2 (Short Run):</strong> <span class="term">Inelastic Supply</span>. A 10% rise in price leads to only a 2% rise in supply. <span class="highlight">Constraint:</span> Building new "fabs" (factories) takes years.</p>
+                        <p>• <strong>0.8 (Long Run):</strong> <span class="term">More Elastic</span>. Supply is 4x more responsive. Firms can invest in capital and train labor over time.</p>
+                    </div>
+                    
+                    <h4>2. Impact on Smartphone Producers</h4>
+                    <div class="explanation">
+                        <p>• <strong>Volatility:</strong> In the SR, if demand spikes, Supply cannot respond. Prices will <span class="highlight">skyrocket</span> (See Diagram: Steep Curve).</p>
+                        <p>• <strong>Planning:</strong> Producers face uncertainty and high costs during shortages.</p>
+                    </div>
+
+                    <h4>3. Significance (Evaluation)</h4>
+                    <div class="explanation">
+                        <p>It signals that shortages are <span class="highlight">temporary</span> but inevitable without long-term planning. Even in LR, 0.8 is still inelastic (< 1), meaning this industry is structurally difficult to scale.</p>
+                    </div>
+                </div>
+
+                <!-- Part B Logic -->
+                <div id="tab-b" class="tab-content">
+                    <h4>1. The Price Mechanism (AO2)</h4>
+                    <div class="explanation">
+                        <p>A "continuing increase in demand" shifts $D$ to the Right ($D \rightarrow D_1$).</p>
+                        <p>• <span class="term">Signaling:</span> Rising price ($P \uparrow$) signals higher profitability.</p>
+                        <p>• <span class="term">Incentive:</span> Firms are motivated by profit to produce more.</p>
+                    </div>
+
+                    <h4>2. Resource Allocation</h4>
+                    <div class="explanation">
+                        <p>Resources (Factors of Production) move <span class="highlight">towards</span> the semi-conductor industry and <span class="highlight">away</span> from other sectors.</p>
+                        <p>• <strong>Labor:</strong> Engineers move to chip companies.</p>
+                        <p>• <strong>Capital:</strong> Investment flows into building foundries.</p>
+                    </div>
+
+                    <h4>3. Evaluation (AO3)</h4>
+                    <div class="explanation">
+                        <p><strong>Factor Immobility:</strong> You cannot turn a farmer into a chip engineer overnight. Allocation is slow (Time Lags).</p>
+                    </div>
+                </div>
+
+                <!-- Model Answer -->
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif; font-size:16px;">
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (a) [8 Marks]</div>
+                            
+                            <p>Price elasticity of supply (PES) measures the responsiveness of quantity supplied to a change in price. <span class="mark-tag">AO1</span></p>
+                            
+                            <span class="model-sub">Short Run (0.2):</span>
+                            <p>The estimate of 0.2 indicates supply is <span class="term">price inelastic</span>. For smartphone producers, this means a sudden increase in demand will lead to a <span class="highlight">significant increase in price</span> but only a small increase in quantity supplied. This is due to fixed factors of production, such as the complexity of building silicon wafer plants. <span class="method-tag">AO2</span></p>
+                            
+                            <span class="model-sub">Long Run (0.8):</span>
+                            <p>In the long run, supply becomes more elastic (0.8) as variable factors can be changed—new factories can be built. <span class="mark-tag">AO2</span></p>
+                            
+                            <span class="model-sub">Significance (Evaluation):</span>
+                            <p>The long-run estimate is significant because it indicates that supply shortages are likely temporary. However, the fact that PES remains below 1 (0.8) suggests that semi-conductors are fundamentally resource-constrained, requiring smartphone producers to maintain large buffer stocks or strategic partnerships. <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                        <div class="model-section" style="border-bottom:none;">
+                            <div class="model-header">Part (b) [12 Marks]</div>
+                            
+                            <p>Resource allocation in a market economy is guided by the <span class="highlight">price mechanism</span>.</p>
+
+                            <span class="model-sub">Analysis (The Process):</span>
+                            <p>A continuing increase in demand for semi-conductors shifts the demand curve to the right. This creates excess demand, driving up the market price. <span class="mark-tag">AO2</span></p>
+                            <p>The rising price acts as a <span class="term">signal</span> to producers that the good is under-provided and an <span class="term">incentive</span> (via higher profits) to increase production. Consequently, resources (land, labor, capital) will be <strong>reallocated</strong> towards the semi-conductor industry. For example, investment funds will flow into building new chip foundries rather than other sectors. <span class="mark-tag">AO2</span></p>
+
+                            <span class="model-sub">Evaluation:</span>
+                            <p>However, the effectiveness of this allocation depends on <span class="highlight">factor mobility</span>. Since chip manufacturing requires highly specialized labor, there will be significant time lags (as seen in part a). Furthermore, if the industry pollutes (negative externality), the market may over-allocate resources to it compared to the social optimum. <span class="mark-tag">AO3</span></p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Canvas Setup
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // State
+    let width, height;
+    let mode = 'a'; // 'a' or 'b'
+    let sliderVal = 0; // 0-100
+    let isExam = false;
+
+    // Initialization
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        updateUI();
+    }
+
+    function resize() {
+        if (!canvas.parentElement) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        width = canvas.width;
+        height = canvas.height;
+        draw();
+    }
+
+    // Interaction Functions
+    function switchMode(newMode) {
+        mode = newMode;
+        sliderVal = 0;
+        isExam = false;
+        document.getElementById('mainSlider').value = 0;
+        
+        // Update Buttons
+        document.getElementById('btn-mode-a').className = mode === 'a' ? 'action-btn active' : 'action-btn';
+        document.getElementById('btn-mode-b').className = mode === 'b' ? 'action-btn active' : 'action-btn';
+        
+        // Auto-switch Tab
+        switchTab(newMode);
+        
+        updateUI();
+        draw();
+    }
+
+    function switchTab(id) {
+        // Remove active class from all
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        
+        // Add active to target
+        document.getElementById('tab-btn-' + id).classList.add('active');
+        document.getElementById('tab-' + id).classList.add('active');
+    }
+
+    function manualSlider() {
+        isExam = false;
+        sliderVal = parseInt(document.getElementById('mainSlider').value);
+        draw();
+    }
+
+    function showExamEffect() {
+        isExam = true;
+        sliderVal = 100;
+        document.getElementById('mainSlider').value = 100;
+        draw();
+    }
+
+    function resetGraph() {
+        isExam = false;
+        sliderVal = 0;
+        document.getElementById('mainSlider').value = 0;
+        draw();
+    }
+
+    function updateUI() {
+        const label = document.getElementById('sliderLabel');
+        const legend = document.getElementById('legendOverlay');
+        const status = document.getElementById('statusText');
+
+        if (mode === 'a') {
+            label.innerText = "Time (Short → Long Run):";
+            legend.innerHTML = `
+                <div style="color:#2980b9; font-weight:bold;">● Demand</div>
+                <div style="color:#e74c3c; font-weight:bold;">● Supply (Rotating)</div>
+            `;
+            status.innerText = "Drag slider to see Supply become more Elastic over time.";
+        } else {
+            label.innerText = "Demand Increase:";
+            legend.innerHTML = `
+                <div style="color:#2980b9; font-weight:bold;">● Demand Shift</div>
+                <div style="color:#27ae60; font-weight:bold;">● Supply</div>
+                <div style="color:#8e44ad;">● Resource Allocation</div>
+            `;
+            status.innerText = "Drag slider to shift Demand and reallocate resources.";
+        }
+    }
+
+    // Drawing Logic
+    function draw() {
+        if (!width) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        // Padding
+        const p = 50;
+        const origin = {x: p, y: height - p};
+        const maxX = width - p;
+        const maxY = p;
+
+        // Axes
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(origin.x, maxY);
+        ctx.lineTo(origin.x, origin.y);
+        ctx.lineTo(maxX, origin.y);
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = '#333';
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("Price (P)", origin.x + 10, maxY + 10);
+        ctx.fillText(mode === 'a' ? "Quantity (Q)" : "Qty of Semi-conductors", maxX - 120, origin.y - 10);
+
+        if (mode === 'a') {
+            drawPartA(origin, width, height, p);
+        } else {
+            drawPartB(origin, width, height, p);
+        }
+    }
+
+    function drawPartA(origin, w, h, p) {
+        // Center point for rotation (Equilibrium)
+        const cx = origin.x + (w - 2*p) * 0.5;
+        const cy = origin.y - (h - 2*p) * 0.5;
+
+        // Demand (Static)
+        ctx.beginPath();
+        ctx.strokeStyle = '#2980b9';
+        ctx.lineWidth = 3;
+        ctx.moveTo(cx - 100, cy - 100); // Top Left
+        ctx.lineTo(cx + 100, cy + 100); // Bottom Right
+        ctx.stroke();
+        ctx.fillText("D", cx + 105, cy + 105);
+
+        // Supply Rotation
+        // SR (0.2) = Steep. LR (0.8) = Flatter.
+        // Let's say steep is 80 degrees, flat is 45 degrees.
+        const t = sliderVal / 100; // 0 to 1
+        
+        // Visual angle calculation (relative to horizontal)
+        // Steep (SR): High angle. Flat (LR): Low angle.
+        // But Supply is positive slope.
+        const angleSR = Math.PI / 2.2; // Steep
+        const angleLR = Math.PI / 4;   // Flat
+        
+        const currentAngle = angleSR - (t * (angleSR - angleLR));
+        
+        // Calculate Line Coordinates based on center pivot
+        const length = 140;
+        const dx = Math.cos(currentAngle) * length;
+        const dy = Math.sin(currentAngle) * length;
+
+        // Supply Line
+        ctx.beginPath();
+        ctx.strokeStyle = '#e74c3c';
+        ctx.lineWidth = 4;
+        ctx.moveTo(cx - dx, cy + dy); // Bottom Left relative to center
+        ctx.lineTo(cx + dx, cy - dy); // Top Right
+        ctx.stroke();
+        
+        // Text Label
+        ctx.fillStyle = '#e74c3c';
+        const labelText = t < 0.3 ? "SR Supply (PES 0.2)" : (t > 0.8 ? "LR Supply (PES 0.8)" : "S (Transitioning)");
+        ctx.fillText(labelText, cx + dx + 10, cy - dy);
+
+        // Exam Effect: Ghost Lines
+        if (isExam) {
+            // Draw Ghost SR
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            const dxSR = Math.cos(angleSR) * length;
+            const dySR = Math.sin(angleSR) * length;
+            ctx.beginPath(); ctx.strokeStyle = '#e74c3c';
+            ctx.moveTo(cx - dxSR, cy + dySR); ctx.lineTo(cx + dxSR, cy - dySR); ctx.stroke();
+            ctx.fillText("SR", cx + dxSR + 5, cy - dySR);
+            ctx.restore();
+        }
+
+        // Responsiveness Visual (Price change for shift)
+        // Draw a hypothetical Demand shift visualization to show Delta P difference?
+        // Let's keep it simple: Show steepness text.
+        ctx.fillStyle = '#555';
+        ctx.font = "italic 13px Arial";
+        if (t < 0.2) {
+            ctx.fillText("Steep: Large ΔP required for small ΔQ", origin.x + 20, origin.y - 30);
+        } else if (t > 0.8) {
+            ctx.fillText("Flatter: Small ΔP yields large ΔQ", origin.x + 20, origin.y - 30);
+        }
+    }
+
+    function drawPartB(origin, w, h, p) {
+        // Supply (Fixed)
+        const cx = origin.x + (w - 2*p) * 0.4; // Base X
+        const cy = origin.y - (h - 2*p) * 0.4; // Base Y
+
+        // Supply Line
+        ctx.beginPath();
+        ctx.strokeStyle = '#27ae60';
+        ctx.lineWidth = 3;
+        ctx.moveTo(cx - 80, cy + 80);
+        ctx.lineTo(cx + 150, cy - 150);
+        ctx.stroke();
+        ctx.fillStyle = '#27ae60';
+        ctx.fillText("S", cx + 155, cy - 150);
+
+        // Demand (Shifting)
+        const shiftMax = 100;
+        const currentShift = (sliderVal / 100) * shiftMax;
+
+        // Demand 1 Base
+        const d1Start = {x: cx - 80, y: cy - 80}; // Top Left
+        const d1End = {x: cx + 80, y: cy + 80};   // Bottom Right
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(41, 128, 185, 0.3)'; // Ghost D1
+        ctx.moveTo(d1Start.x, d1Start.y);
+        ctx.lineTo(d1End.x, d1End.y);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(41, 128, 185, 0.5)';
+        ctx.fillText("D1", d1End.x, d1End.y + 10);
+
+        // Demand 2 (Shifted)
+        const d2Start = {x: d1Start.x + currentShift, y: d1Start.y};
+        const d2End = {x: d1End.x + currentShift, y: d1End.y};
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#2980b9';
+        ctx.lineWidth = 3;
+        ctx.moveTo(d2Start.x, d2Start.y);
+        ctx.lineTo(d2End.x, d2End.y);
+        ctx.stroke();
+        ctx.fillStyle = '#2980b9';
+        ctx.fillText("D2", d2End.x, d2End.y + 10);
+
+        // Arrow for Shift
+        if (currentShift > 10) {
+            drawArrow(d1Start.x + 50, d1Start.y + 50, d2Start.x + 50, d2Start.y + 50);
+        }
+
+        // Intersections (Equilibrium)
+        // Visual intersection logic: S is x=y ish. D is x=-y ish shifted.
+        // Approx new intersection moves Up and Right along Supply curve.
+        // New Eq Point:
+        // Slope S = 1. Slope D = -1.
+        // Shift D right by S -> Intersection x moves by S/2, y moves by S/2 (up).
+        const dx = currentShift / 2;
+        const dy = currentShift / 2;
+        
+        const eqX = cx + dx;
+        const eqY = cy - dy; // Canvas Y is inverted (minus is up)
+
+        // Draw Dotted lines to axes
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#666';
+        
+        // P2
+        ctx.beginPath();
+        ctx.moveTo(origin.x, eqY);
+        ctx.lineTo(eqX, eqY);
+        ctx.stroke();
+        ctx.fillText("P2", origin.x - 25, eqY + 5);
+
+        // Q2
+        ctx.beginPath();
+        ctx.moveTo(eqX, origin.y);
+        ctx.lineTo(eqX, eqY);
+        ctx.stroke();
+        ctx.fillText("Q2", eqX - 10, origin.y + 20);
+
+        ctx.setLineDash([]);
+        
+        // Circle point
+        ctx.beginPath();
+        ctx.arc(eqX, eqY, 5, 0, 2*Math.PI);
+        ctx.fillStyle = '#2980b9';
+        ctx.fill();
+
+        // Highlighting Resource Allocation
+        // Area under Q axis growing
+        if (currentShift > 5) {
+            ctx.fillStyle = "rgba(142, 68, 173, 0.1)";
+            ctx.fillRect(cx, origin.y - 10, eqX - cx, 10);
+            
+            ctx.fillStyle = "#8e44ad";
+            ctx.font = "bold 12px Arial";
+            ctx.fillText("Resources Inflow ->", cx + (eqX-cx)/2 - 50, origin.y - 15);
+        }
+    }
+
+    function drawArrow(x1, y1, x2, y2) {
+        const head = 10; 
+        const angle = Math.atan2(y2-y1, x2-x1);
+        ctx.beginPath(); 
+        ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); 
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
+        
+        ctx.beginPath(); 
+        ctx.moveTo(x2, y2); 
+        ctx.lineTo(x2-head*Math.cos(angle-Math.PI/6), y2-head*Math.sin(angle-Math.PI/6));
+        ctx.lineTo(x2-head*Math.cos(angle+Math.PI/6), y2-head*Math.sin(angle+Math.PI/6));
+        ctx.fillStyle = '#333'; ctx.fill();
+    }
+
+    // Init call
+    window.addEventListener('load', init);
+
+</script>
+
+</body>
+</html>

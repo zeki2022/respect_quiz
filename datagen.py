@@ -6,28 +6,34 @@ import os
 import sys
 
 # ==========================================
-# 🔧 配置区域：在这里定义你的学科映射关系
+# 🔧 配置区域
 # ==========================================
 BATCH_CONFIG = [
     {
+        "key": "math", # 用于命令行匹配的标识
         "input": "math.xlsx", 
         "output": "subjects/math/data.js", 
         "var_name": "MATH_DATA"
     },
     {
+        "key": "econ",
         "input": "econ.xlsx", 
         "output": "subjects/econ/data.js", 
         "var_name": "ECON_DATA"
     },
-    # 未来只需在这里加一行：
-    { "input": "physics.xlsx", "output": "subjects/phys/data.js", "var_name": "PHYSICS_DATA" },
+    {
+        "key": "phys",
+        "input": "physics.xlsx", 
+        "output": "subjects/phys/data.js", 
+        "var_name": "PHYSICS_DATA" 
+    },
 ]
 # ==========================================
 
 def generate_data(input_file, output_file, var_name=None):
     # 检查输入文件是否存在
     if not os.path.exists(input_file):
-        print(f"⚠️ 跳过: 找不到文件 '{input_file}'")
+        print(f"⚠️  跳过: 找不到文件 '{input_file}'")
         return
 
     print(f"🔄 正在处理: {input_file} -> {output_file} ...")
@@ -40,7 +46,6 @@ def generate_data(input_file, output_file, var_name=None):
 
     df.columns = df.columns.str.strip()
     
-    # 如果没有指定 var_name，尝试自动推断
     if not var_name:
         if "econ" in output_file.lower(): var_name = "ECON_DATA"
         elif "phys" in output_file.lower(): var_name = "PHYSICS_DATA"
@@ -48,7 +53,6 @@ def generate_data(input_file, output_file, var_name=None):
 
     papers_list = []
     
-    # 分组逻辑 (按试卷 qp 分组)
     if 'qp' not in df.columns:
         print(f"❌ 错误: {input_file} 缺少 'qp' 列")
         return
@@ -69,9 +73,7 @@ def generate_data(input_file, output_file, var_name=None):
             q_file = str(row['quest file'])
             base_path = str(row['path'])
             
-            # 智能清洗路径：不管 Excel 里写没写 subjects/xxx/，都清洗干净
             clean_path = base_path
-            # 移除常见前缀
             prefixes = ["subjects/math/", "subjects/econ/", "subjects/phys/", 
                         "subjects/math", "subjects/econ", "subjects/phys"]
             for p in prefixes:
@@ -82,8 +84,6 @@ def generate_data(input_file, output_file, var_name=None):
             full_url = ""
             title_desc = ""
             
-            # 判断是否是新题
-            # 假设 Excel 里有一列叫 'new'，如果填了 'y'，就在标题前加个标记
             is_new = str(row.get('new', '')).lower() == 'y'
             
             if q_file != "nan" and q_file.strip() != "":
@@ -99,7 +99,6 @@ def generate_data(input_file, output_file, var_name=None):
                 "url": full_url
             }
             
-            # 如果是新题，可以加个标记字段（前端需配合修改才能显示，这里先存数据）
             if is_new:
                 q_data["isNew"] = True
 
@@ -114,29 +113,49 @@ def generate_data(input_file, output_file, var_name=None):
     js_content += ";"
 
     try:
-        # 自动创建输出目录（如果不存在）
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(js_content)
-        print(f"✅ 成功! {var_name} 已更新。")
+        print(f"✅ 成功! {var_name} 已更新。\n")
     except Exception as e:
         print(f"❌ 写入失败: {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auto-generate data.js for Respect Quiz")
-    parser.add_argument("-i", "--input", help="Input Excel file")
-    parser.add_argument("-o", "--output", help="Output JS file")
+    
+    # 互斥组：要么用 -i/-o 自定义模式，要么用快捷方式模式
+    group = parser.add_argument_group('Shortcuts')
+    group.add_argument("-m", "--math", action="store_true", help="Update Mathematics only")
+    group.add_argument("-e", "--econ", action="store_true", help="Update Economics only")
+    group.add_argument("-p", "--phys", action="store_true", help="Update Physics only")
+    
+    parser.add_argument("-i", "--input", help="Custom Input Excel file")
+    parser.add_argument("-o", "--output", help="Custom Output JS file")
     
     args = parser.parse_args()
     
-    # 逻辑分支：
+    # 方式二：完全自定义路径模式 (优先级最高)
     if args.input and args.output:
-        # 模式 1: 命令行指定了文件，只处理这一个
+        print(f"🔧 自定义模式: {args.input} -> {args.output}")
         generate_data(args.input, args.output)
+        sys.exit(0)
+
+    # 方式三：快捷参数模式
+    # 收集用户想要更新的学科 key
+    targets = []
+    if args.math: targets.append("math")
+    if args.econ: targets.append("econ")
+    if args.phys: targets.append("phys")
+
+    if targets:
+        # 如果用户指定了某些学科，只更新这些
+        print(f"🎯 指定更新模式: {', '.join(targets).upper()}\n")
+        for task in BATCH_CONFIG:
+            if task["key"] in targets:
+                generate_data(task["input"], task["output"], task["var_name"])
     else:
-        # 模式 2: 没给参数，进入【自动批处理模式】
-        print("🚀 开始批量更新所有学科数据...\n")
+        # 方式一：默认模式（什么参数都没加），更新全部
+        print("🚀 默认模式：批量更新所有学科...\n")
         for task in BATCH_CONFIG:
             generate_data(task["input"], task["output"], task["var_name"])
-        print("\n✨ 所有任务执行完毕!")
+        print("✨ 所有任务执行完毕!")

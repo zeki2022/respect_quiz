@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Econ Q4: Circular Flow</title>
+    
+    <!-- 1. 引用公共样式 -->
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <!-- 2. MathJax 配置 (强制开启 $ 识别) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 3. 核心布局与样式 (Econ V4.0 军规) */
+        body { 
+            padding-top: 60px; padding-bottom: 40px; 
+            background-color: #f4f7f6; 
+            max-width: none !important; 
+        }
+        
+        .container {
+            width: 98%; max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 450px; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        /* 原生返回箭头 */
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        
+        /* 题目原图占位 */
+        .orig-img { 
+            max-width: 100%; height: auto; 
+            border: 1px solid #eee; border-radius: 6px; 
+            margin-bottom: 15px; display: block;
+        }
+
+        /* 画布容器 - 防塌陷 */
+        .canvas-container { 
+            width: 100%; 
+            height: 450px; /* 固定高度，确保图表清晰 */
+            position: relative; background: #fff; border: 1px solid #ddd; 
+            border-radius: 8px; margin-bottom: 15px; overflow:hidden; 
+        }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* 控制条 */
+        .controls { 
+            display: flex; flex-direction: column; gap: 12px; 
+            background: #f8f9fa; padding: 15px; border-radius: 8px; border:1px solid #eee;
+        }
+        .control-row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+        
+        button.action-btn { 
+            flex: 1; background-color: #fff; color: #333; border: 1px solid #ccc; 
+            padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size:14px;
+            transition: all 0.2s;
+        }
+        button.action-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
+        button.action-btn.blue { background-color: #3498db; color: white; border-color: #3498db; }
+        
+        /* 右侧面板 Tabs */
+        .solution-panel { max-height: 85vh; overflow-y: auto; padding-right:5px; }
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .tab-item { 
+            padding: 10px 15px; cursor: pointer; font-weight: bold; color: #7f8c8d; 
+            border-bottom: 2px solid transparent; margin-bottom: -2px; font-size: 14px;
+        }
+        .tab-item.active { color: #3498db; border-bottom-color: #3498db; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        /* 内容样式 */
+        .explanation p { margin-bottom: 10px; line-height: 1.6; font-size: 14px; color: #444; }
+        .term { color: #d35400; font-weight: bold; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; font-weight: bold; color:#2c3e50;}
+        h4 { margin: 15px 0 8px 0; color: #2c3e50; border-left: 4px solid #3498db; padding-left: 8px; font-size: 15px; }
+        
+        .problem-text { background:#e8f4fd; padding:15px; border-left:4px solid #3498db; margin-bottom:15px; font-size:15px; line-height:1.6; color:#333; }
+        
+        /* Model Answer 专用 */
+        .essay-header { font-size: 16px; color: #e67e22; font-weight: bold; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px; }
+        .essay-header:first-child { margin-top: 0; }
+        .essay-subhead { color: #2980b9; font-weight: bold; margin-top: 10px; display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- 原生导航 -->
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <!-- 左侧：Canvas 交互 -->
+        <div class="left-col">
+            <div class="card">
+                <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">9708 Econ / Section C / Q4</h3>
+                
+                <div class="problem-text">
+                    <!-- 图片占位 -->
+                    <img src="q4_orig.png" class="orig-img" onerror="this.style.display='none'" alt="Circular Flow Diagram">
+                    
+                    <p><strong>(a)</strong> Explain how the circular flow of income in an economy changes when that economy moves from a closed to an open economy and consider what determines the extent of the change. [8]</p>
+                    <p><strong>(b)</strong> Assess whether the potential benefits of free trade always outweigh the arguments for protectionism. [12]</p>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight:bold; color:#555;">Economy Type:</span>
+                        <div class="mode-btns" style="display:flex; gap:10px; flex:1;">
+                            <button class="action-btn active" onclick="setMode('closed')" id="btnClosed">Closed Economy</button>
+                            <button class="action-btn" onclick="setMode('open')" id="btnOpen">Open Economy</button>
+                        </div>
+                    </div>
+                    <div class="control-row" style="margin-top:10px;">
+                        <span style="font-size:12px; color:#777;">Animation Speed:</span>
+                        <button class="action-btn blue" onclick="resetAnim()">Replay Flow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：MS 解析 -->
+        <div class="right-col">
+            <div class="card solution-panel">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab('a')">Part (a) Logic</div>
+                    <div class="tab-item" onclick="switchTab('b')">Part (b) Logic</div>
+                    <div class="tab-item" onclick="switchTab('model')">Full Answer</div>
+                </div>
+
+                <!-- Part A -->
+                <div id="tab-a" class="tab-content active">
+                    <h4>1. The Circular Flow Concept (AO1)</h4>
+                    <div class="explanation">
+                        <p>The circular flow shows how income ($Y$) flows between <strong>Households</strong> and <strong>Firms</strong>.</p>
+                        <p>• Households provide factors of production $\rightarrow$ Income.</p>
+                        <p>• Households spend income $\rightarrow$ Firms revenue.</p>
+                    </div>
+                    
+                    <h4>2. Closed vs Open (AO2)</h4>
+                    <div class="explanation">
+                        <p><strong>Closed Economy:</strong> Only has domestic sectors.<br>
+                        Injections ($J$) = Investment ($I$) + Gov Spending ($G$).<br>
+                        Leakages ($W$) = Savings ($S$) + Taxes ($T$).</p>
+                        
+                        <p><strong>Open Economy:</strong> Trades with the Rest of the World.<br>
+                        <span class="highlight">New Injection: Exports ($X$)</span> enter the flow.<br>
+                        <span class="highlight">New Leakage: Imports ($M$)</span> leave the flow.</p>
+                    </div>
+                    
+                    <h4>3. Determinants of Change (AO3)</h4>
+                    <div class="explanation">
+                        <p>The <strong>extent of change</strong> depends on the "Openness" of the economy (e.g., Trade as % of GDP, barriers to trade, exchange rates).</p>
+                    </div>
+                </div>
+
+                <!-- Part B -->
+                <div id="tab-b" class="tab-content">
+                    <h4>1. Benefits of Free Trade</h4>
+                    <div class="explanation">
+                        <p>• <strong>Efficiency:</strong> Resources allocated better (Comparative Advantage).</p>
+                        <p>• <strong>Lower Prices:</strong> Competition reduces costs.</p>
+                        <p>• <strong>Choice:</strong> Consumers have access to world variety.</p>
+                    </div>
+                    
+                    <h4>2. Arguments for Protectionism</h4>
+                    <div class="explanation">
+                        <p>• <span class="term">Infant Industries:</span> New industries need shielding to grow.</p>
+                        <p>• <span class="term">Anti-Dumping:</span> Prevent foreign firms selling below cost.</p>
+                        <p>• <span class="term">Strategic Industries:</span> Defense/Food security.</p>
+                        <p>• <span class="term">Current Account Deficit:</span> Reduce imports to fix BOP.</p>
+                    </div>
+                </div>
+
+                <!-- Model Answer -->
+                <div id="tab-model" class="tab-content">
+                    <div class="explanation" style="font-family: Georgia, serif; font-size:15px;">
+                        
+                        <div class="essay-header">Part (a) [8 Marks]</div>
+                        <p>The <span class="term">Circular Flow of Income</span> describes the movement of money between households and firms.</p>
+                        <span class="essay-subhead">Closed Economy:</span>
+                        <p>In a closed economy, there are no foreign trade sectors. Injections are limited to Investment ($I$) and Government Spending ($G$). Withdrawals are Savings ($S$) and Taxes ($T$). Equilibrium is where $I+G = S+T$.</p>
+                        <span class="essay-subhead">Move to Open Economy:</span>
+                        <p>When opening up, the model adds the foreign sector. <strong>Exports ($X$)</strong> become a new injection, and <strong>Imports ($M$)</strong> become a new leakage. The new equilibrium is $J=W$ where $J = I+G+X$ and $W = S+T+M$.</p>
+                        <span class="essay-subhead">Evaluation:</span>
+                        <p>The <strong>extent</strong> of this change depends on the degree of openness (trade/GDP ratio) and government trade policies (tariffs/quotas).</p>
+
+                        <div class="essay-header">Part (b) [12 Marks]</div>
+                        <p>Free trade allows countries to specialize based on comparative advantage, leading to higher world output and lower prices.</p>
+                        <span class="essay-subhead">Arguments for Protectionism:</span>
+                        <p>However, protectionism is argued for to protect <span class="highlight">Infant Industries</span> (sunrise industries) until they achieve economies of scale. It is also used against <span class="highlight">Dumping</span> (predatory pricing) and to protect strategic sectors (e.g., defense).</p>
+                        <span class="essay-subhead">Conclusion:</span>
+                        <p>While protectionism has valid short-term arguments (e.g., protecting jobs), the <span class="highlight">benefits of free trade</span> (efficiency, lower prices, consumer choice) generally outweigh them in the long run. Protectionism often leads to retaliation and inefficiency.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // State
+        let isOpen = false;
+        let animFrame = 0;
+        
+        // Layout Constants
+        let width, height;
+        let housePos, firmPos, bankPos, govPos, worldPos;
+        
+        function resize() {
+            if(!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            // 强制兜底高度
+            canvas.height = 450; 
+            width = canvas.width; height = canvas.height;
+            
+            // Init Positions based on width
+            const midY = height * 0.5;
+            housePos = { x: width * 0.2, y: midY, color: '#2ecc71', label: 'Households' };
+            firmPos = { x: width * 0.8, y: midY, color: '#3498db', label: 'Firms' };
+            
+            // Injections/Leakages Sources
+            bankPos = { x: width * 0.5, y: height * 0.2, label: 'Financial' }; // S & I
+            govPos = { x: width * 0.5, y: height * 0.8, label: 'Gov' }; // T & G
+            worldPos = { x: width * 0.95, y: height * 0.2, label: 'Rest of World' }; // X & M
+            
+            drawFrame();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        function setMode(mode) {
+            isOpen = (mode === 'open');
+            document.getElementById('btnClosed').className = isOpen ? 'action-btn' : 'action-btn active';
+            document.getElementById('btnOpen').className = isOpen ? 'action-btn active' : 'action-btn';
+            animFrame = 0; // Reset animation loop
+        }
+        
+        function resetAnim() {
+            animFrame = 0;
+        }
+        
+        function switchTab(id) {
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const index = id==='a'?0:(id==='b'?1:2);
+            document.querySelectorAll('.tab-item')[index].classList.add('active');
+            document.getElementById('tab-'+id).classList.add('active');
+        }
+
+        // --- Animation Loop ---
+        function loop() {
+            animFrame++;
+            drawFrame();
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        function drawFrame() {
+            if(!width) return;
+            ctx.clearRect(0, 0, width, height);
+            
+            // 1. Draw Main Flow (Circle)
+            // Inner: Factors (H -> F)
+            drawFlowCurve(housePos, firmPos, -60, '#7f8c8d', 'Factors of Production', 1);
+            // Outer: Income (F -> H)
+            drawFlowCurve(firmPos, housePos, -60, '#e67e22', 'Income (Y)', -1);
+            // Inner: Goods (F -> H)
+            drawFlowCurve(firmPos, housePos, 60, '#7f8c8d', 'Goods & Services', -1);
+            // Outer: Expenditure (H -> F)
+            drawFlowCurve(housePos, firmPos, 60, '#e67e22', 'Expenditure (E)', 1);
+            
+            // 2. Draw Leakages & Injections
+            
+            // Savings (S) -> Banks -> Investment (I)
+            drawLeakage(housePos, bankPos, 'Savings (S)');
+            drawInjection(bankPos, firmPos, 'Investment (I)');
+            
+            // Taxes (T) -> Gov -> Spending (G)
+            drawLeakage(housePos, govPos, 'Taxes (T)');
+            drawInjection(govPos, firmPos, 'Gov Spending (G)');
+            
+            // 3. Open Economy Extras
+            if(isOpen) {
+                // Imports (M): Leakage from H to World
+                // We visualize this as leaving H
+                drawLeakage(housePos, worldPos, 'Imports (M)', true);
+                
+                // Exports (X): Injection from World to F
+                drawInjection(worldPos, firmPos, 'Exports (X)', true);
+            }
+
+            // 4. Draw Nodes
+            drawNode(housePos);
+            drawNode(firmPos);
+            drawNode(bankPos, true);
+            drawNode(govPos, true);
+            if(isOpen) drawNode(worldPos, true);
+        }
+        
+        // Helpers
+        function drawNode(pos, isSmall=false) {
+            ctx.fillStyle = pos.color || '#95a5a6';
+            const r = isSmall ? 30 : 40;
+            ctx.beginPath(); ctx.arc(pos.x, pos.y, r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = 'white'; ctx.font = isSmall?'bold 10px Arial':'bold 12px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(pos.label, pos.x, pos.y);
+        }
+        
+        function drawFlowCurve(p1, p2, offset, color, label, direction) {
+            ctx.beginPath();
+            ctx.strokeStyle = color; ctx.lineWidth = 4;
+            
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2 + offset;
+            
+            ctx.moveTo(p1.x, p1.y + (offset>0?30:-30));
+            ctx.quadraticCurveTo(midX, midY, p2.x, p2.y + (offset>0?30:-30));
+            ctx.stroke();
+            
+            // Animated Dot
+            const t = (animFrame % 200) / 200; // 0 to 1
+            const flowT = direction === 1 ? t : (1-t);
+            
+            // Simple Bezier point calc
+            const invT = 1 - flowT;
+            const bx = invT*invT*p1.x + 2*invT*flowT*midX + flowT*flowT*p2.x;
+            const by = invT*invT*(p1.y+(offset>0?30:-30)) + 2*invT*flowT*midY + flowT*flowT*(p2.y+(offset>0?30:-30));
+            
+            ctx.beginPath(); ctx.fillStyle = 'white'; ctx.arc(bx, by, 4, 0, Math.PI*2); ctx.fill();
+            
+            // Label
+            ctx.fillStyle = color; ctx.font = '12px Arial';
+            ctx.fillText(label, midX, midY + (offset>0?15:-5));
+        }
+        
+        function drawLeakage(from, to, label, isLong=false) {
+            ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2; ctx.setLineDash([5,5]);
+            ctx.beginPath();
+            
+            // Start from node edge
+            let startY = from.y + (to.y > from.y ? 40 : -40);
+            let endY = to.y + (to.y > from.y ? -30 : 30);
+            
+            if (isLong) {
+                // Special path for World
+                ctx.moveTo(from.x, from.y - 40);
+                ctx.lineTo(from.x, from.y - 80);
+                ctx.lineTo(to.x, from.y - 80);
+                ctx.lineTo(to.x, to.y + 30);
+            } else {
+                ctx.moveTo(from.x, startY);
+                ctx.lineTo(to.x - 30, endY); // Connect to side
+            }
+            ctx.stroke(); ctx.setLineDash([]);
+            
+            // Text
+            ctx.fillStyle = '#c0392b'; 
+            if (isLong) ctx.fillText(label, (from.x+to.x)/2, from.y - 85);
+            else ctx.fillText(label, (from.x+to.x)/2 - 40, (startY+endY)/2);
+        }
+        
+        function drawInjection(from, to, label, isLong=false) {
+            ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            let startY = from.y + (to.y > from.y ? 30 : -30);
+            let endY = to.y + (to.y > from.y ? -40 : 40);
+            
+            if (isLong) {
+                ctx.moveTo(from.x, from.y + 30);
+                ctx.lineTo(to.x, from.y + 30); // Straight across
+                ctx.lineTo(to.x, to.y - 40);
+            } else {
+                ctx.moveTo(from.x + 30, startY);
+                ctx.lineTo(to.x, endY);
+            }
+            ctx.stroke();
+            
+            ctx.fillStyle = '#27ae60';
+            if (isLong) ctx.fillText(label, (from.x+to.x)/2, from.y + 20);
+            else ctx.fillText(label, (from.x+to.x)/2 + 40, (startY+endY)/2);
+        }
+
+        // Init
+        setTimeout(() => { resize(); }, 200);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q1 - South Africa Economic Difficulties</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f4fd;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .unemployment-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section A / Question 1</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>1 Can South Africa escape from its economic difficulties?</strong></p>
+                    
+                    <p>South Africa has serious economic difficulties. Despite its vast natural resources, the main economic indicators show a country in trouble. As Fig. 1.1 shows, despite a fall over the last year, unemployment remains very high. It is amongst the highest in the world, particularly for young people, and this has led to one of the highest and most persistent levels of income inequality in the world, with a Gini coefficient of 0.67.</p>
+                    
+                    <p>Economic growth is amongst the worst in Africa and this, together with high government expenditure, means that the country has had a fiscal deficit of more than 4% of GDP in recent years. Despite falls in the value of South Africa's currency (rand), the current account of the balance of payments is projected to move to a significant deficit of 2.3% of GDP in 2023 and to deteriorate further to about 2.5% of GDP in 2024. South Africa is also suffering extended power cuts of up to 10 hours per day due to the collapse of the state electricity provider. What can be done?</p>
+                    
+                    <!-- 原图占位符 -->
+                    <div class="orig-img">
+                        <img src="q1_orig.png" alt="Fig. 1.1 South Africa % rate of unemployment, January 2020 to October 2022" 
+                             style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+                        <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">
+                            Source: tradingeconomics.com
+                        </div>
+                    </div>
+                    
+                    <p>In a March 2023 statement, the International Monetary Fund (IMF) recommended that the South African government should adopt the following policies:</p>
+                    
+                    <ul>
+                        <li>Improvements in infrastructure, particularly electricity supplies and transport links. This should be achieved by promoting more private sector investment.</li>
+                        <li>Encourage more competition within South Africa and free trade with neighbouring countries by reducing protection. Closer links with the African Continental Free Trade Area (AfCFTA) should be established.</li>
+                        <li>To tackle the very high rates of unemployment and income inequality, a range of policies has been suggested. These include setting the minimum national wage at an appropriate rate to encourage more people back into the workforce. This should be done alongside policies to strengthen employment protection. In addition, other policies include improving levels of education and training and better support for the transition from school to work. Finally, policies to promote entrepreneurship need to be introduced.</li>
+                    </ul>
+                    
+                    <p>However, will these policies help South Africa escape from its economic difficulties?</p>
+                    
+                    <p><em>Sources: adapted from: FocusEconomics article, 'Will South Africa find a way out of its economic rut?' and IMF concluding statement concerning South Africa, 22 March 2023</em></p>
+                    
+                    <!-- 失业率数据表格 -->
+                    <div class="unemployment-data">
+                        <strong>Fig. 1.1 Data Table:</strong>
+                        <table class="data-table">
+                            <tr>
+                                <th>Period</th>
+                                <th>Unemployment Rate (%)</th>
+                                <th>Change</th>
+                            </tr>
+                            <tr><td>Jan 2020</td><td>23.3</td><td>-</td></tr>
+                            <tr><td>2020</td><td>30.1</td><td>+6.8</td></tr>
+                            <tr><td>2020</td><td>32.5</td><td>+2.4</td></tr>
+                            <tr><td>2020</td><td>34.4</td><td>+1.9</td></tr>
+                            <tr><td>2020</td><td>34.9</td><td>+0.5</td></tr>
+                            <tr><td>2021</td><td>35.3</td><td>+0.4</td></tr>
+                            <tr><td>2021</td><td>34.5</td><td>-0.8</td></tr>
+                            <tr><td>2021</td><td>33.9</td><td>-0.6</td></tr>
+                            <tr><td>2022</td><td>32.6</td><td>-1.3</td></tr>
+                            <tr><td>2022</td><td>32.9</td><td>+0.3</td></tr>
+                            <tr><td>2022</td><td>32.7</td><td>-0.2</td></tr>
+                            <tr><td>Oct 2022</td><td>32.7</td><td>0.0</td></tr>
+                        </table>
+                    </div>
+                    
+                    <p><strong>(a)</strong> <strong>(i)</strong> Identify the overall change in the unemployment rate in South Africa between January 2020 and October 2022. [1]</p>
+                    
+                    <p><strong>(ii)</strong> Compare the trend in the unemployment rate in South Africa between January 2020 and January 2022 with that between January 2022 and October 2022. [1]</p>
+                    
+                    <p><strong>(b)</strong> Identify <strong>one possible impact on firms in South Africa and</strong> <strong>one possible impact on the government</strong> of South Africa of such a high rate of unemployment. [2]</p>
+                    
+                    <p><strong>(c)</strong> Consider whether continued falls in the value of the South African rand may lead to a reduction in the current account deficit of the balance of payments. [4]</p>
+                    
+                    <p><strong>(d)</strong> Assess the extent to which closer membership of the AfCFTA may help South Africa to achieve the growth needed to 'escape from its economic difficulties'. [6]</p>
+                    
+                    <p><strong>(e)</strong> Assess the extent to which the policies suggested to improve infrastructure and to reduce the high rates of unemployment in South Africa are likely to reduce income inequality. [6]</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Exchange Rate & Current Account Analysis</h4>
+                <p>This interactive diagram shows how currency depreciation affects the current account balance, depending on price elasticity of demand (PED) for exports and imports.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="forexCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● Demand for ZAR (Exports)</div>
+                        <div style="color: #c0392b">● Supply of ZAR (Imports)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Rand Depreciation:</span>
+                        <input type="range" id="depreciationSlider" min="0" max="100" value="30" style="flex: 1; cursor: pointer;" oninput="updateForexChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>0% (No change)</span>
+                        <span>50% (Significant fall)</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <span style="font-weight: bold; font-size: 14px;">Elasticity Scenario:</span>
+                        <button class="action-btn" id="elasticBtn" onclick="setElasticity('elastic')">Elastic PED</button>
+                        <button class="action-btn active" id="inelasticBtn" onclick="setElasticity('inelastic')">Inelastic PED</button>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show J-Curve Effect</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetForexChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Exchange Rate (USD/ZAR):</span>
+                        <span id="exchangeRate">14.50</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Export Value (USD bn):</span>
+                        <span id="exportValue">95.2</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Import Value (USD bn):</span>
+                        <span id="importValue">98.7</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Current Account Balance:</span>
+                        <span id="currentAccount" style="color: #e74c3c; font-weight: bold;">-3.5 bn USD</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Marshall-Lerner Condition:</span>
+                        <span id="mlCondition" style="color: #27ae60; font-weight: bold;">Satisfied</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a)(i) - Overall Unemployment Change</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation">Examine the unemployment data from January 2020 to October 2022 in Fig. 1.1</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation">Identify the starting point (Jan 2020: <span class="highlight-term">23.3%</span>) and ending point (Oct 2022: <span class="highlight-term">32.7%</span>)</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation">Calculate the overall change: <span class="highlight-equation">32.7% - 23.3% = 9.4 percentage points</span></span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Point (1 mark):</strong> The unemployment rate <span class="highlight-term">increased / rose</span> between January 2020 and October 2022.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (a)(ii) - Trend Comparison</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation">Analyze the trend from January 2020 to January 2022: The rate generally increased from <span class="highlight-term">23.3%</span> to <span class="highlight-term">35.3%</span></span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation">Analyze the trend from January 2022 to October 2022: The rate decreased from <span class="highlight-term">35.3%</span> to <span class="highlight-term">32.7%</span></span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation">Compare the two trends: First period shows an <span class="highlight-term">upward trend</span>, second period shows a <span class="highlight-term">downward trend</span></span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Point (1 mark):</strong> The unemployment rate <span class="highlight-term">increased in the first period</span> and then <span class="highlight-term">fell in the second period</span>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Impacts of High Unemployment</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Impact on firms:</strong> High unemployment increases labor supply, making it easier for firms to recruit workers at lower wage rates due to reduced bargaining power of workers.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Alternative impact on firms:</strong> High unemployment reduces aggregate demand in the economy, leading to weaker demand for firms' products and services.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Impact on government:</strong> High unemployment reduces income tax revenue as fewer people are earning taxable income.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Alternative impact on government:</strong> High unemployment increases government expenditure on unemployment benefits and other social welfare programs.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Points (2 marks):</strong> 
+                            <br>1. Firms: <span class="highlight-term">easier/cheaper to recruit labour / pay lower wages / suffer weaker demand</span>
+                            <br>2. Government: <span class="highlight-term">reduced tax revenue / higher welfare payments</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (c) - Exchange Rate & Current Account (Interactive)</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Initial effect of depreciation:</strong> A fall in the value of the rand makes South African exports cheaper in foreign markets (price effect).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Simultaneously:</strong> Imports become more expensive for South African consumers, which should reduce import demand.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Theoretical improvement:</strong> Cheaper exports and more expensive imports should increase net exports $(X - M)$, reducing the current account deficit.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Critical factor:</strong> The actual effect depends on the price elasticity of demand (PED) for exports and imports, as shown in the interactive diagram.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Analysis (3 marks):</strong>
+                            <br>1. Exports become relatively cheaper (1 mark)
+                            <br>2. Imports become relatively more expensive (1 mark)
+                            <br>3. This should increase export demand and/or reduce import demand, improving current account (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (d) - AfCFTA Membership & Growth</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Export-led growth:</strong> AfCFTA provides access to larger markets, potentially increasing exports and stimulating aggregate demand (AD).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Competitiveness effect:</strong> Increased competition forces domestic firms to become more efficient, potentially increasing aggregate supply (AS).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Drawbacks:</strong> Domestic industries may face intense competition, leading to business closures and job losses in uncompetitive sectors.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Structural issues:</strong> South Africa's infrastructure problems (power cuts) may limit its ability to benefit from trade opportunities.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (e) - Policies & Income Inequality</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Infrastructure improvements:</strong> Better transport links increase labor mobility, allowing workers to access higher-paying jobs.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Minimum wage:</strong> Directly raises incomes for low-wage workers, reducing wage inequality.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Education and training:</strong> Increases human capital, enabling workers to access higher-skilled, better-paying jobs.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Limitations:</strong> These policies take time to implement and may have high opportunity costs. Minimum wage could increase unemployment if set too high.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (c) - Critical Evaluation</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Price Elasticity of Demand (PED):</strong> The effectiveness of depreciation depends on whether the Marshall-Lerner condition is satisfied: $$PED_X + PED_M > 1$$ where $PED_X$ is PED for exports and $PED_M$ is PED for imports.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>J-Curve Effect:</strong> In the short run, depreciation may worsen the current account as quantities adjust slowly (inelastic demand). Only in the long run does improvement occur as consumers find substitutes.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Inflationary pressure:</strong> Depreciation increases import prices, which can cause cost-push inflation, potentially offsetting any competitiveness gains.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Continued falls in the rand <span class="highlight-term">may not</span> reduce the current account deficit in the short term, and effectiveness depends on elasticities and time horizon.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Evaluation (1 mark):</strong> Reserve 1 mark for a valid conclusion emphasizing the importance of PED and other evaluation points.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (d) - Balanced Evaluation of AfCFTA</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Extent of benefit depends on:</strong>
+                            <br>• South Africa's comparative advantage sectors
+                            <br>• Ability to overcome infrastructure constraints
+                            <br>• Competitive position relative to other African economies</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Short-run vs. Long-run:</strong> Initial adjustment costs (job losses in uncompetitive industries) may outweigh benefits, but long-term efficiency gains could be substantial.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Complementary policies needed:</strong> Trade liberalization alone may not be sufficient without domestic reforms (infrastructure, education, business environment).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Distributional effects:</strong> Benefits may be unevenly distributed, potentially exacerbating inequality if gains accrue mainly to capital owners and skilled workers.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Evaluation (2 marks):</strong> 
+                            <br>1 mark for balanced evaluation assessing both sides
+                            <br>1 mark for justified conclusion answering the question</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (e) - Policies & Inequality Evaluation</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Time lags:</strong> Infrastructure projects and education reforms take years to yield benefits, while inequality needs immediate attention.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Fiscal constraints:</strong> South Africa's fiscal deficit (4% of GDP) limits the government's ability to finance expensive infrastructure and social programs.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Unintended consequences:</strong> Minimum wage may increase unemployment if set above market equilibrium, potentially worsening poverty.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Structural barriers:</strong> Deep-seated issues like spatial segregation (legacy of apartheid) and skills mismatches may limit policy effectiveness.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>Conclusion:</strong> The suggested policies are <span class="highlight-term">likely to reduce income inequality in the long run</span>, but their effectiveness depends on careful implementation, sequencing, and addressing fiscal constraints.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Evaluation (2 marks):</strong> 
+                            <br>1 mark for balanced evaluation assessing both sides
+                            <br>1 mark for justified conclusion answering the question</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a)(i) and (ii) [2 Marks]</div>
+                            <p><strong>(a)(i)</strong> The overall change in the unemployment rate in South Africa between January 2020 and October 2022 was an <span class="highlight-term">increase of approximately 9.4 percentage points</span>, from 23.3% to 32.7%. This represents a significant deterioration in the labor market over this period.</p>
+                            
+                            <p><strong>(a)(ii)</strong> Between January 2020 and January 2022, the unemployment rate showed a clear <span class="highlight-term">upward trend</span>, rising from 23.3% to a peak of 35.3%. However, between January 2022 and October 2022, the trend <span class="highlight-term">reversed</span>, with the rate declining to 32.7%. This suggests some recent improvement, though the rate remains critically high.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) [2 Marks]</div>
+                            <p><strong>Impact on firms:</strong> A high unemployment rate means firms face a larger pool of available labor, which may allow them to <span class="highlight-term">recruit workers at lower wage rates</span> due to reduced bargaining power of workers. Alternatively, high unemployment reduces aggregate demand in the economy, leading to <span class="highlight-term">weaker demand for firms' products</span> and potentially lower profits.</p>
+                            
+                            <p><strong>Impact on government:</strong> High unemployment reduces <span class="highlight-term">tax revenue</span> from income taxes as fewer people are earning taxable income. Simultaneously, the government faces <span class="highlight-term">increased expenditure</span> on unemployment benefits and other social welfare programs, exacerbating the fiscal deficit.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (c) [4 Marks]</div>
+                            <p>Continued falls in the value of the South African rand may lead to a reduction in the current account deficit, but this outcome is not guaranteed and depends on several factors.</p>
+                            
+                            <p><span class="model-sub">Theoretical mechanism:</span> Depreciation makes South African exports cheaper in foreign markets and imports more expensive domestically. This should increase the quantity demanded of exports and decrease the quantity demanded of imports, improving net exports $(X - M)$ and reducing the current account deficit.</p>
+                            
+                            <p><span class="model-sub">Critical evaluation:</span> The effectiveness depends crucially on the <span class="highlight-term">price elasticity of demand (PED)</span> for exports and imports. According to the Marshall-Lerner condition, depreciation improves the current account only if $PED_X + PED_M > 1$. In the short run, demand tends to be inelastic as consumers and producers need time to adjust, potentially causing a <span class="highlight-term">J-curve effect</span> where the deficit worsens before improving.</p>
+                            
+                            <p><span class="model-sub">Additional considerations:</span> Depreciation may also fuel inflation through higher import prices, eroding competitiveness gains. Furthermore, South Africa's export structure (heavy reliance on commodities with relatively inelastic demand) may limit the benefits of depreciation.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> While continued rand depreciation <span class="highlight-term">could</span> reduce the current account deficit in the long run if elasticities are favorable, short-term effects may be adverse, and complementary policies to enhance export competitiveness are likely necessary.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (d) [6 Marks]</div>
+                            <p>Closer membership of the African Continental Free Trade Area (AfCFTA) may help South Africa achieve growth, but the extent of this help is contingent on several factors.</p>
+                            
+                            <p><span class="model-sub">Potential benefits (analysis):</span> AfCFTA provides access to a market of over 1.3 billion people, enabling <span class="highlight-term">export-led growth</span> through increased foreign demand. This stimulates aggregate demand (AD) and can create economies of scale for South African firms. Additionally, increased competition may force domestic firms to become more efficient, potentially increasing aggregate supply (AS) through productivity gains.</p>
+                            
+                            <p><span class="model-sub">Limitations and drawbacks (evaluation):</span> South African industries may face intense competition from more efficient producers in other African countries, potentially leading to <span class="highlight-term">deindustrialization</span> in vulnerable sectors. The country's infrastructure constraints, particularly electricity shortages, severely limit its ability to expand production for export markets. Benefits may be unevenly distributed, with skilled workers and capital owners gaining disproportionately, potentially exacerbating inequality.</p>
+                            
+                            <p><span class="model-sub">Time dimension:</span> Short-term adjustment costs (job losses, firm closures) may outweigh benefits, while long-term gains depend on successful structural transformation.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> AfCFTA membership <span class="highlight-term">can contribute to growth</span> but is not a panacea. Its effectiveness depends on complementary domestic reforms to address infrastructure deficits, improve education and skills, and support vulnerable sectors through the transition.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (e) [6 Marks]</div>
+                            <p>The suggested supply-side policies are likely to reduce income inequality in South Africa, but their effectiveness is subject to significant qualifications.</p>
+                            
+                            <p><span class="model-sub">How policies may reduce inequality (analysis):</span> Infrastructure improvements, particularly in transport, increase <span class="highlight-term">labor mobility</span>, allowing workers to access higher-paying jobs. A minimum wage directly raises incomes for low-wage workers, compressing the wage distribution. Education and training enhance <span class="highlight-term">human capital</span>, enabling upward mobility and access to higher-skilled, better-remunerated employment. Entrepreneurship promotion can create new income opportunities.</p>
+                            
+                            <p><span class="model-sub">Limitations and challenges (evaluation):</span> South Africa's <span class="highlight-term">fiscal constraints</span> (deficit exceeding 4% of GDP) limit the government's capacity to finance infrastructure and social programs. The minimum wage may increase unemployment if set above market equilibrium, potentially worsening poverty. Education reforms take decades to yield benefits, while inequality requires more immediate attention. Deep-seated <span class="highlight-term">structural barriers</span> (apartheid legacy, spatial segregation, skills mismatches) may persist despite these policies.</p>
+                            
+                            <p><span class="model-sub">Implementation considerations:</span> The sequencing and targeting of policies matter. For instance, infrastructure investment in marginalized regions combined with localized education programs may be more effective than uniform national policies.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> While the recommended policies address key drivers of inequality and <span class="highlight-term">are likely to reduce income disparity over time</span>, their success depends on careful design, adequate financing, and addressing the structural roots of South Africa's exceptionally high inequality (Gini coefficient of 0.67).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            // 初始汇率和数值
+            initialExchangeRate: 14.50, // USD/ZAR
+            initialExports: 95.2, // USD billions
+            initialImports: 98.7, // USD billions
+            
+            // 弹性参数
+            elasticities: {
+                elastic: {
+                    pedExports: 2.5,  // 富有弹性
+                    pedImports: 1.8,
+                    label: "Elastic PED"
+                },
+                inelastic: {
+                    pedExports: 0.4,  // 缺乏弹性
+                    pedImports: 0.3,
+                    label: "Inelastic PED"
+                }
+            },
+            
+            // 当前设置
+            currentElasticity: "inelastic",
+            depreciationLevel: 30, // 百分比 (0-100)
+            isExamMode: false
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            document.querySelector(`.tab:nth-child(${tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 外汇图表功能 ====================
+        const forexCanvas = document.getElementById('forexCanvas');
+        const forexCtx = forexCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeForexCanvas() {
+            if (!forexCanvas.parentElement) return;
+            
+            canvasWidth = forexCanvas.parentElement.clientWidth;
+            canvasHeight = forexCanvas.parentElement.clientHeight;
+            forexCanvas.width = canvasWidth;
+            forexCanvas.height = canvasHeight;
+            
+            drawForexChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeForexCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeForexCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeForexCanvas, 300);
+            setTimeout(resizeForexCanvas, 1000);
+        }
+        
+        // 设置弹性类型
+        function setElasticity(type) {
+            ECONOMIC_PARAMS.currentElasticity = type;
+            
+            // 更新按钮状态
+            document.getElementById('elasticBtn').classList.remove('active');
+            document.getElementById('inelasticBtn').classList.remove('active');
+            document.getElementById(`${type}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateForexChart();
+        }
+        
+        // 更新图表（滑块变动时调用）
+        function updateForexChart() {
+            ECONOMIC_PARAMS.depreciationLevel = parseInt(document.getElementById('depreciationSlider').value);
+            ECONOMIC_PARAMS.isExamMode = false;
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        // 显示考试模式（J曲线效果）
+        function showExamMode() {
+            ECONOMIC_PARAMS.isExamMode = true;
+            ECONOMIC_PARAMS.depreciationLevel = 70; // 显著贬值
+            document.getElementById('depreciationSlider').value = 70;
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetForexChart() {
+            ECONOMIC_PARAMS.isExamMode = false;
+            ECONOMIC_PARAMS.depreciationLevel = 30;
+            document.getElementById('depreciationSlider').value = 30;
+            drawForexChart();
+            updateDataPanel();
+        }
+        
+        // 绘制外汇图表
+        function drawForexChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            forexCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#333';
+            forexCtx.lineWidth = 2;
+            
+            // Y轴（价格：汇率）
+            forexCtx.moveTo(padding.left, padding.top);
+            forexCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量：ZAR）
+            forexCtx.moveTo(padding.left, padding.top + graphHeight);
+            forexCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            forexCtx.stroke();
+            
+            // 坐标轴标签
+            forexCtx.font = 'bold 14px Arial';
+            forexCtx.fillStyle = '#333';
+            forexCtx.textAlign = 'center';
+            
+            // Y轴标签
+            forexCtx.save();
+            forexCtx.translate(20, padding.top + graphHeight / 2);
+            forexCtx.rotate(-Math.PI / 2);
+            forexCtx.fillText("Exchange Rate (USD/ZAR)", 0, 0);
+            forexCtx.restore();
+            
+            // X轴标签
+            forexCtx.fillText("Quantity of South African Rand (ZAR)", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            forexCtx.strokeStyle = '#eee';
+            forexCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                forexCtx.beginPath();
+                forexCtx.moveTo(padding.left, y);
+                forexCtx.lineTo(padding.left + graphWidth, y);
+                forexCtx.stroke();
+                
+                // Y轴刻度标签
+                const rate = (14.5 - (i * 2.5 / 5)).toFixed(2);
+                forexCtx.fillStyle = '#666';
+                forexCtx.font = '12px Arial';
+                forexCtx.textAlign = 'right';
+                forexCtx.fillText(rate, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                forexCtx.beginPath();
+                forexCtx.moveTo(x, padding.top);
+                forexCtx.lineTo(x, padding.top + graphHeight);
+                forexCtx.stroke();
+                
+                // X轴刻度标签
+                const qty = (i * 20) + 'bn';
+                forexCtx.fillStyle = '#666';
+                forexCtx.font = '12px Arial';
+                forexCtx.textAlign = 'center';
+                forexCtx.fillText(qty, x, padding.top + graphHeight + 20);
+            }
+            
+            // 当前弹性参数
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentElasticity];
+            const depreciationFactor = 1 - (ECONOMIC_PARAMS.depreciationLevel / 100) * 0.3;
+            
+            // 绘制需求曲线（对ZAR的需求，来自出口）
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#2980b9';
+            forexCtx.lineWidth = 3;
+            
+            // 需求曲线：向下倾斜，表示汇率越高，对ZAR需求越少
+            const demandStartY = padding.top;
+            const demandEndY = padding.top + graphHeight;
+            const demandStartX = padding.left + graphWidth * 0.2;
+            const demandEndX = padding.left + graphWidth * 0.8;
+            
+            forexCtx.moveTo(demandStartX, demandStartY);
+            forexCtx.lineTo(demandEndX, demandEndY);
+            forexCtx.stroke();
+            
+            // 需求曲线标签
+            forexCtx.fillStyle = '#2980b9';
+            forexCtx.font = 'bold 14px Arial';
+            forexCtx.textAlign = 'left';
+            forexCtx.fillText("D (Demand for ZAR from exports)", demandEndX - 150, demandStartY + 30);
+            
+            // 绘制供给曲线（ZAR的供给，来自进口）
+            forexCtx.beginPath();
+            forexCtx.strokeStyle = '#c0392b';
+            forexCtx.lineWidth = 3;
+            
+            // 供给曲线：向上倾斜，表示汇率越高，ZAR供给越多
+            const supplyStartY = padding.top + graphHeight;
+            const supplyEndY = padding.top;
+            const supplyStartX = padding.left + graphWidth * 0.1;
+            const supplyEndX = padding.left + graphWidth * 0.9;
+            
+            forexCtx.moveTo(supplyStartX, supplyStartY);
+            forexCtx.lineTo(supplyEndX, supplyEndY);
+            forexCtx.stroke();
+            
+            // 供给曲线标签
+            forexCtx.fillStyle = '#c0392b';
+            forexCtx.fillText("S (Supply of ZAR from imports)", supplyStartX, supplyStartY - 20);
+            
+            // 初始均衡点
+            const equilibriumX = padding.left + graphWidth * 0.5;
+            const equilibriumY = padding.top + graphHeight * 0.5;
+            
+            // 标记初始均衡点
+            forexCtx.beginPath();
+            forexCtx.arc(equilibriumX, equilibriumY, 6, 0, Math.PI * 2);
+            forexCtx.fillStyle = '#27ae60';
+            forexCtx.fill();
+            forexCtx.strokeStyle = '#2c3e50';
+            forexCtx.lineWidth = 2;
+            forexCtx.stroke();
+            
+            forexCtx.fillStyle = '#2c3e50';
+            forexCtx.font = 'bold 12px Arial';
+            forexCtx.textAlign = 'right';
+            forexCtx.fillText("E₀ (Initial Equilibrium)", equilibriumX - 10, equilibriumY - 15);
+            
+            // 如果处于贬值状态，绘制新的供给曲线和均衡点
+            if (ECONOMIC_PARAMS.depreciationLevel > 0) {
+                // 贬值使供给曲线右移（在任何给定汇率下，进口商供给更多ZAR）
+                const shiftAmount = (ECONOMIC_PARAMS.depreciationLevel / 100) * graphWidth * 0.3;
+                const newSupplyStartX = supplyStartX + shiftAmount;
+                const newSupplyEndX = supplyEndX + shiftAmount;
+                
+                // 绘制新的供给曲线
+                forexCtx.beginPath();
+                forexCtx.strokeStyle = '#c0392b';
+                forexCtx.setLineDash([5, 5]);
+                forexCtx.lineWidth = 3;
+                
+                forexCtx.moveTo(newSupplyStartX, supplyStartY);
+                forexCtx.lineTo(newSupplyEndX, supplyEndY);
+                forexCtx.stroke();
+                
+                // 恢复实线
+                forexCtx.setLineDash([]);
+                
+                // 新供给曲线标签
+                forexCtx.fillStyle = '#c0392b';
+                forexCtx.fillText("S₁ (After depreciation)", newSupplyStartX, supplyStartY - 40);
+                
+                // 计算新均衡点（需求曲线与新供给曲线的交点）
+                // 简化计算：线性交点
+                const demandSlope = (demandEndY - demandStartY) / (demandEndX - demandStartX);
+                const demandIntercept = demandStartY - demandSlope * demandStartX;
+                
+                const newSupplySlope = (supplyEndY - supplyStartY) / (newSupplyEndX - newSupplyStartX);
+                const newSupplyIntercept = supplyStartY - newSupplySlope * newSupplyStartX;
+                
+                // 计算交点
+                const newEqX = (newSupplyIntercept - demandIntercept) / (demandSlope - newSupplySlope);
+                const newEqY = demandSlope * newEqX + demandIntercept;
+                
+                // 标记新均衡点
+                forexCtx.beginPath();
+                forexCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+                forexCtx.fillStyle = '#e74c3c';
+                forexCtx.fill();
+                forexCtx.strokeStyle = '#2c3e50';
+                forexCtx.lineWidth = 2;
+                forexCtx.stroke();
+                
+                forexCtx.fillStyle = '#2c3e50';
+                forexCtx.font = 'bold 12px Arial';
+                forexCtx.textAlign = 'left';
+                forexCtx.fillText("E₁ (New Equilibrium)", newEqX + 10, newEqY - 15);
+                
+                // 绘制箭头显示移动方向
+                drawArrow(forexCtx, equilibriumX, equilibriumY, newEqX, newEqY, '#7b61ff');
+                
+                // 显示汇率变动
+                const initialRate = 14.50;
+                const newRate = initialRate * depreciationFactor;
+                const rateChangePercent = ((newRate - initialRate) / initialRate * 100).toFixed(1);
+                
+                forexCtx.fillStyle = '#2c3e50';
+                forexCtx.font = 'bold 14px Arial';
+                forexCtx.textAlign = 'center';
+                forexCtx.fillText(`Rand depreciation: ${rateChangePercent}%`, canvasWidth / 2, padding.top - 20);
+                
+                // 显示弹性情景
+                forexCtx.fillStyle = ECONOMIC_PARAMS.currentElasticity === 'elastic' ? '#27ae60' : '#e67e22';
+                forexCtx.fillText(`${elasticity.label} Scenario`, canvasWidth / 2, padding.top - 5);
+                
+                // 如果处于考试模式，显示J曲线注释
+                if (ECONOMIC_PARAMS.isExamMode) {
+                    forexCtx.fillStyle = '#e74c3c';
+                    forexCtx.font = 'italic 13px Arial';
+                    forexCtx.fillText("J-Curve Effect: Short-term worsening before improvement", canvasWidth / 2, padding.top + graphHeight + 60);
+                }
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            forexCtx.fillStyle = '#2980b9';
+            forexCtx.fillRect(legendX, legendY, 15, 15);
+            forexCtx.fillStyle = '#333';
+            forexCtx.font = '12px Arial';
+            forexCtx.textAlign = 'left';
+            forexCtx.fillText("Demand for ZAR (Exports)", legendX + 25, legendY + 12);
+            
+            forexCtx.fillStyle = '#c0392b';
+            forexCtx.fillRect(legendX, legendY + 25, 15, 15);
+            forexCtx.fillStyle = '#333';
+            forexCtx.fillText("Supply of ZAR (Imports)", legendX + 25, legendY + 37);
+            
+            forexCtx.fillStyle = '#27ae60';
+            forexCtx.beginPath();
+            forexCtx.arc(legendX + 7, legendY + 55, 6, 0, Math.PI * 2);
+            forexCtx.fill();
+            forexCtx.fillStyle = '#333';
+            forexCtx.fillText("Initial Equilibrium (E₀)", legendX + 25, legendY + 60);
+            
+            if (ECONOMIC_PARAMS.depreciationLevel > 0) {
+                forexCtx.fillStyle = '#e74c3c';
+                forexCtx.beginPath();
+                forexCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+                forexCtx.fill();
+                forexCtx.fillStyle = '#333';
+                forexCtx.fillText("New Equilibrium (E₁)", legendX + 25, legendY + 85);
+            }
+        }
+        
+        // 绘制箭头函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 15;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentElasticity];
+            const depreciationFactor = 1 - (ECONOMIC_PARAMS.depreciationLevel / 100) * 0.3;
+            
+            // 计算新汇率
+            const newExchangeRate = (ECONOMIC_PARAMS.initialExchangeRate * depreciationFactor).toFixed(2);
+            
+            // 计算进出口值（基于弹性和贬值程度）
+            const priceChangePercent = (depreciationFactor - 1) * 100;
+            
+            // 出口变化：价格下降，数量变化取决于弹性
+            const exportPriceChange = priceChangePercent; // 负值
+            const exportQuantityChange = elasticity.pedExports * exportPriceChange;
+            const exportValueChange = exportPriceChange + exportQuantityChange + (exportPriceChange * exportQuantityChange / 100);
+            const newExportValue = (ECONOMIC_PARAMS.initialExports * (1 + exportValueChange / 100)).toFixed(1);
+            
+            // 进口变化：价格上升，数量变化取决于弹性
+            const importPriceChange = -priceChangePercent; // 正值（进口更贵）
+            const importQuantityChange = elasticity.pedImports * importPriceChange;
+            const importValueChange = importPriceChange + importQuantityChange + (importPriceChange * importQuantityChange / 100);
+            const newImportValue = (ECONOMIC_PARAMS.initialImports * (1 + importValueChange / 100)).toFixed(1);
+            
+            // 计算经常账户余额
+            const currentAccount = (parseFloat(newExportValue) - parseFloat(newImportValue)).toFixed(1);
+            const initialCA = (ECONOMIC_PARAMS.initialExports - ECONOMIC_PARAMS.initialImports).toFixed(1);
+            
+            // 检查马歇尔-勒纳条件
+            const mlCondition = (elasticity.pedExports + elasticity.pedImports) > 1;
+            
+            // 更新显示
+            document.getElementById('exchangeRate').textContent = newExchangeRate;
+            document.getElementById('exportValue').textContent = newExportValue;
+            document.getElementById('importValue').textContent = newImportValue;
+            
+            const caElement = document.getElementById('currentAccount');
+            caElement.textContent = `${currentAccount} bn USD`;
+            
+            if (parseFloat(currentAccount) < parseFloat(initialCA)) {
+                caElement.style.color = '#e74c3c'; // 红色，恶化
+            } else {
+                caElement.style.color = '#27ae60'; // 绿色，改善
+            }
+            
+            const mlElement = document.getElementById('mlCondition');
+            mlElement.textContent = mlCondition ? "Satisfied" : "Not Satisfied";
+            mlElement.style.color = mlCondition ? '#27ae60' : '#e74c3c';
+            
+            // 添加解释
+            if (ECONOMIC_PARAMS.isExamMode) {
+                mlElement.textContent += " (J-Curve in short run)";
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置弹性按钮事件
+            setElasticity('inelastic');
+            
+            // 初始化外汇图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

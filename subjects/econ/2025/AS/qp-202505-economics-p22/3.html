@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q3 - Supply Curve & Price Elasticity</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 - 修复版 */
+        body::before {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 40px;
+            color: rgba(0, 0, 0, 0.08);
+            pointer-events: none;
+            z-index: 10000;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            position: relative;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f4fd;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .cost-table th, .cost-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .cost-table th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .cost-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .supply-box {
+            background: #f0f4ff;
+            border: 2px solid #7b61ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .supply-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .supply-icon {
+            width: 24px;
+            height: 24px;
+            background: #7b61ff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .elasticity-comparison {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .elasticity-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 8px;
+            border-bottom: 1px dashed #ffecb3;
+        }
+        
+        .elasticity-row:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section B / Question 3</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>OR</strong></p>
+                    
+                    <p><strong>3 (a)</strong> Explain three reasons, associated with costs of production, why the supply curve for a particular market may shift to the right and consider the extent to which government microeconomic policy may also shift the supply curve for a particular market to the right. [8]</p>
+                    
+                    <p><strong>(b)</strong> Assess the extent to which knowledge of a product's price elasticity of supply is the most useful measure of elasticity to a firm needing to react quickly to changes in its market. [12]</p>
+                    
+                    <div class="supply-box">
+                        <h4 style="margin-top: 0; color: #7b61ff;">Key Microeconomic Concepts for Q3</h4>
+                        <div class="supply-item">
+                            <div class="supply-icon">S</div>
+                            <div><strong>Supply Curve Shift:</strong> Changes in production costs or technology</div>
+                        </div>
+                        <div class="supply-item">
+                            <div class="supply-icon">P</div>
+                            <div><strong>Price Elasticity of Supply (PES):</strong> Responsiveness of quantity supplied to price changes</div>
+                        </div>
+                        <div class="supply-item">
+                            <div class="supply-icon">G</div>
+                            <div><strong>Government Policy:</strong> Subsidies, taxes, regulations affecting supply</div>
+                        </div>
+                        <div class="supply-item">
+                            <div class="supply-icon">C</div>
+                            <div><strong>Cost Factors:</strong> Wages, raw materials, technology, productivity</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 供给曲线右移原因表格 -->
+                    <table class="cost-table">
+                        <tr>
+                            <th>Cost Factor</th>
+                            <th>Effect on Production Cost</th>
+                            <th>Supply Curve Shift</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Lower Wage Rates</strong></td>
+                            <td>Decreases labor cost</td>
+                            <td>Rightward shift (S → S₁)</td>
+                            <td>Minimum wage reduction</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Increased Productivity</strong></td>
+                            <td>Lowers cost per unit</td>
+                            <td>Rightward shift (S → S₁)</td>
+                            <td>New training program</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lower Raw Material Costs</strong></td>
+                            <td>Reduces input costs</td>
+                            <td>Rightward shift (S → S₁)</td>
+                            <td>Oil price decrease</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Technology Improvement</strong></td>
+                            <td>Increases efficiency</td>
+                            <td>Rightward shift (S → S₁)</td>
+                            <td>Automation equipment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Government Subsidy</strong></td>
+                            <td>Reduces effective cost</td>
+                            <td>Rightward shift (S → S₁)</td>
+                            <td>Solar panel subsidies</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="elasticity-comparison">
+                        <h4 style="margin-top: 0; color: #d35400;">Elasticity Comparison for Part (b)</h4>
+                        <div class="elasticity-row">
+                            <span><strong>Price Elasticity of Supply (PES):</strong></span>
+                            <span>How quickly firms can adjust output when price changes</span>
+                        </div>
+                        <div class="elasticity-row">
+                            <span><strong>Price Elasticity of Demand (PED):</strong></span>
+                            <span>How consumers respond to price changes</span>
+                        </div>
+                        <div class="elasticity-row">
+                            <span><strong>Income Elasticity of Demand (YED):</strong></span>
+                            <span>How demand changes with income</span>
+                        </div>
+                        <div class="elasticity-row">
+                            <span><strong>Cross Elasticity of Demand (XED):</strong></span>
+                            <span>How demand for one good changes with price of another</span>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Mark Scheme Information:</strong></p>
+                    <ul>
+                        <li><strong>Part (a):</strong> 8 marks total (AO1: 3, AO2: 3, AO3: 2)</li>
+                        <li><strong>Part (b):</strong> 12 marks total (AO1/AO2: 8, AO3: 4)</li>
+                        <li>For part (b), must compare PES with other elasticity measures</li>
+                        <li>One-sided responses cannot gain evaluation marks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Supply Curve Analysis & Elasticity Comparison</h4>
+                <p>Interactive diagrams showing supply curve shifts and how different elasticities affect firm responses to market changes.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="supplyCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● D = Demand</div>
+                        <div style="color: #c0392b" id="supplyLabel">● S = Supply</div>
+                        <div style="color: #27ae60" id="newSupplyLabel" style="display: none;">● S₁ = New Supply</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Select Analysis:</span>
+                        <button class="action-btn active" id="supplyShiftBtn" onclick="setAnalysisType('supplyShift')">Supply Shifts (a)</button>
+                        <button class="action-btn" id="elasticityBtn" onclick="setAnalysisType('elasticity')">Elasticity (b)</button>
+                    </div>
+                    
+                    <div id="supplyControls">
+                        <div class="control-row">
+                            <span style="font-weight: bold; font-size: 14px;">Cost Reduction:</span>
+                            <input type="range" id="costSlider" min="0" max="100" value="30" style="flex: 1; cursor: pointer;" oninput="updateChart()">
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                            <span>No Change</span>
+                            <span>50% Cost Reduction</span>
+                        </div>
+                        
+                        <div class="control-row" style="margin-top: 10px;">
+                            <span style="font-weight: bold; font-size: 14px;">Shift Cause:</span>
+                            <button class="action-btn" id="techBtn" onclick="setShiftCause('technology')">Technology</button>
+                            <button class="action-btn active" id="subsidyBtn" onclick="setShiftCause('subsidy')">Subsidy</button>
+                        </div>
+                    </div>
+                    
+                    <div id="elasticityControls" style="display: none;">
+                        <div class="control-row">
+                            <span style="font-weight: bold; font-size: 14px;">Supply Elasticity:</span>
+                            <button class="action-btn active" id="elasticBtn" onclick="setElasticityType('elastic')">Elastic PES</button>
+                            <button class="action-btn" id="inelasticBtn" onclick="setElasticityType('inelastic')">Inelastic PES</button>
+                        </div>
+                        
+                        <div class="control-row">
+                            <span style="font-weight: bold; font-size: 14px;">Price Change:</span>
+                            <input type="range" id="priceSlider" min="-50" max="50" value="0" style="flex: 1; cursor: pointer;" oninput="updateChart()">
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                            <span>-50% (Price Fall)</span>
+                            <span>0% (No Change)</span>
+                            <span>+50% (Price Rise)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Market Reaction</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Analysis Type:</span>
+                        <span id="analysisType" style="color: #7b61ff; font-weight: bold;">Supply Curve Shifts</span>
+                    </div>
+                    <div class="data-row">
+                        <span id="dataLabel1">Initial Equilibrium Price:</span>
+                        <span id="dataValue1">P₀ = $50</span>
+                    </div>
+                    <div class="data-row">
+                        <span id="dataLabel2">Initial Equilibrium Quantity:</span>
+                        <span id="dataValue2">Q₀ = 60 units</span>
+                    </div>
+                    <div class="data-row">
+                        <span id="dataLabel3">New Equilibrium Price:</span>
+                        <span id="dataValue3">P₁ = $50</span>
+                    </div>
+                    <div class="data-row">
+                        <span id="dataLabel4">New Equilibrium Quantity:</span>
+                        <span id="dataValue4">Q₁ = 60 units</span>
+                    </div>
+                    <div class="data-row">
+                        <span id="dataLabel5">Response Time:</span>
+                        <span id="dataValue5" style="color: #27ae60; font-weight: bold;">Immediate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Supply Curve Shifts [8 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>AO1 Knowledge and Understanding (max 3 marks):</strong> Three cost-related reasons for supply curve rightward shift</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Reason 1: Lower Wage Rates (1 mark)</strong></p>
+                            <p>• Reduced labor costs decrease production costs</p>
+                            <p>• Firms can produce more at each price level</p>
+                            <p>• Supply curve shifts right: $S \rightarrow S_1$</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Reason 2: Increased Worker Productivity (1 mark)</strong></p>
+                            <p>• Higher output per worker lowers average cost</p>
+                            <p>• More efficient production increases supply</p>
+                            <p>• Example: Better training or equipment</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Reason 3: Lower Raw Material Costs (1 mark)</strong></p>
+                            <p>• Cheaper inputs reduce production costs</p>
+                            <p>• Firms increase supply at given prices</p>
+                            <p>• Example: Oil price decrease reduces transport costs</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Alternative valid reasons (also 1 mark each):</strong></p>
+                            <p>• Improved technology reducing costs</p>
+                            <p>• Lower costs of distribution</p>
+                            <p>• Economies of scale from expansion</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>AO2 Analysis (max 3 marks):</strong> Government microeconomic policy effects</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Government Subsidies (1-2 marks):</strong></p>
+                            <p>• Direct payments to producers reduce effective costs</p>
+                            <p>• Example: Education subsidies increase supply of education</p>
+                            <p>• Supply shifts right: $S \rightarrow S_1$</p>
+                            <p>• Extent depends on subsidy size and how firms use it</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Other Government Policies (1 mark):</strong></p>
+                            <p>• Infrastructure investment reduces transport costs</p>
+                            <p>• Training programs increase labor productivity</p>
+                            <p>• Deregulation reduces compliance costs</p>
+                            <p>• However, some regulations may limit supply increase</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Price Elasticity of Supply [12 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>AO1 Knowledge and Understanding:</strong> PES definition and calculation</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Price Elasticity of Supply (PES):</strong> Measures responsiveness of quantity supplied to price changes</p>
+                            <p><strong>Formula:</strong> $$PES = \frac{\%\ \text{change in quantity supplied}}{\%\ \text{change in price}}$$</p>
+                            <p><strong>Interpretation:</strong></p>
+                            <p>• $PES > 1$: Elastic supply (responsive to price changes)</p>
+                            <p>• $PES < 1$: Inelastic supply (unresponsive to price changes)</p>
+                            <p>• $PES = 0$: Perfectly inelastic (fixed supply)</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>AO2 Analysis:</strong> Why PES matters for quick reaction</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>High PES enables quick adjustment (2 marks):</strong></p>
+                            <p>• Firms can rapidly increase output when prices rise</p>
+                            <p>• Requires: spare capacity, flexible production, available inputs</p>
+                            <p>• Example: Digital products (instant replication)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Low PES limits quick response (1 mark):</strong></p>
+                            <p>• Time lags in production adjustment</p>
+                            <p>• Constraints: fixed capital, specialized labor, long production cycles</p>
+                            <p>• Example: Agricultural products (seasonal)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Comparing with PED (1 mark):</strong></p>
+                            <p>• PED measures consumer response to price changes</p>
+                            <p>• Important for pricing strategy but less about production adjustment</p>
+                            <p>• Formula: $PED = \frac{\%\Delta Q_d}{\%\Delta P}$</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation [2 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Extent of Government Policy Effectiveness:</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Factors limiting policy effectiveness (1 mark):</strong></p>
+                            <p>• <strong>Size of subsidy/tax:</strong> Small changes may have limited effect</p>
+                            <p>• <strong>Firm behavior:</strong> May not use subsidies as intended</p>
+                            <p>• <strong>Price Elasticity of Supply (PES):</strong> If PES is low, supply won't increase much</p>
+                            <p>• <strong>Other regulations:</strong> May counteract policy effects</p>
+                            <p>• <strong>Time lags:</strong> Policies take time to affect supply</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Conclusion (1 mark):</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p>Government microeconomic policy <span class="highlight-term">can shift</span> supply curves rightward through subsidies and other measures, but the <span class="highlight-term">extent varies</span> depending on:</p>
+                            <ol>
+                                <li>Policy design and implementation</li>
+                                <li>Market conditions and elasticities</li>
+                                <li>Complementary factors (technology, infrastructure)</li>
+                                <li>Time horizon (short vs long run)</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Critical Evaluation [4 marks]</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>When PES is most useful:</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Quick reaction scenarios (1 mark):</strong></p>
+                            <p>• Rapid price changes in competitive markets</p>
+                            <p>• Seasonal demand fluctuations</p>
+                            <p>• Supply chain disruptions</p>
+                            <p>• New market opportunities</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Limitations of PES knowledge:</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Other elasticities may be more important (1 mark):</strong></p>
+                            <p>• <strong>Price Elasticity of Demand (PED):</strong> Crucial for pricing decisions</p>
+                            <p>• <strong>Income Elasticity of Demand (YED):</strong> Important during economic cycles</p>
+                            <p>• <strong>Cross Elasticity of Demand (XED):</strong> Vital for competitive strategy</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Factors affecting PES usefulness (1 mark):</strong></p>
+                            <p>• <strong>Production time:</strong> Long production cycles limit quick adjustment</p>
+                            <p>• <strong>Storage capacity:</strong> Ability to hold inventory affects response speed</p>
+                            <p>• <strong>Resource mobility:</strong> Ease of reallocating resources</p>
+                            <p>• <strong>Technology:</strong> Flexible production systems enable faster response</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Market context matters:</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Different market conditions (1 mark):</strong></p>
+                            <p>• <strong>Recession:</strong> YED knowledge may be more useful</p>
+                            <p>• <strong>New competitor entry:</strong> XED becomes crucial</p>
+                            <p>• <strong>Inflationary period:</strong> PED important for pricing power</p>
+                            <p>• <strong>Supply shortages:</strong> PES critical for output adjustment</p>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong></span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p>Knowledge of PES is <span class="highlight-term">very useful</span> for firms needing quick reactions, but <span class="highlight-term">not always the most useful</span> elasticity measure. The optimal elasticity knowledge depends on:</p>
+                            <ol>
+                                <li>Specific market conditions and challenges</li>
+                                <li>Type of product and production constraints</li>
+                                <li>Time horizon of the needed reaction</li>
+                                <li>Overall business strategy and competitive environment</li>
+                            </ol>
+                            <p>A comprehensive understanding of <span class="highlight-term">multiple elasticities</span> provides the best basis for quick, effective market responses.</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Requirements for AO3 (4 marks):</strong></p>
+                            <p>Level 2 (3-4 marks): Clear comparison of PES with other elasticities, justified conclusion addressing "most useful".</p>
+                            <p>Level 1 (1-2 marks): Simple evaluative comments, vague conclusion.</p>
+                            <p><em>Note: Must compare with other elasticity measures. One-sided responses get zero evaluation marks.</em></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Model Answer [8 Marks]</div>
+                            
+                            <p>Supply curves shift rightward when production costs decrease, enabling firms to supply more at each price. Three cost-related reasons are:</p>
+                            
+                            <p><span class="model-sub">1. Lower wage rates:</span> Reduced labor costs allow firms to produce more profitably at existing prices, shifting supply from S to S₁.</p>
+                            
+                            <p><span class="model-sub">2. Increased productivity:</span> When workers produce more per hour, average costs fall, increasing supply capacity.</p>
+                            
+                            <p><span class="model-sub">3. Cheaper raw materials:</span> Lower input costs directly reduce production expenses, encouraging increased supply.</p>
+                            
+                            <p><span class="model-sub">Government policy impact:</span> Microeconomic policies like subsidies can also shift supply rightward. For example, education subsidies reduce providers' costs, increasing education supply. However, effectiveness depends on subsidy size, how firms use funds, and existing regulations that may limit expansion.</p>
+                            
+                            <p>While both cost reductions and government policies can increase supply, their impact varies based on market conditions and implementation effectiveness.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Model Answer [12 Marks]</div>
+                            
+                            <p>Price Elasticity of Supply (PES) measures how quickly firms can adjust output when prices change. For firms needing quick market reactions, PES knowledge is valuable but not always the most useful elasticity measure.</p>
+                            
+                            <p><span class="model-sub">PES usefulness:</span> High PES enables rapid output increases when prices rise, crucial in volatile markets. Firms with flexible production, spare capacity, and available inputs can respond quickly. For example, software firms can instantly increase supply when demand rises.</p>
+                            
+                            <p><span class="model-sub">Limitations:</span> Many products have low PES due to production constraints. Agricultural products have seasonal cycles, and manufactured goods may require long lead times. In these cases, knowing PES doesn't enable quick responses.</p>
+                            
+                            <p><span class="model-sub">Alternative elasticities:</span> Price Elasticity of Demand (PED) helps set optimal prices during market changes. Income Elasticity of Demand (YED) is crucial during economic downturns when income changes affect demand. Cross Elasticity of Demand (XED) helps respond to competitor actions.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> PES knowledge is important for production planning and capacity decisions, especially for firms in fast-changing markets. However, for comprehensive quick responses, firms need multiple elasticity measures. The "most useful" measure depends on specific market conditions and the type of reaction needed.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const SUPPLY_PARAMS = {
+            // 当前分析类型
+            analysisType: "supplyShift", // "supplyShift" or "elasticity"
+            
+            // 供给曲线移动参数
+            shiftCause: "subsidy", // "technology" or "subsidy"
+            costReduction: 30, // 0-100
+            
+            // 弹性分析参数
+            elasticityType: "elastic", // "elastic" or "inelastic"
+            priceChange: 0, // -50 to +50
+            
+            // 是否显示考试模式
+            isExamMode: false,
+            
+            // 初始市场参数
+            initialParams: {
+                price: 50,
+                quantity: 60,
+                supplyIntercept: 20,
+                supplySlope: 0.5,
+                demandIntercept: 80,
+                demandSlope: -0.5
+            },
+            
+            // 弹性参数
+            elasticityParams: {
+                elastic: {
+                    label: "Elastic Supply (PES > 1)",
+                    slope: 0.3,
+                    responseTime: "Quick (days)"
+                },
+                inelastic: {
+                    label: "Inelastic Supply (PES < 1)",
+                    slope: 1.2,
+                    responseTime: "Slow (months)"
+                }
+            }
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            document.querySelector(`.tab:nth-child(${tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 供给曲线图表功能 ====================
+        const supplyCanvas = document.getElementById('supplyCanvas');
+        const supplyCtx = supplyCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeCanvas() {
+            if (!supplyCanvas.parentElement) return;
+            
+            canvasWidth = supplyCanvas.parentElement.clientWidth;
+            canvasHeight = supplyCanvas.parentElement.clientHeight;
+            supplyCanvas.width = canvasWidth;
+            supplyCanvas.height = canvasHeight;
+            
+            drawChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeCanvas, 300);
+            setTimeout(resizeCanvas, 1000);
+        }
+        
+        // 设置分析类型
+        function setAnalysisType(type) {
+            SUPPLY_PARAMS.analysisType = type;
+            
+            // 更新按钮状态
+            document.getElementById('supplyShiftBtn').classList.remove('active');
+            document.getElementById('elasticityBtn').classList.remove('active');
+            document.getElementById(`${type}Btn`).classList.add('active');
+            
+            // 显示/隐藏控制面板
+            document.getElementById('supplyControls').style.display = type === 'supplyShift' ? 'block' : 'none';
+            document.getElementById('elasticityControls').style.display = type === 'elasticity' ? 'block' : 'none';
+            
+            // 重绘图
+            updateChart();
+        }
+        
+        // 设置移动原因
+        function setShiftCause(cause) {
+            SUPPLY_PARAMS.shiftCause = cause;
+            
+            // 更新按钮状态
+            document.getElementById('techBtn').classList.remove('active');
+            document.getElementById('subsidyBtn').classList.remove('active');
+            document.getElementById(`${cause}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateChart();
+        }
+        
+        // 设置弹性类型
+        function setElasticityType(type) {
+            SUPPLY_PARAMS.elasticityType = type;
+            
+            // 更新按钮状态
+            document.getElementById('elasticBtn').classList.remove('active');
+            document.getElementById('inelasticBtn').classList.remove('active');
+            document.getElementById(`${type}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateChart();
+        }
+        
+        // 更新图表（滑块变动时调用）
+        function updateChart() {
+            if (SUPPLY_PARAMS.analysisType === "supplyShift") {
+                SUPPLY_PARAMS.costReduction = parseInt(document.getElementById('costSlider').value);
+            } else {
+                SUPPLY_PARAMS.priceChange = parseInt(document.getElementById('priceSlider').value);
+            }
+            
+            SUPPLY_PARAMS.isExamMode = false;
+            drawChart();
+            updateDataPanel();
+        }
+        
+        // 显示考试模式
+        function showExamMode() {
+            SUPPLY_PARAMS.isExamMode = true;
+            
+            if (SUPPLY_PARAMS.analysisType === "supplyShift") {
+                SUPPLY_PARAMS.costReduction = 70;
+                document.getElementById('costSlider').value = 70;
+            } else {
+                SUPPLY_PARAMS.priceChange = 30;
+                document.getElementById('priceSlider').value = 30;
+            }
+            
+            drawChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetChart() {
+            SUPPLY_PARAMS.isExamMode = false;
+            
+            if (SUPPLY_PARAMS.analysisType === "supplyShift") {
+                SUPPLY_PARAMS.costReduction = 30;
+                document.getElementById('costSlider').value = 30;
+            } else {
+                SUPPLY_PARAMS.priceChange = 0;
+                document.getElementById('priceSlider').value = 0;
+            }
+            
+            drawChart();
+            updateDataPanel();
+        }
+        
+        // 绘制图表
+        function drawChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            supplyCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            supplyCtx.beginPath();
+            supplyCtx.strokeStyle = '#333';
+            supplyCtx.lineWidth = 2;
+            
+            // Y轴（价格）
+            supplyCtx.moveTo(padding.left, padding.top);
+            supplyCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量）
+            supplyCtx.moveTo(padding.left, padding.top + graphHeight);
+            supplyCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            supplyCtx.stroke();
+            
+            // 坐标轴标签
+            supplyCtx.font = 'bold 14px Arial';
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.textAlign = 'center';
+            
+            // Y轴标签
+            supplyCtx.save();
+            supplyCtx.translate(20, padding.top + graphHeight / 2);
+            supplyCtx.rotate(-Math.PI / 2);
+            supplyCtx.fillText("Price ($)", 0, 0);
+            supplyCtx.restore();
+            
+            // X轴标签
+            supplyCtx.fillText("Quantity (units)", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            supplyCtx.strokeStyle = '#eee';
+            supplyCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                supplyCtx.beginPath();
+                supplyCtx.moveTo(padding.left, y);
+                supplyCtx.lineTo(padding.left + graphWidth, y);
+                supplyCtx.stroke();
+                
+                // Y轴刻度标签
+                const price = 100 - (i * 20);
+                supplyCtx.fillStyle = '#666';
+                supplyCtx.font = '12px Arial';
+                supplyCtx.textAlign = 'right';
+                supplyCtx.fillText(`$${price}`, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                supplyCtx.beginPath();
+                supplyCtx.moveTo(x, padding.top);
+                supplyCtx.lineTo(x, padding.top + graphHeight);
+                supplyCtx.stroke();
+                
+                // X轴刻度标签
+                const qty = i * 25;
+                supplyCtx.fillStyle = '#666';
+                supplyCtx.font = '12px Arial';
+                supplyCtx.textAlign = 'center';
+                supplyCtx.fillText(qty, x, padding.top + graphHeight + 20);
+            }
+            
+            // 绘制需求曲线 (D) - 向下倾斜
+            supplyCtx.beginPath();
+            supplyCtx.strokeStyle = '#2980b9';
+            supplyCtx.lineWidth = 2.5;
+            supplyCtx.setLineDash([]);
+            
+            const dStartY = padding.top;
+            const dEndY = padding.top + graphHeight;
+            const dStartX = padding.left + graphWidth * 0.8;
+            const dEndX = padding.left + graphWidth * 0.2;
+            
+            supplyCtx.moveTo(dStartX, dStartY);
+            supplyCtx.lineTo(dEndX, dEndY);
+            supplyCtx.stroke();
+            
+            // 需求曲线标签
+            supplyCtx.fillStyle = '#2980b9';
+            supplyCtx.font = 'bold 14px Arial';
+            supplyCtx.textAlign = 'left';
+            supplyCtx.fillText("D", dEndX - 40, dEndY - 10);
+            
+            if (SUPPLY_PARAMS.analysisType === "supplyShift") {
+                // ============ 供给曲线移动分析 ============
+                drawSupplyShiftAnalysis(padding, graphWidth, graphHeight);
+            } else {
+                // ============ 弹性分析 ============
+                drawElasticityAnalysis(padding, graphWidth, graphHeight);
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            supplyCtx.fillStyle = '#2980b9';
+            supplyCtx.fillRect(legendX, legendY, 15, 15);
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.font = '12px Arial';
+            supplyCtx.textAlign = 'left';
+            supplyCtx.fillText("Demand (D)", legendX + 25, legendY + 12);
+        }
+        
+        // 绘制供给曲线移动分析
+        function drawSupplyShiftAnalysis(padding, graphWidth, graphHeight) {
+            // 绘制初始供给曲线 (S₀) - 向上倾斜
+            supplyCtx.beginPath();
+            supplyCtx.strokeStyle = '#c0392b';
+            supplyCtx.lineWidth = 2.5;
+            supplyCtx.setLineDash([]);
+            
+            const s0StartY = padding.top + graphHeight;
+            const s0EndY = padding.top;
+            const s0StartX = padding.left;
+            const s0EndX = padding.left + graphWidth * 0.7;
+            
+            supplyCtx.moveTo(s0StartX, s0StartY);
+            supplyCtx.lineTo(s0EndX, s0EndY);
+            supplyCtx.stroke();
+            
+            // 初始供给曲线标签
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.font = 'bold 14px Arial';
+            supplyCtx.textAlign = 'right';
+            supplyCtx.fillText("S₀", s0EndX - 10, s0EndY + 20);
+            
+            // 计算初始均衡点 (D与S₀的交点)
+            const initialEqX = padding.left + graphWidth * 0.5;
+            const initialEqY = padding.top + graphHeight * 0.5;
+            
+            // 标记初始均衡点
+            supplyCtx.beginPath();
+            supplyCtx.arc(initialEqX, initialEqY, 6, 0, Math.PI * 2);
+            supplyCtx.fillStyle = '#e67e22';
+            supplyCtx.fill();
+            supplyCtx.strokeStyle = '#2c3e50';
+            supplyCtx.lineWidth = 2;
+            supplyCtx.stroke();
+            
+            supplyCtx.fillStyle = '#2c3e50';
+            supplyCtx.font = 'bold 12px Arial';
+            supplyCtx.textAlign = 'right';
+            supplyCtx.fillText("E₀", initialEqX - 10, initialEqY - 15);
+            
+            // 根据成本降低幅度绘制新供给曲线 (S₁)
+            const costReductionFactor = SUPPLY_PARAMS.costReduction / 100;
+            const shiftAmount = costReductionFactor * graphWidth * 0.3;
+            
+            const s1StartX = s0StartX + shiftAmount;
+            const s1EndX = s0EndX + shiftAmount;
+            
+            // 绘制新供给曲线
+            supplyCtx.beginPath();
+            supplyCtx.strokeStyle = '#c0392b';
+            supplyCtx.setLineDash([5, 5]);
+            supplyCtx.lineWidth = 2.5;
+            
+            supplyCtx.moveTo(s1StartX, s0StartY);
+            supplyCtx.lineTo(s1EndX, s0EndY);
+            supplyCtx.stroke();
+            
+            // 恢复实线
+            supplyCtx.setLineDash([]);
+            
+            // 新供给曲线标签
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.fillText("S₁", s1EndX - 10, s0EndY + 20);
+            
+            // 计算新均衡点 (D与S₁的交点)
+            const newEqX = initialEqX + shiftAmount * 0.7;
+            const newEqY = initialEqY - shiftAmount * 0.4;
+            
+            // 标记新均衡点
+            supplyCtx.beginPath();
+            supplyCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+            supplyCtx.fillStyle = '#27ae60';
+            supplyCtx.fill();
+            supplyCtx.strokeStyle = '#2c3e50';
+            supplyCtx.lineWidth = 2;
+            supplyCtx.stroke();
+            
+            supplyCtx.fillStyle = '#2c3e50';
+            supplyCtx.font = 'bold 12px Arial';
+            supplyCtx.textAlign = 'left';
+            supplyCtx.fillText("E₁", newEqX + 10, newEqY - 15);
+            
+            // 绘制箭头显示移动方向
+            drawArrow(supplyCtx, initialEqX, initialEqY, newEqX, newEqY, '#7b61ff');
+            
+            // 显示标题
+            supplyCtx.fillStyle = '#2c3e50';
+            supplyCtx.font = 'bold 16px Arial';
+            supplyCtx.textAlign = 'center';
+            
+            const causeLabel = SUPPLY_PARAMS.shiftCause === "technology" ? 
+                "Technology Improvement" : "Government Subsidy";
+            supplyCtx.fillText(`Supply Shift: ${causeLabel}`, canvasWidth / 2, padding.top - 20);
+            
+            supplyCtx.fillStyle = '#27ae60';
+            supplyCtx.font = 'bold 13px Arial';
+            supplyCtx.fillText(`Cost Reduction: ${SUPPLY_PARAMS.costReduction}%`, canvasWidth / 2, padding.top - 5);
+            
+            // 图例补充
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.fillRect(legendX, legendY + 25, 15, 15);
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.font = '12px Arial';
+            supplyCtx.textAlign = 'left';
+            supplyCtx.fillText("Supply (S₀)", legendX + 25, legendY + 37);
+            
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.setLineDash([5, 5]);
+            supplyCtx.beginPath();
+            supplyCtx.moveTo(legendX, legendY + 55);
+            supplyCtx.lineTo(legendX + 15, legendY + 55);
+            supplyCtx.stroke();
+            supplyCtx.setLineDash([]);
+            
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.fillText("New Supply (S₁)", legendX + 25, legendY + 60);
+            
+            supplyCtx.fillStyle = '#e67e22';
+            supplyCtx.beginPath();
+            supplyCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+            supplyCtx.fill();
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.fillText("Initial Equilibrium (E₀)", legendX + 25, legendY + 85);
+            
+            supplyCtx.fillStyle = '#27ae60';
+            supplyCtx.beginPath();
+            supplyCtx.arc(legendX + 7, legendY + 105, 6, 0, Math.PI * 2);
+            supplyCtx.fill();
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.fillText("New Equilibrium (E₁)", legendX + 25, legendY + 110);
+            
+            // 如果处于考试模式，显示效果说明
+            if (SUPPLY_PARAMS.isExamMode) {
+                supplyCtx.fillStyle = '#e74c3c';
+                supplyCtx.font = 'italic 13px Arial';
+                supplyCtx.fillText("Rightward shift → Lower price, Higher quantity", canvasWidth / 2, padding.top + graphHeight + 60);
+            }
+        }
+        
+        // 绘制弹性分析
+        function drawElasticityAnalysis(padding, graphWidth, graphHeight) {
+            const elasticity = SUPPLY_PARAMS.elasticityParams[SUPPLY_PARAMS.elasticityType];
+            const priceChangeFactor = SUPPLY_PARAMS.priceChange / 100;
+            
+            // 绘制弹性供给曲线
+            supplyCtx.beginPath();
+            supplyCtx.strokeStyle = '#c0392b';
+            supplyCtx.lineWidth = 2.5;
+            supplyCtx.setLineDash([]);
+            
+            // 根据弹性类型调整斜率
+            const slope = elasticity.slope;
+            const sStartY = padding.top + graphHeight;
+            const sEndY = padding.top;
+            const sStartX = padding.left;
+            const sEndX = padding.left + graphWidth * (0.3 + (1 - slope) * 0.4);
+            
+            supplyCtx.moveTo(sStartX, sStartY);
+            supplyCtx.lineTo(sEndX, sEndY);
+            supplyCtx.stroke();
+            
+            // 供给曲线标签
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.font = 'bold 14px Arial';
+            supplyCtx.textAlign = 'right';
+            supplyCtx.fillText("S", sEndX - 10, sEndY + 20);
+            
+            // 计算初始均衡点
+            const initialEqX = padding.left + graphWidth * 0.4;
+            const initialEqY = padding.top + graphHeight * 0.6;
+            
+            // 标记初始均衡点
+            supplyCtx.beginPath();
+            supplyCtx.arc(initialEqX, initialEqY, 6, 0, Math.PI * 2);
+            supplyCtx.fillStyle = '#e67e22';
+            supplyCtx.fill();
+            supplyCtx.strokeStyle = '#2c3e50';
+            supplyCtx.lineWidth = 2;
+            supplyCtx.stroke();
+            
+            supplyCtx.fillStyle = '#2c3e50';
+            supplyCtx.font = 'bold 12px Arial';
+            supplyCtx.textAlign = 'right';
+            supplyCtx.fillText("E₀", initialEqX - 10, initialEqY - 15);
+            
+            // 根据价格变化绘制新需求曲线
+            if (SUPPLY_PARAMS.priceChange !== 0) {
+                const shiftAmount = priceChangeFactor * graphWidth * 0.3;
+                
+                // 新需求曲线 (价格变化导致需求移动)
+                const newDStartX = padding.left + graphWidth * 0.8 + shiftAmount;
+                const newDEndX = padding.left + graphWidth * 0.2 + shiftAmount;
+                
+                supplyCtx.beginPath();
+                supplyCtx.strokeStyle = '#2980b9';
+                supplyCtx.setLineDash([5, 5]);
+                supplyCtx.lineWidth = 2;
+                
+                supplyCtx.moveTo(newDStartX, padding.top);
+                supplyCtx.lineTo(newDEndX, padding.top + graphHeight);
+                supplyCtx.stroke();
+                
+                // 恢复实线
+                supplyCtx.setLineDash([]);
+                
+                // 新需求曲线标签
+                supplyCtx.fillStyle = '#2980b9';
+                supplyCtx.fillText("D₁", newDEndX - 40, padding.top + graphHeight - 10);
+                
+                // 计算新均衡点
+                const newEqX = initialEqX + (SUPPLY_PARAMS.elasticityType === "elastic" ? 
+                    shiftAmount * 0.8 : shiftAmount * 0.3);
+                const newEqY = initialEqY - (SUPPLY_PARAMS.elasticityType === "elastic" ? 
+                    Math.abs(shiftAmount) * 0.5 : Math.abs(shiftAmount) * 0.8);
+                
+                // 标记新均衡点
+                supplyCtx.beginPath();
+                supplyCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+                supplyCtx.fillStyle = '#27ae60';
+                supplyCtx.fill();
+                supplyCtx.strokeStyle = '#2c3e50';
+                supplyCtx.lineWidth = 2;
+                supplyCtx.stroke();
+                
+                supplyCtx.fillStyle = '#2c3e50';
+                supplyCtx.font = 'bold 12px Arial';
+                supplyCtx.textAlign = 'left';
+                supplyCtx.fillText("E₁", newEqX + 10, newEqY - 15);
+                
+                // 绘制箭头显示移动方向
+                drawArrow(supplyCtx, initialEqX, initialEqY, newEqX, newEqY, '#7b61ff');
+                
+                // 显示供给响应
+                supplyCtx.fillStyle = SUPPLY_PARAMS.elasticityType === "elastic" ? '#27ae60' : '#e74c3c';
+                supplyCtx.font = 'italic 12px Arial';
+                supplyCtx.textAlign = 'center';
+                
+                const responseType = SUPPLY_PARAMS.elasticityType === "elastic" ? 
+                    "Large quantity response" : "Small quantity response";
+                supplyCtx.fillText(responseType, (initialEqX + newEqX) / 2, (initialEqY + newEqY) / 2 - 20);
+            }
+            
+            // 显示标题
+            supplyCtx.fillStyle = '#2c3e50';
+            supplyCtx.font = 'bold 16px Arial';
+            supplyCtx.textAlign = 'center';
+            supplyCtx.fillText(elasticity.label, canvasWidth / 2, padding.top - 20);
+            
+            supplyCtx.fillStyle = SUPPLY_PARAMS.priceChange > 0 ? '#e74c3c' : 
+                                 SUPPLY_PARAMS.priceChange < 0 ? '#27ae60' : '#666';
+            supplyCtx.font = 'bold 13px Arial';
+            const priceChangeText = SUPPLY_PARAMS.priceChange === 0 ? "No price change" : 
+                `Price ${SUPPLY_PARAMS.priceChange > 0 ? "increase" : "decrease"}: ${Math.abs(SUPPLY_PARAMS.priceChange)}%`;
+            supplyCtx.fillText(priceChangeText, canvasWidth / 2, padding.top - 5);
+            
+            // 图例补充
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            supplyCtx.fillStyle = '#c0392b';
+            supplyCtx.fillRect(legendX, legendY + 25, 15, 15);
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.font = '12px Arial';
+            supplyCtx.textAlign = 'left';
+            supplyCtx.fillText(`Supply (${SUPPLY_PARAMS.elasticityType})`, legendX + 25, legendY + 37);
+            
+            supplyCtx.fillStyle = '#e67e22';
+            supplyCtx.beginPath();
+            supplyCtx.arc(legendX + 7, legendY + 55, 6, 0, Math.PI * 2);
+            supplyCtx.fill();
+            supplyCtx.fillStyle = '#333';
+            supplyCtx.fillText("Initial Equilibrium (E₀)", legendX + 25, legendY + 60);
+            
+            if (SUPPLY_PARAMS.priceChange !== 0) {
+                supplyCtx.fillStyle = '#27ae60';
+                supplyCtx.beginPath();
+                supplyCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+                supplyCtx.fill();
+                supplyCtx.fillStyle = '#333';
+                supplyCtx.fillText("New Equilibrium (E₁)", legendX + 25, legendY + 85);
+            }
+            
+            // 如果处于考试模式，显示响应时间
+            if (SUPPLY_PARAMS.isExamMode) {
+                supplyCtx.fillStyle = '#e67e22';
+                supplyCtx.font = 'italic 13px Arial';
+                supplyCtx.fillText(`Firm response: ${elasticity.responseTime}`, canvasWidth / 2, padding.top + graphHeight + 60);
+            }
+        }
+        
+        // 绘制箭头函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 12;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            const analysisType = SUPPLY_PARAMS.analysisType;
+            
+            // 更新分析类型显示
+            document.getElementById('analysisType').textContent = 
+                analysisType === "supplyShift" ? "Supply Curve Shifts" : "Elasticity Analysis";
+            
+            if (analysisType === "supplyShift") {
+                // 供给曲线移动分析数据
+                const costReductionFactor = SUPPLY_PARAMS.costReduction / 100;
+                
+                document.getElementById('dataLabel1').textContent = "Initial Price:";
+                document.getElementById('dataLabel2').textContent = "Initial Quantity:";
+                document.getElementById('dataLabel3').textContent = "New Price:";
+                document.getElementById('dataLabel4').textContent = "New Quantity:";
+                document.getElementById('dataLabel5').textContent = "Market Effect:";
+                
+                // 计算数值
+                const initialPrice = 50;
+                const initialQuantity = 60;
+                const newPrice = initialPrice - costReductionFactor * 15;
+                const newQuantity = initialQuantity + costReductionFactor * 30;
+                
+                document.getElementById('dataValue1').textContent = `P₀ = $${initialPrice}`;
+                document.getElementById('dataValue2').textContent = `Q₀ = ${initialQuantity} units`;
+                document.getElementById('dataValue3').textContent = `P₁ = $${newPrice.toFixed(1)}`;
+                document.getElementById('dataValue4').textContent = `Q₁ = ${newQuantity.toFixed(0)} units`;
+                
+                const effectElement = document.getElementById('dataValue5');
+                effectElement.textContent = "Lower price, Higher quantity";
+                effectElement.style.color = '#27ae60';
+                
+            } else {
+                // 弹性分析数据
+                const elasticity = SUPPLY_PARAMS.elasticityParams[SUPPLY_PARAMS.elasticityType];
+                const priceChangeFactor = SUPPLY_PARAMS.priceChange / 100;
+                
+                document.getElementById('dataLabel1').textContent = "Price Change:";
+                document.getElementById('dataLabel2').textContent = "Supply Elasticity:";
+                document.getElementById('dataLabel3').textContent = "Quantity Response:";
+                document.getElementById('dataLabel4').textContent = "Response Time:";
+                document.getElementById('dataLabel5').textContent = "Firm Capability:";
+                
+                // 计算数值
+                const priceChangeText = SUPPLY_PARAMS.priceChange === 0 ? "No change" : 
+                    `${SUPPLY_PARAMS.priceChange > 0 ? "+" : ""}${SUPPLY_PARAMS.priceChange}%`;
+                
+                const quantityResponse = SUPPLY_PARAMS.elasticityType === "elastic" ? 
+                    Math.abs(SUPPLY_PARAMS.priceChange) * 1.5 : Math.abs(SUPPLY_PARAMS.priceChange) * 0.5;
+                
+                document.getElementById('dataValue1').textContent = priceChangeText;
+                document.getElementById('dataValue1').style.color = 
+                    SUPPLY_PARAMS.priceChange > 0 ? '#e74c3c' : 
+                    SUPPLY_PARAMS.priceChange < 0 ? '#27ae60' : '#666';
+                
+                document.getElementById('dataValue2').textContent = 
+                    SUPPLY_PARAMS.elasticityType === "elastic" ? "PES > 1 (Elastic)" : "PES < 1 (Inelastic)";
+                document.getElementById('dataValue2').style.color = 
+                    SUPPLY_PARAMS.elasticityType === "elastic" ? '#27ae60' : '#e74c3c';
+                
+                document.getElementById('dataValue3').textContent = 
+                    SUPPLY_PARAMS.priceChange === 0 ? "N/A" : `${quantityResponse.toFixed(1)}%`;
+                
+                document.getElementById('dataValue4').textContent = elasticity.responseTime;
+                document.getElementById('dataValue4').style.color = 
+                    SUPPLY_PARAMS.elasticityType === "elastic" ? '#27ae60' : '#e67e22';
+                
+                const capabilityElement = document.getElementById('dataValue5');
+                capabilityElement.textContent = 
+                    SUPPLY_PARAMS.elasticityType === "elastic" ? 
+                    "Quick adjustment possible" : "Slow adjustment limited";
+                capabilityElement.style.color = 
+                    SUPPLY_PARAMS.elasticityType === "elastic" ? '#27ae60' : '#e74c3c';
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置初始分析类型
+            setAnalysisType('supplyShift');
+            setShiftCause('subsidy');
+            setElasticityType('elastic');
+            
+            // 初始化图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
