@@ -3,6 +3,58 @@
 
 const ECON_DATA = [
     {
+        "id": "qp-202505-economics-p11",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P11.PDF",
+        "questions": [
+            {
+                "qNum": "1-30",
+                "title": "Question 1-30",
+                "url": "2025/AS/qp-202505-economics-p11/1-30.html"
+            }
+        ]
+    },
+    {
+        "id": "qp-202505-economics-p12",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P12.PDF",
+        "questions": [
+            {
+                "qNum": "1-30",
+                "title": "Question 1-30",
+                "url": "2025/AS/qp-202505-economics-p12/1-30.html"
+            }
+        ]
+    },
+    {
+        "id": "qp-202505-economics-p13",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P13.PDF",
+        "questions": [
+            {
+                "qNum": "1-30",
+                "title": "Question 1-30",
+                "url": "2025/AS/qp-202505-economics-p13/1-30.html"
+            }
+        ]
+    },
+    {
+        "id": "qp-202505-economics-p14",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P14.PDF",
+        "questions": [
+            {
+                "qNum": "1-30",
+                "title": "Question 1-30",
+                "url": "2025/AS/qp-202505-economics-p14/1-30.html"
+            }
+        ]
+    },
+    {
         "id": "qp-202505-economics-p21",
         "year": "2025",
         "subject": "AS",
@@ -65,6 +117,39 @@ const ECON_DATA = [
                 "qNum": "5",
                 "title": "Question 5",
                 "url": "2025/AS/qp-202505-economics-p22/5.html"
+            }
+        ]
+    },
+    {
+        "id": "qp-202505-economics-p23",
+        "year": "2025",
+        "subject": "AS",
+        "paperName": "QP-202505-ECONOMICS-P23.PDF",
+        "questions": [
+            {
+                "qNum": "1",
+                "title": "Question 1",
+                "url": "2025/AS/qp-202505-economics-p23/1.html"
+            },
+            {
+                "qNum": "2",
+                "title": "Question 2",
+                "url": "2025/AS/qp-202505-economics-p23/2.html"
+            },
+            {
+                "qNum": "3",
+                "title": "Question 3",
+                "url": "2025/AS/qp-202505-economics-p23/3.html"
+            },
+            {
+                "qNum": "4",
+                "title": "Question 4",
+                "url": "2025/AS/qp-202505-economics-p23/4.html"
+            },
+            {
+                "qNum": "5",
+                "title": "Question 5",
+                "url": "2025/AS/qp-202505-economics-p23/5.html"
             }
         ]
     },

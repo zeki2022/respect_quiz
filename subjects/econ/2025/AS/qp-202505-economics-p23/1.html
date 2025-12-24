@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q1 - Philippines Onion Market</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff6;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f4fd;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+            min-height: 350px; /* 防塌陷 - 强制设置 */
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block; /* 防止inline元素间距问题 */
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .graph-selector {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .graph-tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            margin-right: 10px;
+        }
+        
+        .graph-tab:hover {
+            color: #3498db;
+        }
+        
+        .graph-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        /* 添加调试边框 - 如果动画还不显示，取消注释这行 */
+        /* .canvas-container { border: 2px solid red !important; } */
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section A / Question 1</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>How onions became a luxury good in the Philippines</strong></p>
+                    
+                    <p>Global inflation is putting a strain on food prices, particularly in low-income countries in Asia.</p>
+                    
+                    <p>It was also reported that the government had set up a partnership with two local universities to experiment growing onions and other vegetables using alternative techniques in a controlled environment to increase crop yields.</p>
+                    
+                    <p><em>Sources: Chad de Guzman, 'In the Philippines, onions are now more expensive than meat', Time Magazine, 9 January 2023</em></p>
+                    <p><em>Cost of living: How onions became a luxury in the Philippines, BBC, 27 January 2023</em></p>
+                    
+                    <!-- 原图占位符 -->
+                    <div class="orig-img">
+                        <img src="q1_orig.png" alt="Fig. 1.1 Onion price trends in the Philippines" 
+                             style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+                        <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">
+                            Source: BBC, 2023
+                        </div>
+                    </div>
+                    
+                    <p><strong>(a)</strong> Use a demand and supply diagram to demonstrate how 'a series of typhoons' affected the market price of food crops in Southeast Asia in January 2023. [2]</p>
+                    
+                    <p><strong>(b)</strong> Is the short-run price elasticity of supply of red onions elastic or inelastic? Justify your answer. [2]</p>
+                    
+                    <p><strong>(c)</strong> With the help of a production possibility curve (PPC) diagram, consider the impact on the opportunity cost to a farmer in the Philippines of starting to grow red onions. [4]</p>
+                    
+                    <p><strong>(d)</strong> Assess whether a 'suggested retail price' is the best way of stabilising onion prices in the Philippines. [6]</p>
+                    
+                    <p><strong>(e)</strong> Assess the extent to which the increase in onion prices is likely to have affected all households equally in the Philippines. [6]</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <div class="graph-selector">
+                    <!-- 修改图表标签，添加data属性和event参数 -->
+                    <div class="graph-tab active" onclick="switchGraph('supplyDemand', event)" data-graph="supplyDemand">Supply & Demand Diagram</div>
+                    <div class="graph-tab" onclick="switchGraph('ppc', event)" data-graph="ppc">PPC Diagram</div>
+                    <div class="graph-tab" onclick="switchGraph('priceControl', event)" data-graph="priceControl">Price Control Analysis</div>
+                </div>
+                
+                <h4 id="graph-title">Supply & Demand Analysis</h4>
+                <p id="graph-description">This interactive diagram shows how typhoons affect the market for onions through supply shocks.</p>
+                
+                <div class="canvas-container" id="canvasContainer">
+                    <canvas id="econCanvas"></canvas>
+                    <div id="canvas-legend" style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee; display: none;">
+                        <div style="color: #2980b9">● Demand (D)</div>
+                        <div style="color: #c0392b">● Supply (S)</div>
+                        <div style="color: #27ae60">● Equilibrium (E)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Typhoon Impact:</span>
+                        <input type="range" id="typhoonSlider" min="0" max="100" value="0" style="flex: 1; cursor: pointer;" oninput="updateGraph()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>0% (No typhoon)</span>
+                        <span>100% (Severe typhoon)</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <span style="font-weight: bold; font-size: 14px;">Scenario:</span>
+                        <button class="action-btn active" id="supplyShockBtn" onclick="setScenario('supplyShock')">Supply Shock</button>
+                        <button class="action-btn" id="priceControlBtn" onclick="setScenario('priceControl')">Price Control</button>
+                        <button class="action-btn" id="ppcBtn" onclick="setScenario('ppc')">PPC Analysis</button>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showMarkSchemeMode()">★ Show Mark Scheme Points</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetGraph()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Onion Price (PHP/kg):</span>
+                        <span id="onionPrice">120</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Quantity (tons/month):</span>
+                        <span id="quantity">800</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Supply Shift:</span>
+                        <span id="supplyShift">0%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Price Change:</span>
+                        <span id="priceChange" style="color: #e74c3c; font-weight: bold;">0%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Market Status:</span>
+                        <span id="marketStatus" style="color: #27ae60; font-weight: bold;">Equilibrium</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <!-- 修改答案标签 -->
+                    <div class="tab active" onclick="switchTab('analysis')" data-tab="analysis">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')" data-tab="evaluation">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')" data-tab="model">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Demand and Supply Diagram [2 marks]</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Understand the effect of typhoons:</strong> Typhoons destroy crops and disrupt transportation, reducing the supply of onions.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Draw the diagram:</strong> Start with initial equilibrium where demand (D) intersects supply (S₀) at price P₀ and quantity Q₀.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Show supply shift:</strong> Draw a leftward shift of the supply curve to S₁ (decrease in supply).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Identify new equilibrium:</strong> The new equilibrium (E₁) shows higher price P₁ and lower quantity Q₁.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Points (2 marks):</strong></p>
+                            <p>• <span class="highlight-term">1 mark:</span> Accurate/fully labelled supply and demand diagram showing a shift to the left of the supply curve</p>
+                            <p>• <span class="highlight-term">1 mark:</span> New equilibrium showing higher equilibrium price and lower equilibrium quantity</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Price Elasticity of Supply [2 marks]</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Define price elasticity of supply (PES):</strong> $$PES = \\frac{\\% \\text{ change in quantity supplied}}{\\% \\text{ change in price}}$$</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Short-run characteristics:</strong> In the short run, agricultural supply is typically inelastic because:</span>
+                            <ul>
+                                <li>Growing cycles take time (onions take 3-4 months to grow)</li>
+                                <li>Limited ability to increase production quickly</li>
+                                <li>Fixed factors of production (land, equipment)</li>
+                            </ul>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Apply to red onions:</strong> With typhoons destroying crops, farmers cannot immediately increase supply even if prices rise sharply.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Points (2 marks):</strong></p>
+                            <p>• <span class="highlight-term">1 mark:</span> Identify as <span class="highlight-term">inelastic</span> (accept perfectly inelastic)</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Justification referring to typhoons making supply volatile/unpredictable OR nature of agricultural goods means additional supply cannot be quickly produced</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (c) - Production Possibility Curve [4 marks]</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Set up PPC axes:</strong> X-axis = Red onions, Y-axis = Other crops/alternative goods</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Initial position:</strong> Farmer initially produces only other crops (point A on Y-axis with zero red onions).</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Decision to grow onions:</strong> Farmer moves along PPC from point A to point B, increasing onion production but decreasing other crop production.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Opportunity cost:</strong> The opportunity cost = quantity of other crops given up ÷ quantity of onions gained. On a concave PPC, opportunity cost increases as more onions are produced.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Points (4 marks):</strong></p>
+                            <p>• <span class="highlight-term">1 mark:</span> Correctly labelled axes PPC diagram (one must be red onions)</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Initial production combination showing all resources used for 'other good' with zero onions</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Second production combination showing increased onions and reduced 'other good'</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Valid evaluation, e.g., opportunity cost rises with more onion production</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (d) - Price Stabilization Policy [6 marks]</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Understanding 'suggested retail price':</strong> This is essentially a maximum price (price ceiling) set below equilibrium to keep prices affordable.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Benefits of maximum price:</strong></span>
+                            <ul>
+                                <li>Prevents exploitation during shortages</li>
+                                <li>Makes onions affordable for low-income households</li>
+                                <li>Reduces inflationary expectations</li>
+                            </ul>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Problems of maximum price:</strong></span>
+                            <ul>
+                                <li>Creates shortage (excess demand)</li>
+                                <li>May lead to black markets</li>
+                                <li>Reduces incentive for farmers to produce</li>
+                                <li>Requires costly enforcement</li>
+                            </ul>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Alternative policies:</strong> Buffer stocks, subsidies to farmers, import liberalization, investment in irrigation and storage.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Structure:</strong></p>
+                            <p>• Up to <span class="highlight-term">3 marks</span> for benefits and disadvantages of maximum price</p>
+                            <p>• Up to <span class="highlight-term">3 marks</span> for at least one alternative policy</p>
+                            <p>• Up to <span class="highlight-term">2 marks</span> for evaluation comparing policies</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (e) - Distributional Effects [6 marks]</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Why effects may be equal:</strong></span>
+                            <ul>
+                                <li>Onions are staple food used by all households</li>
+                                <li>Price inelastic demand means all continue buying similar quantities</li>
+                                <li>Similar price increases across regions</li>
+                            </ul>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Why effects may be unequal:</strong></span>
+                            <ul>
+                                <li>Low-income households spend higher proportion of income on food</li>
+                                <li>Wealthier households can substitute or absorb price increases</li>
+                                <li>Rural households may grow own onions</li>
+                                <li>Different consumption patterns across households</li>
+                            </ul>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Proportional vs. absolute burden:</strong> While all face same absolute price increase, burden is greater for poor as percentage of income.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme Structure:</strong></p>
+                            <p>• Up to <span class="highlight-term">3 marks</span> for why effects may be equal</p>
+                            <p>• Up to <span class="highlight-term">3 marks</span> for why effects may be unequal</p>
+                            <p>• Up to <span class="highlight-term">2 marks</span> for evaluation comparing both viewpoints</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (d) - Critical Evaluation of Price Controls</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Effectiveness depends on enforcement:</strong> Without strong monitoring, black markets may develop, undermining the policy.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Short-term vs. long-term:</strong> Price controls address symptoms (high prices) but not causes (low supply). Long-term solutions require increasing supply.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Alternative evaluation:</strong> Buffer stocks may be more effective but require significant government storage capacity and management.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Political considerations:</strong> Price controls are politically popular but economically inefficient. The 'best' policy depends on government priorities (equity vs. efficiency).</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Evaluation Mark Scheme (2 marks):</strong></p>
+                            <p>• <span class="highlight-term">1 mark:</span> Clear consideration of whether suggested retail price is the 'best' way compared to alternatives</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Reasoned conclusion with justification</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (e) - Distributional Impact Evaluation</h4>
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Regressive nature of food price inflation:</strong> Food price increases act like a regressive tax, taking larger percentage of income from the poor.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Urban-rural divide:</strong> Urban poor are most affected as they rely entirely on market purchases, while rural households may have some self-production.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Substitution possibilities:</strong> Evaluation of whether households can actually substitute onions depends on cultural preferences and cooking traditions.</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> While all households face higher prices, the burden is <span class="highlight-term">not distributed equally</span> - low-income urban households are disproportionately affected.</span>
+                        </div>
+                        <div class="marking-point">
+                            <p><strong>Evaluation Mark Scheme (2 marks):</strong></p>
+                            <p>• <span class="highlight-term">1 mark:</span> Clear consideration of both viewpoints (equal vs. unequal impact)</p>
+                            <p>• <span class="highlight-term">1 mark:</span> Reasoned conclusion about whether price rise affects all households equally</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Demand and Supply Diagram [2 marks]</div>
+                            <p>A series of typhoons would <span class="highlight-term">reduce the supply</span> of food crops in Southeast Asia. In a demand and supply diagram:</p>
+                            <p>1. The initial equilibrium is at point E₀ where demand curve D intersects supply curve S₀, with price P₀ and quantity Q₀.</p>
+                            <p>2. The typhoons cause the supply curve to shift <span class="highlight-term">leftwards from S₀ to S₁</span> (decrease in supply).</p>
+                            <p>3. The new equilibrium is at point E₁ where D intersects S₁, with <span class="highlight-term">higher price P₁</span> and <span class="highlight-term">lower quantity Q₁</span>.</p>
+                            <p>This demonstrates how supply shocks from natural disasters lead to higher food prices and lower availability.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Price Elasticity of Supply [2 marks]</div>
+                            <p>The short-run price elasticity of supply of red onions is <span class="highlight-term">inelastic</span> (likely close to perfectly inelastic).</p>
+                            <p><span class="model-sub">Justification:</span> Agricultural products like onions have inelastic supply in the short run because:</p>
+                            <ul>
+                                <li>Growing cycles are fixed (onions take 3-4 months to mature)</li>
+                                <li>Farmers cannot immediately increase production in response to price increases</li>
+                                <li>Typhoons have destroyed existing crops, making supply even less responsive</li>
+                                <li>Fixed factors of production (land, equipment) limit quick expansion</li>
+                            </ul>
+                            <p>Therefore, even with significant price increases, the quantity supplied cannot increase substantially in the short run.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (c) - Production Possibility Curve [4 marks]</div>
+                            <p><span class="model-sub">Diagram explanation:</span></p>
+                            <p>1. The PPC shows the trade-off between producing red onions (X-axis) and other crops (Y-axis).</p>
+                            <p>2. Initially, the farmer produces only other crops at point A (on the Y-axis, with zero onion production).</p>
+                            <p>3. When the farmer starts growing red onions, they move along the PPC to point B, producing some onions but fewer other crops.</p>
+                            <p>4. The <span class="highlight-term">opportunity cost</span> of producing onions is the amount of other crops given up. On a concave PPC, this opportunity cost <span class="highlight-term">increases</span> as more onions are produced due to diminishing returns and resource specialization.</p>
+                            
+                            <p><span class="model-sub">Evaluation:</span> The opportunity cost to the farmer depends on:</p>
+                            <ul>
+                                <li>The slope of the PPC at the production point</li>
+                                <li>Whether resources are equally suited to both crops</li>
+                                <li>The initial proportion of resources allocated to each crop</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (d) - Price Stabilisation Policy [6 marks]</div>
+                            <p>A 'suggested retail price' (maximum price) may help stabilise onion prices but has significant limitations, and may not be the 'best' policy.</p>
+                            
+                            <p><span class="model-sub">Arguments for maximum price:</span></p>
+                            <ul>
+                                <li>Prevents sellers from charging excessively high prices during shortages</li>
+                                <li>Keeps onions affordable for low-income households, maintaining food security</li>
+                                <li>Reduces incentives for hoarding and speculative storage</li>
+                                <li>Signals government action to control inflation, stabilising expectations</li>
+                            </ul>
+                            
+                            <p><span class="model-sub">Arguments against maximum price:</span></p>
+                            <ul>
+                                <li>Creates shortages (excess demand) if set below equilibrium</li>
+                                <li>May lead to black markets where onions are sold above the legal price</li>
+                                <li>Reduces farmers' incentives to produce onions, worsening long-term supply</li>
+                                <li>Requires costly monitoring and enforcement mechanisms</li>
+                            </ul>
+                            
+                            <p><span class="model-sub">Alternative policies:</span></p>
+                            <ul>
+                                <li><span class="highlight-term">Buffer stock scheme:</span> Government buys during surplus, sells during shortage</li>
+                                <li><span class="highlight-term">Subsidies to farmers:</span> Lowers production costs, increases supply</li>
+                                <li><span class="highlight-term">Import liberalisation:</span> Temporary removal of tariffs during shortages</li>
+                                <li><span class="highlight-term">Investment in infrastructure:</span> Irrigation, storage, and transport to reduce losses</li>
+                            </ul>
+                            
+                            <p><span class="model-sub">Conclusion:</span> While a maximum price can provide short-term relief, it is <span class="highlight-term">not the best long-term solution</span>. A combination of buffer stocks and investment in agricultural infrastructure would be more effective in stabilising prices without creating market distortions.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (e) - Distributional Effects [6 marks]</div>
+                            <p>The increase in onion prices is <span class="highlight-term">unlikely to have affected all households equally</span> in the Philippines due to differing income levels, consumption patterns, and access alternatives.</p>
+                            
+                            <p><span class="model-sub">Why effects might appear equal:</span></p>
+                            <ul>
+                                <li>Onions are a staple ingredient in Filipino cuisine across all income groups</li>
+                                <li>Demand is price inelastic with few close substitutes, so most households continue buying similar quantities</li>
+                                <li>Price increases are generally uniform across markets and regions</li>
+                            </ul>
+                            
+                            <p><span class="model-sub">Why effects are actually unequal:</span></p>
+                            <ul>
+                                <li><span class="highlight-term">Proportional burden:</span> Low-income households spend a larger percentage of their income on food, so price increases have a greater impact on their real income</li>
+                                <li><span class="highlight-term">Substitution possibilities:</span> Wealthier households can more easily substitute onions with other vegetables or absorb price increases</li>
+                                <li><span class="highlight-term">Geographical differences:</span> Rural households may grow their own onions or have access to local markets with lower prices</li>
+                                <li><span class="highlight-term">Consumption patterns:</span> Households vary in their onion usage depending on dietary preferences and cooking habits</li>
+                            </ul>
+                            
+                            <p><span class="model-sub">Evaluation:</span> The regressive nature of food price inflation means that while all households face the same market price, the <span class="highlight-term">economic burden falls disproportionately on poorer households</span>. This exacerbates existing income inequality in the Philippines (Gini coefficient of 0.67).</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> The onion price increase has not affected all households equally. Low-income households, particularly in urban areas with no self-production capability, have borne the brunt of the price shock, highlighting the need for targeted social protection measures alongside market-based solutions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 修复动画不显示的核心问题 ====================
+        
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_MODELS = {
+            currentGraph: "supplyDemand",
+            currentScenario: "supplyShock",
+            
+            supplyDemand: {
+                initialPrice: 120,
+                initialQuantity: 800,
+                typhoonImpact: 0,
+            },
+            
+            initialized: false,
+            dpr: window.devicePixelRatio || 1 // 设备像素比
+        };
+        
+        // ==================== 核心绘图对象 ====================
+        let econCanvas, econCtx;
+        let canvasContainer;
+        
+        // ==================== 标签切换功能（修复事件参数问题）====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签 - 通过数据属性查找
+            const activeTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            } else {
+                // 后备方案：通过文本匹配
+                document.querySelectorAll('.tab').forEach(tab => {
+                    if (tab.textContent.trim() === tabName || 
+                        tab.textContent.toLowerCase().includes(tabName.toLowerCase())) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
+            
+            // 显示对应的内容
+            const contentElement = document.getElementById(`${tabName}-tab`);
+            if (contentElement) {
+                contentElement.classList.add('active');
+            }
+        }
+        
+        // ==================== 图表切换功能（修复事件参数问题）====================
+        function switchGraph(graphType) {
+            ECONOMIC_MODELS.currentGraph = graphType;
+            
+            // 获取事件目标（通过arguments）
+            let clickedElement = null;
+            if (arguments.length > 1 && arguments[1] && arguments[1].target) {
+                clickedElement = arguments[1].target;
+            }
+            
+            // 更新图表标签状态
+            document.querySelectorAll('.graph-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (clickedElement && clickedElement.classList.contains('graph-tab')) {
+                clickedElement.classList.add('active');
+            } else {
+                // 如果没从事件获取，则根据graphType找到对应标签
+                const targetTab = document.querySelector(`.graph-tab[data-graph="${graphType}"]`);
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                }
+            }
+            
+            // 更新标题和描述
+            const titleElement = document.getElementById('graph-title');
+            const descElement = document.getElementById('graph-description');
+            const legendElement = document.getElementById('canvas-legend');
+            
+            switch(graphType) {
+                case 'supplyDemand':
+                    titleElement.textContent = "Supply & Demand Analysis";
+                    descElement.textContent = "This interactive diagram shows how typhoons affect the market for onions through supply shocks.";
+                    if (legendElement) {
+                        legendElement.style.display = 'block';
+                        legendElement.innerHTML = `
+                            <div style="color: #2980b9; margin: 2px 0; font-size: 11px">● Demand (D)</div>
+                            <div style="color: #c0392b; margin: 2px 0; font-size: 11px">● Supply (S)</div>
+                            <div style="color: #27ae60; margin: 2px 0; font-size: 11px">● Equilibrium (E)</div>
+                        `;
+                    }
+                    break;
+                case 'ppc':
+                    titleElement.textContent = "Production Possibility Curve";
+                    descElement.textContent = "This diagram shows the trade-off between onion production and other crops, illustrating opportunity cost.";
+                    if (legendElement) {
+                        legendElement.style.display = 'block';
+                        legendElement.innerHTML = `
+                            <div style="color: #2980b9; margin: 2px 0; font-size: 11px">● PPC Curve</div>
+                            <div style="color: #c0392b; margin: 2px 0; font-size: 11px">● Initial Point (A)</div>
+                            <div style="color: #27ae60; margin: 2px 0; font-size: 11px">● New Point (B)</div>
+                        `;
+                    }
+                    break;
+                case 'priceControl':
+                    titleElement.textContent = "Price Control Analysis";
+                    descElement.textContent = "This diagram shows the effects of a maximum price (price ceiling) on the onion market.";
+                    if (legendElement) {
+                        legendElement.style.display = 'block';
+                        legendElement.innerHTML = `
+                            <div style="color: #2980b9; margin: 2px 0; font-size: 11px">● Demand (D)</div>
+                            <div style="color: #c0392b; margin: 2px 0; font-size: 11px">● Supply (S)</div>
+                            <div style="color: #e74c3c; margin: 2px 0; font-size: 11px">● Price Ceiling</div>
+                        `;
+                    }
+                    break;
+            }
+            
+            // 立即重绘图
+            drawCurrentGraph();
+            updateDataPanel();
+        }
+        
+        // ==================== 场景设置 ====================
+        function setScenario(scenario) {
+            ECONOMIC_MODELS.currentScenario = scenario;
+            
+            // 更新按钮状态
+            document.getElementById('supplyShockBtn').classList.remove('active');
+            document.getElementById('priceControlBtn').classList.remove('active');
+            document.getElementById('ppcBtn').classList.remove('active');
+            document.getElementById(`${scenario}Btn`).classList.add('active');
+            
+            // 根据场景切换图表
+            if (scenario === 'ppc') {
+                switchGraph('ppc');
+            } else if (scenario === 'priceControl') {
+                switchGraph('priceControl');
+            } else {
+                switchGraph('supplyDemand');
+            }
+        }
+        
+        // ==================== 核心绘图函数（改进版）====================
+        
+        // 绘制当前图表
+        function drawCurrentGraph() {
+            if (!econCtx || !econCanvas) {
+                console.error("Canvas context not available");
+                return;
+            }
+            
+            // 清除画布
+            econCtx.clearRect(0, 0, econCanvas.width, econCanvas.height);
+            
+            // 检查canvas尺寸
+            if (econCanvas.width === 0 || econCanvas.height === 0) {
+                console.warn("Canvas dimensions are zero");
+                return;
+            }
+            
+            // 根据当前图表类型绘制
+            switch(ECONOMIC_MODELS.currentGraph) {
+                case 'supplyDemand':
+                    drawSupplyDemandGraph();
+                    break;
+                case 'ppc':
+                    drawPPCGraph();
+                    break;
+                case 'priceControl':
+                    drawPriceControlGraph();
+                    break;
+            }
+        }
+        
+
+
+        // 改进的供给需求图绘制
+        function drawSupplyDemandGraph() {
+            const width = econCanvas.width / ECONOMIC_MODELS.dpr;
+            const height = econCanvas.height / ECONOMIC_MODELS.dpr;
+            
+            // 设置合理的边距 - 增加图形区域
+            const padding = { top: 40, right: 50, bottom: 60, left: 70 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+            
+            // 如果图形区域太小，不绘制
+            if (graphWidth < 100 || graphHeight < 100) return;
+            
+            // 设置上下文缩放以支持高清显示
+            econCtx.save();
+            econCtx.scale(ECONOMIC_MODELS.dpr, ECONOMIC_MODELS.dpr);
+            
+            // 绘制背景
+            econCtx.fillStyle = '#ffffff';
+            econCtx.fillRect(0, 0, width, height);
+            
+            // 绘制坐标轴
+            econCtx.beginPath();
+            econCtx.strokeStyle = '#333';
+            econCtx.lineWidth = 1.5;
+            
+            // Y轴（价格）
+            econCtx.moveTo(padding.left, padding.top);
+            econCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量）
+            econCtx.moveTo(padding.left, padding.top + graphHeight);
+            econCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            econCtx.stroke();
+            
+            // 绘制网格线
+            econCtx.strokeStyle = '#eee';
+            econCtx.lineWidth = 1;
+            
+            // 水平网格线（价格）
+            const priceSteps = 5;
+            for (let i = 0; i <= priceSteps; i++) {
+                const y = padding.top + (i / priceSteps) * graphHeight;
+                econCtx.beginPath();
+                econCtx.moveTo(padding.left, y);
+                econCtx.lineTo(padding.left + graphWidth, y);
+                econCtx.stroke();
+            }
+            
+            // 垂直网格线（数量）
+            const quantitySteps = 5;
+            for (let i = 0; i <= quantitySteps; i++) {
+                const x = padding.left + (i / quantitySteps) * graphWidth;
+                econCtx.beginPath();
+                econCtx.moveTo(x, padding.top);
+                econCtx.lineTo(x, padding.top + graphHeight);
+                econCtx.stroke();
+            }
+            
+            // 需求曲线（更平滑）
+            econCtx.beginPath();
+            econCtx.strokeStyle = '#2980b9';
+            econCtx.lineWidth = 2.5;
+            
+            // 需求曲线：P = a - bQ（使用曲线绘制）
+            const demandStartX = padding.left;
+            const demandEndX = padding.left + graphWidth * 0.9;
+            const demandStartY = padding.top;
+            const demandEndY = padding.top + graphHeight;
+            
+            // 使用二次贝塞尔曲线让需求曲线更平滑
+            econCtx.moveTo(demandStartX, demandStartY);
+            const controlX1 = demandStartX + (demandEndX - demandStartX) * 0.5;
+            const controlY1 = demandStartY + (demandEndY - demandStartY) * 0.3;
+            econCtx.quadraticCurveTo(controlX1, controlY1, demandEndX, demandEndY);
+            econCtx.stroke();
+            
+            // 需求曲线标签 - 减小字体，调整位置
+            econCtx.fillStyle = '#2980b9';
+            econCtx.font = '12px Arial';
+            econCtx.textAlign = 'right';
+            econCtx.fillText("D", demandStartX - 8, demandStartY + 15);
+            
+            // 初始供给曲线
+            econCtx.beginPath();
+            econCtx.strokeStyle = '#c0392b';
+            econCtx.lineWidth = 2.5;
+            
+            // 供给曲线：P = c + dQ
+            const supplyStartX = padding.left;
+            const supplyEndX = padding.left + graphWidth * 0.9;
+            const supplyStartY = padding.top + graphHeight * 0.7;
+            const supplyEndY = padding.top + graphHeight * 0.1;
+            
+            econCtx.moveTo(supplyStartX, supplyStartY);
+            const controlX2 = supplyStartX + (supplyEndX - supplyStartX) * 0.5;
+            const controlY2 = supplyStartY + (supplyEndY - supplyStartY) * 0.3;
+            econCtx.quadraticCurveTo(controlX2, controlY2, supplyEndX, supplyEndY);
+            econCtx.stroke();
+            
+            // 初始供给曲线标签
+            econCtx.fillStyle = '#c0392b';
+            econCtx.font = '12px Arial';
+            econCtx.textAlign = 'left';
+            econCtx.fillText("S₀", supplyStartX + 8, supplyStartY - 8);
+            
+            // 计算初始均衡点
+            const demandSlope = (demandEndY - demandStartY) / (demandEndX - demandStartX);
+            const demandIntercept = demandStartY - demandSlope * demandStartX;
+            
+            const supplySlope = (supplyEndY - supplyStartY) / (supplyEndX - supplyStartX);
+            const supplyIntercept = supplyStartY - supplySlope * supplyStartX;
+            
+            const eqX = (supplyIntercept - demandIntercept) / (demandSlope - supplySlope);
+            const eqY = demandSlope * eqX + demandIntercept;
+            
+            // 标记初始均衡点
+            if (eqX >= padding.left && eqX <= padding.left + graphWidth && 
+                eqY >= padding.top && eqY <= padding.top + graphHeight) {
+                econCtx.beginPath();
+                econCtx.arc(eqX, eqY, 5, 0, Math.PI * 2);
+                econCtx.fillStyle = '#27ae60';
+                econCtx.fill();
+                econCtx.strokeStyle = '#2c3e50';
+                econCtx.lineWidth = 1.5;
+                econCtx.stroke();
+                
+                econCtx.fillStyle = '#2c3e50';
+                econCtx.font = '11px Arial';
+                econCtx.textAlign = 'right';
+                econCtx.fillText("E₀", eqX - 7, eqY - 7);
+            }
+            
+            // 如果有台风影响，绘制新的供给曲线
+            const typhoonImpact = ECONOMIC_MODELS.supplyDemand.typhoonImpact;
+            if (typhoonImpact > 0) {
+                // 台风使供给曲线左移
+                const shiftAmount = (typhoonImpact / 100) * graphWidth * 0.25;
+                const newSupplyStartX = supplyStartX + shiftAmount;
+                const newSupplyEndX = supplyEndX - shiftAmount * 0.5;
+                
+                // 绘制新的供给曲线
+                econCtx.beginPath();
+                econCtx.strokeStyle = '#c0392b';
+                econCtx.setLineDash([5, 3]);
+                econCtx.lineWidth = 2.5;
+                
+                econCtx.moveTo(newSupplyStartX, supplyStartY);
+                const controlX3 = newSupplyStartX + (newSupplyEndX - newSupplyStartX) * 0.5;
+                const controlY3 = supplyStartY + (supplyEndY - supplyStartY) * 0.3;
+                econCtx.quadraticCurveTo(controlX3, controlY3, newSupplyEndX, supplyEndY);
+                econCtx.stroke();
+                
+                // 恢复实线
+                econCtx.setLineDash([]);
+                
+                // 新供给曲线标签
+                econCtx.fillStyle = '#c0392b';
+                econCtx.fillText("S₁", newSupplyStartX + 8, supplyStartY - 8);
+                
+                // 计算新均衡点
+                const newSupplySlope = (supplyEndY - supplyStartY) / (newSupplyEndX - newSupplyStartX);
+                const newSupplyIntercept = supplyStartY - newSupplySlope * newSupplyStartX;
+                
+                const newEqX = (newSupplyIntercept - demandIntercept) / (demandSlope - newSupplySlope);
+                const newEqY = demandSlope * newEqX + demandIntercept;
+                
+                // 标记新均衡点
+                if (newEqX >= padding.left && newEqX <= padding.left + graphWidth && 
+                    newEqY >= padding.top && newEqY <= padding.top + graphHeight) {
+                    econCtx.beginPath();
+                    econCtx.arc(newEqX, newEqY, 5, 0, Math.PI * 2);
+                    econCtx.fillStyle = '#e74c3c';
+                    econCtx.fill();
+                    econCtx.strokeStyle = '#2c3e50';
+                    econCtx.lineWidth = 1.5;
+                    econCtx.stroke();
+                    
+                    econCtx.fillStyle = '#2c3e50';
+                    econCtx.textAlign = 'left';
+                    econCtx.fillText("E₁", newEqX + 7, newEqY - 7);
+                    
+                    // 绘制箭头
+                    drawArrow(econCtx, eqX, eqY, newEqX, newEqY, '#7b61ff');
+                }
+                
+                // 显示变化信息 - 减小字体，调整位置
+                econCtx.fillStyle = '#2c3e50';
+                econCtx.font = '13px Arial';
+                econCtx.textAlign = 'center';
+                econCtx.fillText(`Typhoon Impact: ${typhoonImpact}%`, width / 2, padding.top - 15);
+            }
+            
+            // 添加坐标轴标签 - 减小字体，调整位置
+            econCtx.fillStyle = '#333';
+            econCtx.font = '13px Arial';
+            econCtx.textAlign = 'center';
+            
+            // Y轴标签
+            econCtx.save();
+            econCtx.translate(padding.left - 35, padding.top + graphHeight / 2);
+            econCtx.rotate(-Math.PI / 2);
+            econCtx.fillText("Price (PHP/kg)", 0, 0);
+            econCtx.restore();
+            
+            // X轴标签
+            econCtx.fillText("Quantity of Onions (tons/month)", padding.left + graphWidth / 2, height - 15);
+            
+            // 添加刻度值 - 减小字体
+            econCtx.fillStyle = '#666';
+            econCtx.font = '11px Arial';
+            
+            // Y轴刻度
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                const price = 200 - (i * 40);
+                econCtx.textAlign = 'right';
+                econCtx.fillText(price, padding.left - 8, y + 3);
+            }
+            
+            // X轴刻度
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                const qty = i * 200;
+                econCtx.textAlign = 'center';
+                econCtx.fillText(qty, x, padding.top + graphHeight + 15);
+            }
+            
+            econCtx.restore(); // 恢复上下文状态
+        }
+
+        // ==================== 绘制PPC图 ====================
+function drawPPCGraph() {
+    const width = econCanvas.width / ECONOMIC_MODELS.dpr;
+    const height = econCanvas.height / ECONOMIC_MODELS.dpr;
+    
+    // 设置边距
+    const padding = { top: 40, right: 50, bottom: 60, left: 70 };
+    const graphWidth = width - padding.left - padding.right;
+    const graphHeight = height - padding.top - padding.bottom;
+    
+    if (graphWidth < 100 || graphHeight < 100) return;
+    
+    // 设置上下文缩放
+    econCtx.save();
+    econCtx.scale(ECONOMIC_MODELS.dpr, ECONOMIC_MODELS.dpr);
+    
+    // 绘制背景
+    econCtx.fillStyle = '#ffffff';
+    econCtx.fillRect(0, 0, width, height);
+    
+    // 绘制坐标轴
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#333';
+    econCtx.lineWidth = 1.5;
+    
+    // Y轴（其他作物）
+    econCtx.moveTo(padding.left, padding.top);
+    econCtx.lineTo(padding.left, padding.top + graphHeight);
+    
+    // X轴（洋葱）
+    econCtx.moveTo(padding.left, padding.top + graphHeight);
+    econCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+    econCtx.stroke();
+    
+    // 绘制网格线
+    econCtx.strokeStyle = '#eee';
+    econCtx.lineWidth = 1;
+    
+    // 水平网格线
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (i / 5) * graphHeight;
+        econCtx.beginPath();
+        econCtx.moveTo(padding.left, y);
+        econCtx.lineTo(padding.left + graphWidth, y);
+        econCtx.stroke();
+    }
+    
+    // 垂直网格线
+    for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (i / 5) * graphWidth;
+        econCtx.beginPath();
+        econCtx.moveTo(x, padding.top);
+        econCtx.lineTo(x, padding.top + graphHeight);
+        econCtx.stroke();
+    }
+    
+    // 绘制PPC曲线（凹向原点）
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#2980b9';
+    econCtx.lineWidth = 2.5;
+    
+    // 绘制曲线点
+    for (let i = 0; i <= 100; i++) {
+        const onions = i; // 0-100
+        // 二次函数模拟机会成本递增
+        const otherCrops = 100 - 0.01 * Math.pow(onions, 1.5);
+        
+        const x = padding.left + (onions / 100) * graphWidth;
+        const y = padding.top + graphHeight - (otherCrops / 100) * graphHeight;
+        
+        if (i === 0) {
+            econCtx.moveTo(x, y);
+        } else {
+            econCtx.lineTo(x, y);
+        }
+    }
+    
+    econCtx.stroke();
+    
+    // PPC曲线标签
+    econCtx.fillStyle = '#2980b9';
+    econCtx.font = '12px Arial';
+    econCtx.textAlign = 'center';
+    econCtx.fillText("PPC", padding.left + graphWidth * 0.7, padding.top + graphHeight * 0.3);
+    
+    // 点A（只生产其他作物）
+    const pointAX = padding.left;
+    const pointAY = padding.top;
+    
+    econCtx.beginPath();
+    econCtx.arc(pointAX, pointAY, 5, 0, Math.PI * 2);
+    econCtx.fillStyle = '#c0392b';
+    econCtx.fill();
+    econCtx.strokeStyle = '#2c3e50';
+    econCtx.lineWidth = 1.5;
+    econCtx.stroke();
+    
+    econCtx.fillStyle = '#2c3e50';
+    econCtx.font = '11px Arial';
+    econCtx.textAlign = 'right';
+    econCtx.fillText("A (0 onions, 100 other crops)", pointAX - 8, pointAY - 8);
+    
+    // 点B（开始生产洋葱）
+    const onionsB = 40;
+    const otherCropsB = 100 - 0.01 * Math.pow(onionsB, 1.5);
+    
+    const pointBX = padding.left + (onionsB / 100) * graphWidth;
+    const pointBY = padding.top + graphHeight - (otherCropsB / 100) * graphHeight;
+    
+    econCtx.beginPath();
+    econCtx.arc(pointBX, pointBY, 5, 0, Math.PI * 2);
+    econCtx.fillStyle = '#27ae60';
+    econCtx.fill();
+    econCtx.strokeStyle = '#2c3e50';
+    econCtx.lineWidth = 1.5;
+    econCtx.stroke();
+    
+    econCtx.fillStyle = '#2c3e50';
+    econCtx.textAlign = 'left';
+    econCtx.fillText(`B (${onionsB} onions, ${Math.round(otherCropsB)} other crops)`, pointBX + 8, pointBY - 8);
+    
+    // 绘制箭头
+    drawArrow(econCtx, pointAX, pointAY, pointBX, pointBY, '#7b61ff');
+    
+    // 显示机会成本
+    const opportunityCost = (100 - otherCropsB) / onionsB;
+    econCtx.fillStyle = '#2c3e50';
+    econCtx.font = '13px Arial';
+    econCtx.textAlign = 'center';
+    econCtx.fillText(`Opportunity cost: ${opportunityCost.toFixed(2)} units of other crops per onion`, width / 2, padding.top - 15);
+    
+    // 添加坐标轴标签
+    econCtx.fillStyle = '#333';
+    econCtx.font = '13px Arial';
+    econCtx.textAlign = 'center';
+    
+    // Y轴标签
+    econCtx.save();
+    econCtx.translate(padding.left - 40, padding.top + graphHeight / 2);
+    econCtx.rotate(-Math.PI / 2);
+    econCtx.fillText("Other Crops (units)", 0, 0);
+    econCtx.restore();
+    
+    // X轴标签
+    econCtx.fillText("Red Onions (units)", padding.left + graphWidth / 2, height - 15);
+    
+    // 添加刻度值
+    econCtx.fillStyle = '#666';
+    econCtx.font = '11px Arial';
+    
+    // Y轴刻度
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (i / 5) * graphHeight;
+        const otherCropsVal = 100 - (i * 20);
+        econCtx.textAlign = 'right';
+        econCtx.fillText(otherCropsVal, padding.left - 8, y + 3);
+    }
+    
+    // X轴刻度
+    for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (i / 5) * graphWidth;
+        const onionVal = i * 20;
+        econCtx.textAlign = 'center';
+        econCtx.fillText(onionVal, x, padding.top + graphHeight + 15);
+    }
+    
+    econCtx.restore(); // 恢复上下文状态
+}
+
+// ==================== 绘制价格控制图 ====================
+function drawPriceControlGraph() {
+    const width = econCanvas.width / ECONOMIC_MODELS.dpr;
+    const height = econCanvas.height / ECONOMIC_MODELS.dpr;
+    
+    // 设置边距
+    const padding = { top: 40, right: 50, bottom: 60, left: 70 };
+    const graphWidth = width - padding.left - padding.right;
+    const graphHeight = height - padding.top - padding.bottom;
+    
+    if (graphWidth < 100 || graphHeight < 100) return;
+    
+    // 设置上下文缩放
+    econCtx.save();
+    econCtx.scale(ECONOMIC_MODELS.dpr, ECONOMIC_MODELS.dpr);
+    
+    // 绘制背景
+    econCtx.fillStyle = '#ffffff';
+    econCtx.fillRect(0, 0, width, height);
+    
+    // 绘制坐标轴
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#333';
+    econCtx.lineWidth = 1.5;
+    
+    // Y轴（价格）
+    econCtx.moveTo(padding.left, padding.top);
+    econCtx.lineTo(padding.left, padding.top + graphHeight);
+    
+    // X轴（数量）
+    econCtx.moveTo(padding.left, padding.top + graphHeight);
+    econCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+    econCtx.stroke();
+    
+    // 绘制网格线
+    econCtx.strokeStyle = '#eee';
+    econCtx.lineWidth = 1;
+    
+    // 水平网格线
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (i / 5) * graphHeight;
+        econCtx.beginPath();
+        econCtx.moveTo(padding.left, y);
+        econCtx.lineTo(padding.left + graphWidth, y);
+        econCtx.stroke();
+    }
+    
+    // 垂直网格线
+    for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (i / 5) * graphWidth;
+        econCtx.beginPath();
+        econCtx.moveTo(x, padding.top);
+        econCtx.lineTo(x, padding.top + graphHeight);
+        econCtx.stroke();
+    }
+    
+    // 需求曲线
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#2980b9';
+    econCtx.lineWidth = 2.5;
+    
+    const demandStartX = padding.left;
+    const demandEndX = padding.left + graphWidth * 0.9;
+    const demandStartY = padding.top;
+    const demandEndY = padding.top + graphHeight;
+    
+    econCtx.moveTo(demandStartX, demandStartY);
+    const demandControlX = demandStartX + (demandEndX - demandStartX) * 0.5;
+    const demandControlY = demandStartY + (demandEndY - demandStartY) * 0.3;
+    econCtx.quadraticCurveTo(demandControlX, demandControlY, demandEndX, demandEndY);
+    econCtx.stroke();
+    
+    econCtx.fillStyle = '#2980b9';
+    econCtx.font = '12px Arial';
+    econCtx.textAlign = 'right';
+    econCtx.fillText("D", demandStartX - 8, demandStartY + 15);
+    
+    // 供给曲线（考虑台风影响）
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#c0392b';
+    econCtx.lineWidth = 2.5;
+    
+    const typhoonImpact = 70; // 考试模式下固定值
+    const shiftAmount = (typhoonImpact / 100) * graphWidth * 0.25;
+    const supplyStartX = padding.left + shiftAmount;
+    const supplyEndX = padding.left + graphWidth * 0.9 - shiftAmount * 0.5;
+    const supplyStartY = padding.top + graphHeight * 0.7;
+    const supplyEndY = padding.top + graphHeight * 0.1;
+    
+    econCtx.moveTo(supplyStartX, supplyStartY);
+    const supplyControlX = supplyStartX + (supplyEndX - supplyStartX) * 0.5;
+    const supplyControlY = supplyStartY + (supplyEndY - supplyStartY) * 0.3;
+    econCtx.quadraticCurveTo(supplyControlX, supplyControlY, supplyEndX, supplyEndY);
+    econCtx.stroke();
+    
+    econCtx.fillStyle = '#c0392b';
+    econCtx.font = '12px Arial';
+    econCtx.textAlign = 'left';
+    econCtx.fillText("S", supplyStartX + 8, supplyStartY - 8);
+    
+    // 计算均衡点
+    const demandSlope = (demandEndY - demandStartY) / (demandEndX - demandStartX);
+    const demandIntercept = demandStartY - demandSlope * demandStartX;
+    
+    const supplySlope = (supplyEndY - supplyStartY) / (supplyEndX - supplyStartX);
+    const supplyIntercept = supplyStartY - supplySlope * supplyStartX;
+    
+    const eqX = (supplyIntercept - demandIntercept) / (demandSlope - supplySlope);
+    const eqY = demandSlope * eqX + demandIntercept;
+    
+    // 标记均衡点
+    if (eqX >= padding.left && eqX <= padding.left + graphWidth && 
+        eqY >= padding.top && eqY <= padding.top + graphHeight) {
+        econCtx.beginPath();
+        econCtx.arc(eqX, eqY, 5, 0, Math.PI * 2);
+        econCtx.fillStyle = '#27ae60';
+        econCtx.fill();
+        econCtx.strokeStyle = '#2c3e50';
+        econCtx.lineWidth = 1.5;
+        econCtx.stroke();
+        
+        econCtx.fillStyle = '#2c3e50';
+        econCtx.font = '11px Arial';
+        econCtx.textAlign = 'right';
+        econCtx.fillText("E", eqX - 7, eqY - 7);
+    }
+    
+    // 价格上限（水平线）
+    const priceCeilingY = padding.top + graphHeight * 0.4;
+    
+    econCtx.beginPath();
+    econCtx.strokeStyle = '#e74c3c';
+    econCtx.setLineDash([5, 3]);
+    econCtx.lineWidth = 2.5;
+    
+    econCtx.moveTo(padding.left, priceCeilingY);
+    econCtx.lineTo(padding.left + graphWidth, priceCeilingY);
+    econCtx.stroke();
+    
+    // 恢复实线
+    econCtx.setLineDash([]);
+    
+    // 价格上限标签
+    econCtx.fillStyle = '#e74c3c';
+    econCtx.font = '12px Arial';
+    econCtx.textAlign = 'left';
+    econCtx.fillText("Price Ceiling", padding.left + 10, priceCeilingY - 8);
+    
+    // 绘制短缺区域
+    const priceCeilingX1 = padding.left + 20; // 简化计算
+    const priceCeilingX2 = padding.left + graphWidth - 20;
+    
+    econCtx.fillStyle = 'rgba(231, 76, 60, 0.1)';
+    econCtx.fillRect(priceCeilingX1, priceCeilingY, priceCeilingX2 - priceCeilingX1, 10);
+    
+    // 短缺标签
+    econCtx.fillStyle = '#e74c3c';
+    econCtx.font = '11px Arial';
+    econCtx.textAlign = 'center';
+    econCtx.fillText("Shortage", padding.left + graphWidth / 2, priceCeilingY + 20);
+    
+    // 添加坐标轴标签
+    econCtx.fillStyle = '#333';
+    econCtx.font = '13px Arial';
+    econCtx.textAlign = 'center';
+    
+    // Y轴标签
+    econCtx.save();
+    econCtx.translate(padding.left - 35, padding.top + graphHeight / 2);
+    econCtx.rotate(-Math.PI / 2);
+    econCtx.fillText("Price (PHP/kg)", 0, 0);
+    econCtx.restore();
+    
+    // X轴标签
+    econCtx.fillText("Quantity of Onions (tons/month)", padding.left + graphWidth / 2, height - 15);
+    
+    // 添加刻度值
+    econCtx.fillStyle = '#666';
+    econCtx.font = '11px Arial';
+    
+    // Y轴刻度
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (i / 5) * graphHeight;
+        const price = 200 - (i * 40);
+        econCtx.textAlign = 'right';
+        econCtx.fillText(price, padding.left - 8, y + 3);
+    }
+    
+    // X轴刻度
+    for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (i / 5) * graphWidth;
+        const qty = i * 200;
+        econCtx.textAlign = 'center';
+        econCtx.fillText(qty, x, padding.top + graphHeight + 15);
+    }
+    
+    // 显示分析
+    econCtx.fillStyle = '#2c3e50';
+    econCtx.font = '13px Arial';
+    econCtx.textAlign = 'center';
+    econCtx.fillText("Maximum price creates shortage and black market", width / 2, padding.top - 15);
+    
+    econCtx.restore(); // 恢复上下文状态
+}
+        
+        // 改进的箭头绘制函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 10;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // ==================== Canvas尺寸管理（改进版）====================
+        function resizeCanvas() {
+            if (!econCanvas || !canvasContainer) return;
+            
+            // 获取容器尺寸，确保不为0
+            const containerWidth = canvasContainer.clientWidth;
+            const containerHeight = canvasContainer.clientHeight || 400;
+            
+            if (containerWidth === 0 || containerHeight === 0) {
+                console.warn("Container dimensions are zero");
+                return;
+            }
+            
+            // 设置canvas尺寸（考虑设备像素比）
+            econCanvas.width = containerWidth * ECONOMIC_MODELS.dpr;
+            econCanvas.height = containerHeight * ECONOMIC_MODELS.dpr;
+            
+            // 设置CSS尺寸
+            econCanvas.style.width = containerWidth + 'px';
+            econCanvas.style.height = containerHeight + 'px';
+            
+            // 立即重绘图
+            drawCurrentGraph();
+        }
+        
+        // ==================== 初始化函数（改进版）====================
+        function initializePage() {
+            console.log("Initializing page...");
+            
+            // 获取DOM元素
+            econCanvas = document.getElementById('econCanvas');
+            canvasContainer = document.getElementById('canvasContainer');
+            
+            if (!econCanvas) {
+                console.error("Canvas element not found!");
+                return;
+            }
+            
+            if (!canvasContainer) {
+                console.error("Canvas container not found!");
+                return;
+            }
+            
+            console.log("Canvas container dimensions:", canvasContainer.clientWidth, canvasContainer.clientHeight);
+            
+            // 获取canvas上下文
+            econCtx = econCanvas.getContext('2d');
+            if (!econCtx) {
+                console.error("Failed to get canvas context!");
+                return;
+            }
+            
+            // 标记已初始化
+            ECONOMIC_MODELS.initialized = true;
+            
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 初始化图表
+            switchGraph('supplyDemand');
+            
+            // 初始化场景
+            setScenario('supplyShock');
+            
+            // 设置初始画布尺寸
+            setTimeout(() => {
+                resizeCanvas();
+                
+                // 强制重绘一次
+                setTimeout(() => {
+                    drawCurrentGraph();
+                    updateDataPanel();
+                }, 100);
+            }, 100);
+            
+            // 添加窗口大小改变监听
+            window.addEventListener('resize', function() {
+                setTimeout(resizeCanvas, 50);
+            });
+            
+            // 添加调试：点击时重绘
+            canvasContainer.addEventListener('click', function() {
+                console.log("Canvas clicked, redrawing...");
+                drawCurrentGraph();
+            });
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            console.log("Page initialized successfully");
+        }
+        
+        // ==================== 其他辅助函数 ====================
+        function updateGraph() {
+            const typhoonValue = parseInt(document.getElementById('typhoonSlider').value);
+            ECONOMIC_MODELS.supplyDemand.typhoonImpact = typhoonValue;
+            
+            drawCurrentGraph();
+            updateDataPanel();
+        }
+        
+        function showMarkSchemeMode() {
+            ECONOMIC_MODELS.supplyDemand.typhoonImpact = 80;
+            document.getElementById('typhoonSlider').value = 80;
+            
+            setScenario('priceControl');
+            
+            drawCurrentGraph();
+            updateDataPanel();
+            
+            alert("Mark Scheme Mode:\n\nKey examination points demonstrated:\n1. Supply shock from typhoons\n2. Maximum price creating shortage\n3. Black market development");
+        }
+        
+        function resetGraph() {
+            ECONOMIC_MODELS.supplyDemand.typhoonImpact = 0;
+            document.getElementById('typhoonSlider').value = 0;
+            setScenario('supplyShock');
+            drawCurrentGraph();
+            updateDataPanel();
+        }
+        
+        function updateDataPanel() {
+            const typhoonImpact = ECONOMIC_MODELS.supplyDemand.typhoonImpact;
+            
+            const basePrice = 120;
+            const baseQuantity = 800;
+            
+            const priceMultiplier = 1 + (typhoonImpact / 100) * 0.8;
+            const quantityMultiplier = 1 - (typhoonImpact / 100) * 0.6;
+            
+            const newPrice = Math.round(basePrice * priceMultiplier);
+            const newQuantity = Math.round(baseQuantity * quantityMultiplier);
+            
+            document.getElementById('onionPrice').textContent = newPrice;
+            document.getElementById('quantity').textContent = newQuantity;
+            document.getElementById('supplyShift').textContent = `${typhoonImpact}%`;
+            
+            const priceChangeElement = document.getElementById('priceChange');
+            const priceChangePercent = Math.round((priceMultiplier - 1) * 100);
+            priceChangeElement.textContent = `${priceChangePercent > 0 ? '+' : ''}${priceChangePercent}%`;
+            priceChangeElement.style.color = priceChangePercent > 0 ? '#e74c3c' : '#27ae60';
+            
+            const marketStatusElement = document.getElementById('marketStatus');
+            if (ECONOMIC_MODELS.currentGraph === 'priceControl') {
+                marketStatusElement.textContent = "Price Control - Shortage";
+                marketStatusElement.style.color = '#e74c3c';
+            } else if (typhoonImpact > 0) {
+                marketStatusElement.textContent = "Supply Shock";
+                marketStatusElement.style.color = '#e67e22';
+            } else {
+                marketStatusElement.textContent = "Equilibrium";
+                marketStatusElement.style.color = '#27ae60';
+            }
+        }
+        
+        // ==================== 页面加载初始化 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM Content Loaded");
+            
+            // 稍微延迟以确保容器已渲染
+            setTimeout(initializePage, 300);
+        });
+        
+        // 确保在DOM加载后也能初始化
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initializePage, 500);
+        }
+    </script>
+</body>
+</html>

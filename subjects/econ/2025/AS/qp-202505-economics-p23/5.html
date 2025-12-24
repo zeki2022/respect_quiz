@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q5 - Terms of Trade & Comparative Advantage</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4f8ff;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #9b59b6;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #f4e8ff;
+            padding: 20px;
+            border-left: 4px solid #9b59b6;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #9b59b6;
+            color: white;
+            border-color: #9b59b6;
+        }
+        
+        button.exam-btn {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #d35400;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #9b59b6;
+        }
+        
+        .tab.active {
+            color: #9b59b6;
+            border-bottom-color: #9b59b6;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #9b59b6;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #9b59b6;
+            font-weight: bold;
+            background-color: #f4e8ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #9b59b6;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #9b59b6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .tot-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .definition-box {
+            background: #fff8e1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ffb300;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .improvement {
+            background-color: #e8f8f5;
+        }
+        
+        .deterioration {
+            background-color: #ffeaea;
+        }
+        
+        .export-price {
+            color: #2980b9;
+            font-weight: bold;
+        }
+        
+        .import-price {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        
+        .policy-box {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .policy-effect {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .positive-effect {
+            background-color: #e8f8f5;
+            border-left-color: #27ae60;
+        }
+        
+        .negative-effect {
+            background-color: #ffeaea;
+            border-left-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section C / Question 5</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>5 (a)</strong> The terms of trade index for an economy changed from 105 to 110 in a given year. Explain two likely reasons for this change and consider the extent to which the change is likely to benefit the current account of the balance of payments of this economy. [8]</p>
+                    
+                    <!-- 原图占位符 - 题目无原图 -->
+                    <div class="orig-img">
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            <em>Original diagram would appear here if provided in the question paper.</em>
+                        </div>
+                    </div>
+                    
+                    <div class="tot-info">
+                        <p><strong>Key Concept: Terms of Trade (TOT)</strong> - Measures the relative price of a country's exports compared to its imports.</p>
+                        <p><strong>TOT Formula:</strong> $$\text{TOT} = \frac{\text{Index of export prices}}{\text{Index of import prices}} \times 100$$</p>
+                        <p>An increase from 105 to 110 represents an <span class="highlight-term">improvement</span> in the terms of trade. The country can now buy more imports with the same quantity of exports.</p>
+                    </div>
+                    
+                    <p><strong>(b)</strong> Assess whether government policy can influence an economy's comparative advantage in a good or service. [12]</p>
+                    
+                    <div class="definition-box">
+                        <p><strong>Comparative advantage</strong> refers to a country's ability to produce a good or service at a lower opportunity cost than another country. It is determined by relative efficiency, not absolute advantage.</p>
+                        <p><strong>Opportunity cost formula:</strong> $$\text{Opportunity Cost of Good X} = \frac{\text{Loss of Good Y}}{\text{Gain of Good X}}$$</p>
+                    </div>
+                    
+                    <div class="policy-box">
+                        <p><strong>Government policies that may influence comparative advantage:</strong></p>
+                        <ul>
+                            <li>Investment in education and training</li>
+                            <li>Research and development (R&D) subsidies</li>
+                            <li>Infrastructure development</li>
+                            <li>Trade policies (tariffs, quotas, subsidies)</li>
+                            <li>Industrial policy and strategic targeting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Terms of Trade & Comparative Advantage Analysis</h4>
+                <p>This interactive diagram shows how terms of trade changes affect current account balance and how government policies can influence comparative advantage.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="tradeCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● Export Price Index</div>
+                        <div style="color: #e67e22">● Import Price Index</div>
+                        <div style="color: #27ae60">● Terms of Trade (TOT)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">TOT Change Cause:</span>
+                        <button class="action-btn active" id="exportBtn" onclick="setTOTCause('export')">Export Price Rise</button>
+                        <button class="action-btn" id="importBtn" onclick="setTOTCause('import')">Import Price Fall</button>
+                    </div>
+                    
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Price Elasticity of Demand:</span>
+                        <button class="action-btn active" id="inelasticBtn" onclick="setElasticity('inelastic')">Inelastic</button>
+                        <button class="action-btn" id="elasticBtn" onclick="setElasticity('elastic')">Elastic</button>
+                    </div>
+                    
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Policy Influence:</span>
+                        <input type="range" id="policySlider" min="0" max="100" value="0" style="flex: 1; cursor: pointer;" oninput="updateTradeChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>No Policy</span>
+                        <span>Strong Policy</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Comparative Advantage Shift</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetTradeChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Terms of Trade Index:</span>
+                        <span id="totIndex">105 → 110</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Export Value ($bn):</span>
+                        <span id="exportValue">85.0</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Import Value ($bn):</span>
+                        <span id="importValue">82.5</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Current Account Balance:</span>
+                        <span id="currentAccount" style="color: #27ae60; font-weight: bold;">+2.5 bn</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Price Elasticity (PED):</span>
+                        <span id="pedValue" style="color: #e67e22; font-weight: bold;">Inelastic (0.4)</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Policy Effect on Comparative Advantage:</span>
+                        <span id="policyEffect" style="color: #9b59b6; font-weight: bold;">None</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Terms of Trade Change: Reasons</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Terms of Trade (TOT) defined:</strong> $$\text{TOT} = \frac{\text{Index of export prices}}{\text{Index of import prices}} \times 100$$ An increase from 105 to 110 represents an <span class="highlight-term">improvement</span> in TOT.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Reason 1: Rise in export prices</strong>
+                            <br>• <span class="export-price">Global demand increase</span> for the country's exports (e.g., commodity boom)
+                            <br>• <span class="export-price">Improved product quality/innovation</span> allowing premium pricing
+                            <br>• <span class="export-price">Currency depreciation</span> making exports cheaper in foreign currency terms, potentially leading to higher export prices in domestic currency</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Reason 2: Fall in import prices</strong>
+                            <br>• <span class="import-price">Global oversupply</span> of imported goods (e.g., manufactured goods from China)
+                            <br>• <span class="import-price">Technological progress</span> reducing production costs abroad
+                            <br>• <span class="import-price">Currency appreciation</span> making imports cheaper in domestic currency
+                            <br>• <span class="import-price">Trade liberalization</span> reducing tariffs and lowering import prices</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Impact on current account (theoretical):</strong> TOT improvement should benefit the current account because:
+                            <br>• <span class="highlight-term">Income effect:</span> Higher export prices mean more revenue from the same quantity of exports
+                            <br>• <span class="highlight-term">Cost effect:</span> Lower import prices reduce expenditure on the same quantity of imports
+                            <br>• Net effect: $(X - M)$ improves, assuming quantities remain constant</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 (3 marks):</strong>
+                            <br>1. Correct definition/formula of TOT (1 mark)
+                            <br>2. Explanation of export price rise as a reason (1 mark)
+                            <br>3. Explanation of import price fall as a reason (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (a) - Current Account Impact Analysis (Interactive)</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Critical factor: Price Elasticity of Demand (PED)</strong> As shown in the diagram, the actual impact on current account depends on whether demand for exports and imports is elastic or inelastic.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Inelastic demand scenario:</strong>
+                            <br>• Export PED < 1: Higher export prices → smaller % decrease in quantity demanded → export revenue increases
+                            <br>• Import PED < 1: Lower import prices → smaller % increase in quantity demanded → import expenditure decreases
+                            <br>• Result: <span class="highlight-term">Current account improves</span> (as shown in the diagram with inelastic PED)</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Elastic demand scenario:</strong>
+                            <br>• Export PED > 1: Higher export prices → larger % decrease in quantity demanded → export revenue may decrease
+                            <br>• Import PED > 1: Lower import prices → larger % increase in quantity demanded → import expenditure may increase
+                            <br>• Result: <span class="highlight-term">Current account may worsen</span> despite TOT improvement</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Marshall-Lerner Condition:</strong> TOT improvement benefits current account only if $$|\text{PED}_X| + |\text{PED}_M| > 1$$ where PED<sub>X</sub> is price elasticity of demand for exports and PED<sub>M</sub> is for imports.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>J-Curve effect:</strong> In the short run, demand tends to be inelastic as consumers adjust slowly. Current account may initially improve (due to price effects) but then deteriorate in the long run as quantities adjust.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO2 (3 marks):</strong>
+                            <br>1. Analysis of how TOT change affects export/import values (1 mark)
+                            <br>2. Explanation of the role of price elasticity (1 mark)
+                            <br>3. Further development (e.g., Marshall-Lerner condition) (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Government Policy & Comparative Advantage</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Comparative advantage defined:</strong> A country has comparative advantage in producing a good if it can produce it at a <span class="highlight-term">lower opportunity cost</span> than another country. Determined by relative factor endowments, technology, and productivity.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>How government policy can influence comparative advantage:</strong>
+                            <br>• <span class="highlight-term">Education and training:</span> Improves human capital, increasing productivity in skill-intensive sectors
+                            <br>• <span class="highlight-term">Research and development (R&D) subsidies:</span> Encourages innovation, creating technological advantages
+                            <br>• <span class="highlight-term">Infrastructure investment:</span> Reduces transport/logistics costs, making exports more competitive
+                            <br>• <span class="highlight-term">Industrial policy:</span> Targeted support for specific industries (e.g., subsidies, tax breaks)
+                            <br>• <span class="highlight-term">Trade policies:</span> Tariffs, quotas, and export subsidies can temporarily protect infant industries</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Production Possibility Curve (PPC) analysis:</strong> As shown in the diagram, government policies can:
+                            <br>1. Shift the PPC outward (economic growth), changing absolute advantage
+                            <br>2. Change the shape of the PPC (biased growth), altering comparative advantage by affecting opportunity costs differently across sectors</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Examples of successful policy influence:</strong>
+                            <br>• <span class="highlight-term">South Korea:</span> Government industrial policy developed comparative advantage in electronics and automobiles
+                            <br>• <span class="highlight-term">Singapore:</span> Education and infrastructure policies created comparative advantage in financial services
+                            <br>• <span class="highlight-term">Germany:</span> Apprenticeship system maintained comparative advantage in high-quality manufacturing</span>
+                        </div>
+                        
+                        <div class="comparison-table">
+                            <tr>
+                                <th>Policy Type</th>
+                                <th>How It Influences Comparative Advantage</th>
+                                <th>Example</th>
+                            </tr>
+                            <tr>
+                                <td><strong>Education/Training</strong></td>
+                                <td>Increases human capital, lowering opportunity cost in skill-intensive sectors</td>
+                                <td>German apprenticeship system for engineering</td>
+                            </tr>
+                            <tr>
+                                <td><strong>R&D Subsidies</strong></td>
+                                <td>Encourages innovation, creating technological advantages</td>
+                                <td>US government funding for tech research (DARPA, NSF)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Infrastructure</strong></td>
+                                <td>Reduces transport costs, making exports more competitive</td>
+                                <td>China's investment in ports and railways</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Trade Protection</strong></td>
+                                <td>Temporarily shields infant industries until they become competitive</td>
+                                <td>Japan's protection of auto industry in 1950s-60s</td>
+                            </tr>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation of TOT Impact</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Extent of benefit depends on multiple factors:</strong>
+                            <br>• <span class="highlight-term">Price elasticity of demand:</span> As shown in the diagram, inelastic demand leads to current account improvement, elastic demand may worsen it
+                            <br>• <span class="highlight-term">Time horizon:</span> Short-run vs. long-run elasticities differ (J-curve effect)
+                            <br>• <span class="highlight-term">Cause of TOT change:</span> Export price rise vs. import price fall may have different implications
+                            <br>• <span class="highlight-term">Initial position:</span> Countries with current account deficit may benefit more than those with surplus</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Secondary effects:</strong>
+                            <br>• <span class="highlight-term">Inflationary pressure:</span> Import price falls may reduce inflation, while export price rises may increase domestic prices
+                            <br>• <span class="highlight-term">Income distribution:</span> Export price rises benefit export sectors, import price falls benefit consumers and import-competing industries
+                            <br>• <span class="highlight-term">Competitiveness:</span> Export price rises may reduce competitiveness if not matched by quality improvements</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Empirical evidence:</strong>
+                            <br>• <span class="highlight-term">Commodity-exporting countries:</span> Often experience volatile TOT with ambiguous current account effects
+                            <br>• <span class="highlight-term">Manufactured goods exporters:</span> More stable TOT but face elastic demand, limiting benefits
+                            <br>• <span class="highlight-term">Oil exporters:</span> TOT improvements (oil price rises) typically improve current account due to inelastic demand</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> A TOT improvement from 105 to 110 is <span class="highlight-term">likely to benefit the current account</span>, but the extent depends crucially on price elasticities. For most economies with relatively inelastic export and import demand (common for primary commodities and essential manufactures), the current account will improve. However, for economies facing elastic demand (e.g., luxury goods exporters), the impact may be limited or negative.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (2 marks):</strong>
+                            <br>1. Evaluation of the extent to which TOT change benefits current account (1 mark)
+                            <br>2. Consideration of limitations/qualifications (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Balanced Evaluation of Policy Influence</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Limitations of government policy:</strong>
+                            <br>• <span class="highlight-term">Time lags:</span> Education and infrastructure investments take decades to affect comparative advantage
+                            <br>• <span class="highlight-term">Government failure:</span> Misallocation of resources, corruption, and bureaucratic inefficiency
+                            <br>• <span class="highlight-term">Crowding out:</span> Government investment may displace more efficient private investment
+                            <br>• <span class="highlight-term">Global competition:</span> Other countries may implement similar policies, nullifying advantages</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Market-based perspective:</strong> Comparative advantage is largely determined by <span class="highlight-term">market forces</span> (factor endowments, technology, preferences). Government intervention may distort these signals, leading to inefficient resource allocation. The <span class="highlight-term">infant industry argument</span> for protection has mixed success; many protected industries never become competitive.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Successful vs. unsuccessful interventions:</strong>
+                            <br>• <span class="highlight-term">Success stories:</span> East Asian Tigers (South Korea, Taiwan, Singapore) used targeted industrial policy effectively
+                            <br>• <span class="highlight-term">Failures:</span> Many Latin American and African countries experienced "white elephant" projects and rent-seeking
+                            <br>• <span class="highlight-term">Key differentiating factors:</strong> Institutional quality, policy consistency, export orientation</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Dynamic comparative advantage:</strong> In a globalized knowledge economy, comparative advantage is increasingly <span class="highlight-term">created rather than inherited</span>. Governments can play a role in:
+                            <br>• Creating innovation ecosystems (e.g., Silicon Valley)
+                            <br>• Developing specialized clusters (e.g., Italian fashion, Swiss watches)
+                            <br>• Investing in "general purpose technologies" with spillover effects</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>WTO constraints:</strong> International trade rules limit certain policies (e.g., export subsidies, local content requirements). Governments must work within these constraints while pursuing industrial policy.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            <span class="explanation"><strong>Context matters:</strong> The effectiveness of policy depends on:
+                            <br>• <span class="highlight-term">Level of development:</span> Developing countries may have more scope for "catch-up" policies
+                            <br>• <span class="highlight-term">Institutional capacity:</span> Effective implementation requires capable bureaucracy
+                            <br>• <span class="highlight-term">Political economy:</span> Policies must navigate interest groups and avoid capture</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">7</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Government policy <span class="highlight-term">can influence but not completely determine</span> an economy's comparative advantage. While market fundamentals (factor endowments, technology) establish the baseline, well-designed policies in education, infrastructure, R&D, and strategic industrial support can reshape comparative advantages over the long term. However, such interventions carry risks of government failure and must be carefully designed, implemented consistently, and adapted to changing global conditions. The most successful cases combine market signals with strategic government support rather than replacing markets with central planning.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 & AO2 (8 marks):</strong>
+                            <br>Level 3 (6-8 marks): Detailed analysis of how policies influence comparative advantage, accurate use of concepts
+                            <br>Level 2 (3-5 marks): Some analysis with limited development, some inaccuracies
+                            <br>Level 1 (1-2 marks): Assertive/descriptive, lacking explanations or relevance</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (4 marks):</strong>
+                            <br>Level 2 (3-4 marks): Developed, reasoned evaluative comments with justified conclusion
+                            <br>Level 1 (1-2 marks): Simple evaluative comments with little development/support
+                            <br>0 marks: One-sided response or no evaluation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Complete Model Answer [8 Marks]</div>
+                            
+                            <p>The terms of trade (TOT) index measures the relative price of a country's exports compared to its imports, calculated as $$\text{TOT} = \frac{\text{Index of export prices}}{\text{Index of import prices}} \times 100$$. An increase from 105 to 110 represents an <span class="highlight-term">improvement</span> in the terms of trade, indicating that the country can purchase more imports with the same quantity of exports. This change could result from two primary reasons.</p>
+                            
+                            <p><span class="model-sub">Reason 1: Increase in export prices:</span> The TOT improvement may stem from rising prices for the country's exports. This could occur due to <span class="export-price">increased global demand</span> for its export commodities (e.g., a resource boom driven by growth in trading partners), <span class="export-price">improved product quality or branding</span> allowing premium pricing, or <span class="export-price">currency depreciation</span> that increases export prices measured in domestic currency (though it may decrease them in foreign currency). For instance, a commodity-exporting country experiencing a price surge for its primary exports (like oil or minerals) would see its TOT improve.</p>
+                            
+                            <p><span class="model-sub">Reason 2: Decrease in import prices:</span> Alternatively, the TOT improvement could result from falling import prices. This might be caused by <span class="import-price">global oversupply</span> of manufactured goods (particularly from large producers like China), <span class="import-price">technological advancements</span> abroad that reduce production costs, <span class="import-price">currency appreciation</span> making imports cheaper in domestic currency terms, or <span class="import-price">trade liberalization</span> reducing tariffs and thus the landed cost of imports. For example, a country importing manufactured goods may benefit from global productivity improvements that lower import prices.</p>
+                            
+                            <p><span class="model-sub">Impact on current account - theoretical perspective:</span> Initially, a TOT improvement appears beneficial for the current account balance. Higher export prices increase export revenue (assuming constant quantity), while lower import prices reduce import expenditure (assuming constant quantity). This would improve net exports $(X - M)$ and thus the current account. The <span class="highlight-term">income effect</span> (more export revenue) and <span class="highlight-term">cost effect</span> (lower import bills) both work in favor of current account improvement.</p>
+                            
+                            <p><span class="model-sub">Critical qualification - price elasticity of demand:</span> However, the actual impact depends crucially on the <span class="highlight-term">price elasticity of demand (PED)</span> for exports and imports. According to the Marshall-Lerner condition, a TOT improvement benefits the current account only if $|\text{PED}_X| + |\text{PED}_M| > 1$. If demand is relatively <span class="highlight-term">inelastic</span> (PED < 1), as is common for essential commodities and manufactured goods with few substitutes, the quantity response will be smaller than the price change. In this case, export revenue increases and import expenditure decreases, improving the current account. Conversely, if demand is <span class="highlight-term">elastic</span> (PED > 1), higher export prices may cause proportionally larger quantity reductions, potentially decreasing export revenue, while lower import prices may spur proportionally larger quantity increases, potentially raising import expenditure - possibly worsening the current account despite TOT improvement.</p>
+                            
+                            <p><span class="model-sub">Time dimension and J-curve effect:</span> Furthermore, elasticities differ between short and long run. In the short run, demand is typically more inelastic as consumers and producers need time to adjust. Thus, a TOT improvement may initially boost the current account (due to price effects dominating), but over time as quantities adjust, the impact may diminish or reverse - the so-called <span class="highlight-term">J-curve effect</span>.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> A TOT improvement from 105 to 110 is <span class="highlight-term">likely to benefit the current account</span> for most economies, particularly those exporting goods with inelastic demand (primary commodities) or importing goods with inelastic demand (essential manufactures). However, the extent of benefit depends critically on price elasticities, with the possibility of perverse outcomes if demand is highly elastic. Empirical evidence suggests that commodity exporters typically experience current account improvements from TOT gains, while manufactured goods exporters face more ambiguous effects due to more elastic demand.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Complete Model Answer [12 Marks]</div>
+                            
+                            <p>Comparative advantage, defined as the ability to produce a good or service at a lower opportunity cost than another country, is traditionally viewed as determined by exogenous factors like natural resource endowments, climate, and historical technological development. However, governments can influence comparative advantage through various policies, though the extent and effectiveness of such influence are subject to significant debate and qualification.</p>
+                            
+                            <p><span class="model-sub">Mechanisms of policy influence:</span> Governments can attempt to shape comparative advantage through multiple channels. <span class="highlight-term">Education and training policies</span> enhance human capital, potentially lowering the opportunity cost of producing skill-intensive goods and services. <span class="highlight-term">Research and development (R&D) subsidies</span> can spur innovation, creating technological advantages in specific sectors. <span class="highlight-term">Infrastructure investment</span> reduces transport and logistics costs, making exports more competitive internationally. <span class="highlight-term">Industrial policies</span> such as targeted subsidies, tax incentives, or strategic trade protection can nurture "infant industries" until they achieve economies of scale and international competitiveness. These policies can shift a country's production possibility frontier (PPF) or alter its shape, thereby changing opportunity costs and comparative advantage.</p>
+                            
+                            <p><span class="model-sub">Historical successes:</span> Several countries have successfully shaped their comparative advantages through strategic policies. <span class="highlight-term">South Korea</span> transformed from a low-income agricultural economy to a high-tech manufacturing powerhouse through decades of targeted industrial policy, education investment, and export promotion. <span class="highlight-term">Singapore</span> developed comparative advantage in financial services and high-value manufacturing through exceptional investment in education, infrastructure, and business-friendly institutions. <span class="highlight-term">Germany</span> maintains comparative advantage in precision engineering through its dual education system and support for Mittelstand (small and medium-sized enterprises). These cases demonstrate that comparative advantage is not entirely predetermined but can be cultivated.</p>
+                            
+                            <p><span class="model-sub">Limitations and risks:</span> However, government attempts to influence comparative advantage face substantial constraints. <span class="highlight-term">Time lags</span> are significant - education reforms may take a generation to affect the workforce, and R&D investments may take decades to yield commercial applications. <span class="highlight-term">Government failure</span> risks include misallocation of resources due to political rather than economic considerations, bureaucratic inefficiency, and corruption. The <span class="highlight-term">infant industry argument</span> for protection often fails in practice, with protected industries sometimes never becoming competitive ("infant industry senility"). <span class="highlight-term">Global competition</span> means other countries may implement similar policies, potentially nullifying any advantage. Furthermore, <span class="highlight-term">WTO rules</span> constrain certain policies like export subsidies and local content requirements.</p>
+                            
+                            <p><span class="model-sub">Market-based critique:</span> From a neoclassical perspective, comparative advantage emerges naturally from market forces reflecting factor endowments and consumer preferences. Government intervention risks distorting these signals, leading to inefficient resource allocation. The <span class="highlight-term">Washington Consensus</span> of the 1990s emphasized market liberalization over industrial policy, arguing that governments lack the information to "pick winners" effectively. Many failed industrial policies in Latin America and Africa support this skepticism, where state-led development often resulted in "white elephant" projects and rent-seeking.</p>
+                            
+                            <p><span class="model-sub">Dynamic comparative advantage in the knowledge economy:</span> In today's globalized economy, comparative advantage is increasingly <span class="highlight-term">dynamic and created</span> rather than static and inherited. Knowledge, innovation, and institutional quality have become more important than natural resources. Governments can foster environments conducive to innovation through investments in basic research, intellectual property protection, and innovation clusters (like Silicon Valley). These "horizontal" policies that improve the general business environment may be more effective than "vertical" policies targeting specific industries.</p>
+                            
+                            <p><span class="model-sub">Contextual factors:</span> The effectiveness of policy depends crucially on context. <span class="highlight-term">Developing countries</span> may have more scope for catch-up through technology transfer and basic education, while <span class="highlight-term">advanced economies</span> must focus on innovation frontiers. <span class="highlight-term">Institutional quality</span> determines implementation capacity - policies that succeeded in East Asia's capable states might fail in countries with weak governance. <span class="highlight-term">Political economy</span> considerations are paramount, as industrial policy can be captured by special interests.</p>
+                            
+                            <p><span class="model-sub">Balanced assessment:</span> Government policy <span class="highlight-term">can influence but not completely determine</span> an economy's comparative advantage. While fundamental factors like geography and resource endowments establish baseline constraints, well-designed policies in education, infrastructure, R&D, and strategic support can reshape comparative advantages over the long term. The most successful approaches combine market signals with strategic government support rather than replacing markets with central planning. For instance, East Asian success stories typically featured close public-private collaboration, export orientation (maintaining market discipline), and gradual phasing out of protection as industries matured.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> In assessing whether government policy can influence comparative advantage, the answer is nuanced. Policy <span class="highlight-term">can make a significant difference</span>, particularly in creating dynamic comparative advantages in knowledge-intensive sectors. However, such influence is constrained by implementation capacity, global competition, and the risk of government failure. The most effective policies are those that complement rather than contradict market forces, focus on building fundamental capabilities (human capital, infrastructure, institutions), and adapt flexibly to changing global conditions. While governments cannot arbitrarily decree comparative advantage, they can create conditions that enable its evolution in desirable directions over the long term.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            // 初始贸易条件
+            initialTOT: 105,
+            newTOT: 110,
+            
+            // 价格指数
+            exportPriceIndex: 105,  // 初始出口价格指数
+            importPriceIndex: 100,  // 初始进口价格指数
+            
+            // 弹性参数
+            elasticities: {
+                inelastic: {
+                    pedExports: 0.4,
+                    pedImports: 0.3,
+                    label: "Inelastic (PED < 1)"
+                },
+                elastic: {
+                    pedExports: 1.8,
+                    pedImports: 1.5,
+                    label: "Elastic (PED > 1)"
+                }
+            },
+            
+            // TOT变化原因
+            totCauses: {
+                export: {
+                    exportChange: 10,  // 出口价格上涨10点
+                    importChange: 0,   // 进口价格不变
+                    label: "Export Price Rise"
+                },
+                import: {
+                    exportChange: 0,   // 出口价格不变
+                    importChange: -5,  // 进口价格下降5点
+                    label: "Import Price Fall"
+                }
+            },
+            
+            // 政策影响参数
+            policyStrength: 0, // 0-100
+            policyEffectOnCA: 1.2, // 政策对比较优势的影响系数
+            
+            // 当前设置
+            currentCause: "export",
+            currentElasticity: "inelastic",
+            isExamMode: false
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            const tabIndex = tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3;
+            document.querySelector(`.tab:nth-child(${tabIndex})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 贸易图表功能 ====================
+        const tradeCanvas = document.getElementById('tradeCanvas');
+        const tradeCtx = tradeCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeTradeCanvas() {
+            if (!tradeCanvas.parentElement) return;
+            
+            canvasWidth = tradeCanvas.parentElement.clientWidth;
+            canvasHeight = tradeCanvas.parentElement.clientHeight;
+            tradeCanvas.width = canvasWidth;
+            tradeCanvas.height = canvasHeight;
+            
+            drawTradeChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeTradeCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeTradeCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeTradeCanvas, 300);
+            setTimeout(resizeTradeCanvas, 1000);
+        }
+        
+        // 设置TOT变化原因
+        function setTOTCause(cause) {
+            ECONOMIC_PARAMS.currentCause = cause;
+            
+            // 更新按钮状态
+            document.getElementById('exportBtn').classList.remove('active');
+            document.getElementById('importBtn').classList.remove('active');
+            document.getElementById(`${cause}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateTradeChart();
+        }
+        
+        // 设置弹性
+        function setElasticity(elasticity) {
+            ECONOMIC_PARAMS.currentElasticity = elasticity;
+            
+            // 更新按钮状态
+            document.getElementById('inelasticBtn').classList.remove('active');
+            document.getElementById('elasticBtn').classList.remove('active');
+            document.getElementById(`${elasticity}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateTradeChart();
+        }
+        
+        // 更新图表（政策滑块变动时调用）
+        function updateTradeChart() {
+            ECONOMIC_PARAMS.policyStrength = parseInt(document.getElementById('policySlider').value);
+            ECONOMIC_PARAMS.isExamMode = false;
+            drawTradeChart();
+            updateDataPanel();
+        }
+        
+        // 显示考试模式（比较优势转移）
+        function showExamMode() {
+            ECONOMIC_PARAMS.isExamMode = true;
+            ECONOMIC_PARAMS.policyStrength = 80; // 强政策影响
+            document.getElementById('policySlider').value = 80;
+            drawTradeChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetTradeChart() {
+            ECONOMIC_PARAMS.isExamMode = false;
+            ECONOMIC_PARAMS.policyStrength = 0;
+            document.getElementById('policySlider').value = 0;
+            ECONOMIC_PARAMS.currentCause = "export";
+            document.getElementById('exportBtn').classList.add('active');
+            document.getElementById('importBtn').classList.remove('active');
+            ECONOMIC_PARAMS.currentElasticity = "inelastic";
+            document.getElementById('inelasticBtn').classList.add('active');
+            document.getElementById('elasticBtn').classList.remove('active');
+            drawTradeChart();
+            updateDataPanel();
+        }
+        
+        // 绘制贸易图表
+        function drawTradeChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            tradeCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#333';
+            tradeCtx.lineWidth = 2;
+            
+            // Y轴（价格指数）
+            tradeCtx.moveTo(padding.left, padding.top);
+            tradeCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（时间/数量）
+            tradeCtx.moveTo(padding.left, padding.top + graphHeight);
+            tradeCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            tradeCtx.stroke();
+            
+            // 坐标轴标签
+            tradeCtx.font = 'bold 14px Arial';
+            tradeCtx.fillStyle = '#333';
+            tradeCtx.textAlign = 'center';
+            
+            // Y轴标签
+            tradeCtx.save();
+            tradeCtx.translate(25, padding.top + graphHeight / 2);
+            tradeCtx.rotate(-Math.PI / 2);
+            tradeCtx.fillText("Price Index / Quantity", 0, 0);
+            tradeCtx.restore();
+            
+            // X轴标签
+            tradeCtx.fillText("Time / Policy Impact", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            tradeCtx.strokeStyle = '#eee';
+            tradeCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                tradeCtx.beginPath();
+                tradeCtx.moveTo(padding.left, y);
+                tradeCtx.lineTo(padding.left + graphWidth, y);
+                tradeCtx.stroke();
+                
+                // Y轴刻度标签
+                const value = (120 - (i * 20)).toFixed(0);
+                tradeCtx.fillStyle = '#666';
+                tradeCtx.font = '12px Arial';
+                tradeCtx.textAlign = 'right';
+                tradeCtx.fillText(value, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                tradeCtx.beginPath();
+                tradeCtx.moveTo(x, padding.top);
+                tradeCtx.lineTo(x, padding.top + graphHeight);
+                tradeCtx.stroke();
+                
+                // X轴刻度标签
+                const labels = ["Initial", "TOT Change", "Short-run", "Long-run", "Policy"];
+                tradeCtx.fillStyle = '#666';
+                tradeCtx.font = '12px Arial';
+                tradeCtx.textAlign = 'center';
+                if (i < labels.length) {
+                    tradeCtx.fillText(labels[i], x, padding.top + graphHeight + 20);
+                }
+            }
+            
+            // 当前参数
+            const cause = ECONOMIC_PARAMS.totCauses[ECONOMIC_PARAMS.currentCause];
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentElasticity];
+            const policyFactor = ECONOMIC_PARAMS.policyStrength / 100;
+            
+            // 计算新的价格指数
+            const newExportPrice = ECONOMIC_PARAMS.exportPriceIndex + cause.exportChange;
+            const newImportPrice = ECONOMIC_PARAMS.importPriceIndex + cause.importChange;
+            const newTOT = (newExportPrice / newImportPrice) * 100;
+            
+            // 绘制初始出口价格线
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#2980b9';
+            tradeCtx.lineWidth = 3;
+            
+            const exportStartX = padding.left;
+            const exportStartY = padding.top + graphHeight - (ECONOMIC_PARAMS.exportPriceIndex / 120) * graphHeight;
+            const exportMidX = padding.left + graphWidth * 0.25;
+            const exportMidY = padding.top + graphHeight - (newExportPrice / 120) * graphHeight;
+            const exportEndX = padding.left + graphWidth * 0.75;
+            const exportEndY = exportMidY; // 保持稳定
+            
+            tradeCtx.moveTo(exportStartX, exportStartY);
+            tradeCtx.lineTo(exportMidX, exportMidY);
+            tradeCtx.lineTo(exportEndX, exportEndY);
+            tradeCtx.stroke();
+            
+            // 出口价格标签
+            tradeCtx.fillStyle = '#2980b9';
+            tradeCtx.font = 'bold 14px Arial';
+            tradeCtx.textAlign = 'left';
+            tradeCtx.fillText("Export Price Index", exportEndX - 100, exportStartY - 10);
+            
+            // 绘制初始进口价格线
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#e67e22';
+            tradeCtx.lineWidth = 3;
+            
+            const importStartX = padding.left;
+            const importStartY = padding.top + graphHeight - (ECONOMIC_PARAMS.importPriceIndex / 120) * graphHeight;
+            const importMidX = padding.left + graphWidth * 0.25;
+            const importMidY = padding.top + graphHeight - (newImportPrice / 120) * graphHeight;
+            const importEndX = padding.left + graphWidth * 0.75;
+            const importEndY = importMidY; // 保持稳定
+            
+            tradeCtx.moveTo(importStartX, importStartY);
+            tradeCtx.lineTo(importMidX, importMidY);
+            tradeCtx.lineTo(importEndX, importEndY);
+            tradeCtx.stroke();
+            
+            // 进口价格标签
+            tradeCtx.fillStyle = '#e67e22';
+            tradeCtx.fillText("Import Price Index", importEndX - 100, importStartY + 20);
+            
+            // 绘制贸易条件线 (TOT)
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#27ae60';
+            tradeCtx.lineWidth = 3;
+            tradeCtx.setLineDash([5, 5]);
+            
+            const totStartY = padding.top + graphHeight - (ECONOMIC_PARAMS.initialTOT / 120) * graphHeight;
+            const totMidY = padding.top + graphHeight - (newTOT / 120) * graphHeight;
+            
+            tradeCtx.moveTo(padding.left, totStartY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.25, totMidY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.75, totMidY);
+            tradeCtx.stroke();
+            
+            tradeCtx.setLineDash([]);
+            
+            // TOT标签
+            tradeCtx.fillStyle = '#27ae60';
+            tradeCtx.fillText(`TOT: ${ECONOMIC_PARAMS.initialTOT} → ${newTOT.toFixed(1)}`, padding.left + graphWidth * 0.5, totMidY - 20);
+            
+            // 标记TOT变化点
+            tradeCtx.beginPath();
+            tradeCtx.arc(padding.left + graphWidth * 0.25, totMidY, 6, 0, Math.PI * 2);
+            tradeCtx.fillStyle = '#27ae60';
+            tradeCtx.fill();
+            tradeCtx.strokeStyle = '#2c3e50';
+            tradeCtx.lineWidth = 2;
+            tradeCtx.stroke();
+            
+            // 绘制出口数量线（受弹性影响）
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#2980b9';
+            tradeCtx.lineWidth = 2;
+            tradeCtx.setLineDash([3, 3]);
+            
+            // 初始出口数量（标准化）
+            const exportQStart = 50;
+            // 价格变化百分比
+            const exportPriceChangePercent = cause.exportChange / ECONOMIC_PARAMS.exportPriceIndex * 100;
+            // 数量变化取决于弹性
+            const exportQChange = exportQStart * (elasticity.pedExports * exportPriceChangePercent / 100);
+            const exportQNew = exportQStart + exportQChange;
+            
+            const exportQStartY = padding.top + graphHeight - (exportQStart / 100) * graphHeight;
+            const exportQMidY = padding.top + graphHeight - (exportQNew / 100) * graphHeight;
+            
+            tradeCtx.moveTo(padding.left + graphWidth * 0.25, exportQStartY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.5, exportQMidY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.75, exportQMidY);
+            tradeCtx.stroke();
+            
+            // 出口数量标签
+            tradeCtx.fillStyle = '#2980b9';
+            tradeCtx.font = 'italic 12px Arial';
+            tradeCtx.fillText(`Export Q: ${exportQStart.toFixed(0)} → ${exportQNew.toFixed(0)}`, padding.left + graphWidth * 0.6, exportQMidY - 10);
+            
+            // 绘制进口数量线
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = '#e67e22';
+            tradeCtx.lineWidth = 2;
+            
+            // 初始进口数量
+            const importQStart = 48;
+            // 价格变化百分比（进口价格下降为负值）
+            const importPriceChangePercent = cause.importChange / ECONOMIC_PARAMS.importPriceIndex * 100;
+            // 数量变化取决于弹性（注意：进口价格下降，数量应增加）
+            const importQChange = importQStart * (elasticity.pedImports * (-importPriceChangePercent) / 100);
+            const importQNew = importQStart + importQChange;
+            
+            const importQStartY = padding.top + graphHeight - (importQStart / 100) * graphHeight;
+            const importQMidY = padding.top + graphHeight - (importQNew / 100) * graphHeight;
+            
+            tradeCtx.moveTo(padding.left + graphWidth * 0.25, importQStartY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.5, importQMidY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.75, importQMidY);
+            tradeCtx.stroke();
+            
+            tradeCtx.setLineDash([]);
+            
+            // 进口数量标签
+            tradeCtx.fillStyle = '#e67e22';
+            tradeCtx.fillText(`Import Q: ${importQStart.toFixed(0)} → ${importQNew.toFixed(0)}`, padding.left + graphWidth * 0.6, importQMidY + 20);
+            
+            // 计算当前账户余额
+            const initialExportValue = exportQStart * (ECONOMIC_PARAMS.exportPriceIndex / 100);
+            const initialImportValue = importQStart * (ECONOMIC_PARAMS.importPriceIndex / 100);
+            const initialCA = initialExportValue - initialImportValue;
+            
+            const newExportValue = exportQNew * (newExportPrice / 100);
+            const newImportValue = importQNew * (newImportPrice / 100);
+            const newCA = newExportValue - newImportValue;
+            
+            // 绘制当前账户余额线
+            tradeCtx.beginPath();
+            tradeCtx.strokeStyle = newCA >= initialCA ? '#27ae60' : '#e74c3c';
+            tradeCtx.lineWidth = 4;
+            
+            const caScale = 2; // 缩放因子以便在图表中显示
+            const caStartY = padding.top + graphHeight - ((initialCA + 50) / 100) * graphHeight * caScale;
+            const caMidY = padding.top + graphHeight - ((newCA + 50) / 100) * graphHeight * caScale;
+            
+            tradeCtx.moveTo(padding.left, caStartY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.25, caMidY);
+            tradeCtx.lineTo(padding.left + graphWidth * 0.75, caMidY);
+            tradeCtx.stroke();
+            
+            // 当前账户标签
+            tradeCtx.fillStyle = newCA >= initialCA ? '#27ae60' : '#e74c3c';
+            tradeCtx.font = 'bold 14px Arial';
+            tradeCtx.fillText(`Current Account: ${initialCA.toFixed(1)} → ${newCA.toFixed(1)}`, 
+                             padding.left + graphWidth * 0.5, caMidY - 15);
+            
+            // 如果政策强度>0，绘制政策影响区域
+            if (ECONOMIC_PARAMS.policyStrength > 0) {
+                // 政策影响比较优势，改变出口潜力
+                const policyEffect = policyFactor * ECONOMIC_PARAMS.policyEffectOnCA;
+                const postPolicyCA = newCA * (1 + policyEffect);
+                
+                tradeCtx.beginPath();
+                tradeCtx.strokeStyle = '#9b59b6';
+                tradeCtx.lineWidth = 4;
+                tradeCtx.setLineDash([5, 5]);
+                
+                const postPolicyY = padding.top + graphHeight - ((postPolicyCA + 50) / 100) * graphHeight * caScale;
+                
+                tradeCtx.moveTo(padding.left + graphWidth * 0.75, caMidY);
+                tradeCtx.lineTo(padding.left + graphWidth, postPolicyY);
+                tradeCtx.stroke();
+                
+                tradeCtx.setLineDash([]);
+                
+                // 政策影响标签
+                tradeCtx.fillStyle = '#9b59b6';
+                tradeCtx.font = 'bold 12px Arial';
+                tradeCtx.textAlign = 'right';
+                tradeCtx.fillText(`Policy effect: +${(policyEffect * 100).toFixed(1)}%`, 
+                                 padding.left + graphWidth - 10, postPolicyY - 10);
+                
+                // 绘制PPC变化示意图（简化）
+                const ppcX = padding.left + graphWidth * 0.85;
+                const ppcY = padding.top + graphHeight * 0.3;
+                const ppcRadius = 40;
+                
+                // 初始PPC（凹向原点）
+                tradeCtx.beginPath();
+                tradeCtx.strokeStyle = '#7f8c8d';
+                tradeCtx.lineWidth = 2;
+                
+                // 绘制简化的PPC弧线
+                tradeCtx.arc(ppcX, ppcY, ppcRadius, Math.PI * 0.7, Math.PI * 0.3, false);
+                tradeCtx.stroke();
+                
+                // 政策后的PPC（向外移动且形状变化）
+                tradeCtx.beginPath();
+                tradeCtx.strokeStyle = '#9b59b6';
+                tradeCtx.lineWidth = 3;
+                
+                // 向外移动并改变形状（偏向某商品）
+                const newPpcRadius = ppcRadius * (1 + policyFactor * 0.3);
+                // 改变弧线角度，模拟偏向性增长
+                tradeCtx.arc(ppcX, ppcY, newPpcRadius, Math.PI * 0.8, Math.PI * 0.2, false);
+                tradeCtx.stroke();
+                
+                // PPC标签
+                tradeCtx.fillStyle = '#2c3e50';
+                tradeCtx.font = '10px Arial';
+                tradeCtx.textAlign = 'center';
+                tradeCtx.fillText("PPC Shift:", ppcX, ppcY + ppcRadius + 25);
+                tradeCtx.fillText("Comparative", ppcX, ppcY + ppcRadius + 40);
+                tradeCtx.fillText("Advantage Change", ppcX, ppcY + ppcRadius + 55);
+            }
+            
+            // 显示TOT变化原因
+            tradeCtx.fillStyle = '#2c3e50';
+            tradeCtx.font = 'bold 14px Arial';
+            tradeCtx.textAlign = 'center';
+            tradeCtx.fillText(`TOT Change Cause: ${cause.label}`, canvasWidth / 2, padding.top - 20);
+            
+            // 显示弹性情景
+            tradeCtx.fillStyle = elasticity.pedExports < 1 ? '#e67e22' : '#2980b6';
+            tradeCtx.fillText(`Elasticity: ${elasticity.label}`, canvasWidth / 2, padding.top - 5);
+            
+            // 显示政策强度
+            if (ECONOMIC_PARAMS.policyStrength > 0) {
+                tradeCtx.fillStyle = '#9b59b6';
+                tradeCtx.fillText(`Policy Influence: ${ECONOMIC_PARAMS.policyStrength}%`, canvasWidth / 2, padding.top + 15);
+            }
+            
+            // 如果处于考试模式，显示关键概念注释
+            if (ECONOMIC_PARAMS.isExamMode) {
+                tradeCtx.fillStyle = '#e74c3c';
+                tradeCtx.font = 'italic 13px Arial';
+                tradeCtx.fillText("Comparative advantage can shift with government policy over time", 
+                                 canvasWidth / 2, padding.top + graphHeight + 60);
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            tradeCtx.fillStyle = '#2980b9';
+            tradeCtx.fillRect(legendX, legendY, 15, 15);
+            tradeCtx.fillStyle = '#333';
+            tradeCtx.font = '12px Arial';
+            tradeCtx.textAlign = 'left';
+            tradeCtx.fillText("Export Prices", legendX + 25, legendY + 12);
+            
+            tradeCtx.fillStyle = '#e67e22';
+            tradeCtx.fillRect(legendX, legendY + 25, 15, 15);
+            tradeCtx.fillStyle = '#333';
+            tradeCtx.fillText("Import Prices", legendX + 25, legendY + 37);
+            
+            tradeCtx.fillStyle = '#27ae60';
+            tradeCtx.fillRect(legendX, legendY + 50, 15, 15);
+            tradeCtx.fillStyle = '#333';
+            tradeCtx.fillText("Terms of Trade", legendX + 25, legendY + 62);
+            
+            tradeCtx.fillStyle = newCA >= initialCA ? '#27ae60' : '#e74c3c';
+            tradeCtx.beginPath();
+            tradeCtx.moveTo(legendX, legendY + 75);
+            tradeCtx.lineTo(legendX + 15, legendY + 75);
+            tradeCtx.lineWidth = 3;
+            tradeCtx.stroke();
+            tradeCtx.fillStyle = '#333';
+            tradeCtx.fillText("Current Account", legendX + 25, legendY + 80);
+            
+            if (ECONOMIC_PARAMS.policyStrength > 0) {
+                tradeCtx.fillStyle = '#9b59b6';
+                tradeCtx.beginPath();
+                tradeCtx.moveTo(legendX, legendY + 95);
+                tradeCtx.lineTo(legendX + 15, legendY + 95);
+                tradeCtx.lineWidth = 3;
+                tradeCtx.setLineDash([5, 5]);
+                tradeCtx.stroke();
+                tradeCtx.setLineDash([]);
+                tradeCtx.fillStyle = '#333';
+                tradeCtx.fillText("Policy Effect", legendX + 25, legendY + 100);
+            }
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            const cause = ECONOMIC_PARAMS.totCauses[ECONOMIC_PARAMS.currentCause];
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentElasticity];
+            const policyFactor = ECONOMIC_PARAMS.policyStrength / 100;
+            
+            // 计算新的价格指数
+            const newExportPrice = ECONOMIC_PARAMS.exportPriceIndex + cause.exportChange;
+            const newImportPrice = ECONOMIC_PARAMS.importPriceIndex + cause.importChange;
+            const newTOT = (newExportPrice / newImportPrice) * 100;
+            
+            // 计算出口数量变化
+            const exportPriceChangePercent = cause.exportChange / ECONOMIC_PARAMS.exportPriceIndex * 100;
+            const exportQChange = 50 * (elasticity.pedExports * exportPriceChangePercent / 100);
+            const exportQNew = 50 + exportQChange;
+            
+            // 计算进口数量变化
+            const importPriceChangePercent = cause.importChange / ECONOMIC_PARAMS.importPriceIndex * 100;
+            const importQChange = 48 * (elasticity.pedImports * (-importPriceChangePercent) / 100);
+            const importQNew = 48 + importQChange;
+            
+            // 计算当前账户余额
+            const initialExportValue = 50 * (ECONOMIC_PARAMS.exportPriceIndex / 100);
+            const initialImportValue = 48 * (ECONOMIC_PARAMS.importPriceIndex / 100);
+            const initialCA = initialExportValue - initialImportValue;
+            
+            const newExportValue = exportQNew * (newExportPrice / 100);
+            const newImportValue = importQNew * (newImportPrice / 100);
+            let newCA = newExportValue - newImportValue;
+            
+            // 政策影响
+            if (ECONOMIC_PARAMS.policyStrength > 0) {
+                const policyEffect = policyFactor * ECONOMIC_PARAMS.policyEffectOnCA;
+                newCA = newCA * (1 + policyEffect);
+            }
+            
+            // 更新显示
+            document.getElementById('totIndex').textContent = `${ECONOMIC_PARAMS.initialTOT} → ${newTOT.toFixed(1)}`;
+            document.getElementById('exportValue').textContent = `${newExportValue.toFixed(1)}`;
+            document.getElementById('importValue').textContent = `${newImportValue.toFixed(1)}`;
+            
+            const caElement = document.getElementById('currentAccount');
+            caElement.textContent = newCA >= 0 ? `+${newCA.toFixed(1)} bn` : `${newCA.toFixed(1)} bn`;
+            caElement.style.color = newCA >= initialCA ? '#27ae60' : '#e74c3c';
+            
+            document.getElementById('pedValue').textContent = elasticity.label;
+            document.getElementById('pedValue').style.color = elasticity.pedExports < 1 ? '#e67e22' : '#2980b6';
+            
+            const policyElement = document.getElementById('policyEffect');
+            if (ECONOMIC_PARAMS.policyStrength === 0) {
+                policyElement.textContent = "None";
+                policyElement.style.color = '#9b59b6';
+            } else if (ECONOMIC_PARAMS.policyStrength < 50) {
+                policyElement.textContent = "Moderate";
+                policyElement.style.color = '#9b59b6';
+            } else {
+                policyElement.textContent = "Strong";
+                policyElement.style.color = '#9b59b6';
+            }
+            
+            if (ECONOMIC_PARAMS.isExamMode) {
+                policyElement.textContent += " (CA shift possible)";
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置TOT变化原因和弹性
+            setTOTCause('export');
+            setElasticity('inelastic');
+            
+            // 初始化贸易图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 添加resize事件监听
+            window.addEventListener('resize', resizeTradeCanvas);
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+    </script>
+</body>
+</html>

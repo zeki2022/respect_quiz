@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q4 - Economic Growth Causes & Impacts</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4fff4;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #e8f8f0;
+            padding: 20px;
+            border-left: 4px solid #2ecc71;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+        
+        button.exam-btn {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #d35400;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #2ecc71;
+        }
+        
+        .tab.active {
+            color: #2ecc71;
+            border-bottom-color: #2ecc71;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #2ecc71;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #2ecc71;
+            font-weight: bold;
+            background-color: #e8f8f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #2ecc71;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #2ecc71;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .growth-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .definition-box {
+            background: #fff8e1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ffb300;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .benefits {
+            background-color: #e8f8f5;
+        }
+        
+        .costs {
+            background-color: #ffeaea;
+        }
+        
+        .ad-growth {
+            color: #2980b9;
+            font-weight: bold;
+        }
+        
+        .as-growth {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        
+        .macro-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .indicator {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .indicator-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .indicator-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .positive {
+            color: #27ae60;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .neutral {
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section C / Question 4</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>4 (a)</strong> Explain two causes of economic growth and consider the extent to which their impact can be measured. [8]</p>
+                    
+                    <!-- 原图占位符 - 题目无原图 -->
+                    <div class="orig-img">
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            <em>Original diagram would appear here if provided in the question paper.</em>
+                        </div>
+                    </div>
+                    
+                    <div class="growth-info">
+                        <p><strong>Key Concept: Economic Growth</strong> - An increase in the real value of goods and services produced in an economy over time, typically measured by the percentage increase in real Gross Domestic Product (GDP).</p>
+                        <p><strong>GDP Growth Formula:</strong> $$\text{Growth Rate} = \frac{\text{GDP}_{\text{current}} - \text{GDP}_{\text{previous}}}{\text{GDP}_{\text{previous}}} \times 100\%$$</p>
+                    </div>
+                    
+                    <p><strong>(b)</strong> Assess the extent to which economic growth is always beneficial for the people and government in an economy. [12]</p>
+                    
+                    <div class="definition-box">
+                        <p><strong>Real GDP per capita</strong> is a key measure of average living standards, calculated as real GDP divided by population. Economic growth typically increases real GDP per capita, but distribution matters.</p>
+                    </div>
+                    
+                    <div class="macro-indicators">
+                        <div class="indicator">
+                            <div class="indicator-value positive">+3.2%</div>
+                            <div class="indicator-label">GDP Growth</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value neutral">2.1%</div>
+                            <div class="indicator-label">Inflation Rate</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value negative">5.4%</div>
+                            <div class="indicator-label">Unemployment</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value positive">+1.8%</div>
+                            <div class="indicator-label">Real Income Growth</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Economic Growth: AD-AS Analysis</h4>
+                <p>This interactive diagram shows how different causes of economic growth affect aggregate demand (AD) and aggregate supply (AS), with impacts on output, prices, and employment.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="growthCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● AD (Aggregate Demand)</div>
+                        <div style="color: #e67e22">● SRAS (Short-run AS)</div>
+                        <div style="color: #27ae60">● LRAS (Long-run AS)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Growth Type:</span>
+                        <button class="action-btn active" id="demandBtn" onclick="setGrowthType('demand')">Demand-led</button>
+                        <button class="action-btn" id="supplyBtn" onclick="setGrowthType('supply')">Supply-side</button>
+                    </div>
+                    
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Growth Magnitude:</span>
+                        <input type="range" id="growthSlider" min="0" max="100" value="30" style="flex: 1; cursor: pointer;" oninput="updateGrowthChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>0% (No growth)</span>
+                        <span>50% (Rapid growth)</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Growth Trade-offs</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetGrowthChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Real GDP (Output):</span>
+                        <span id="realGDP">$1,000 bn</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Price Level (CPI):</span>
+                        <span id="priceLevel">100.0</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Unemployment Rate:</span>
+                        <span id="unemployment">5.4%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Growth Type:</span>
+                        <span id="growthType" style="color: #2980b9; font-weight: bold;">Demand-led</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Growth Rate:</span>
+                        <span id="growthRate" style="color: #27ae60; font-weight: bold;">+3.2%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Measurement Issues:</span>
+                        <span id="measurement" style="color: #e67e22; font-weight: bold;">GDP excludes informal economy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Causes of Economic Growth</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Economic growth defined:</strong> An increase in the <span class="highlight-term">real value of goods and services</span> produced in an economy over time, measured by percentage change in real GDP.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Demand-side causes (AD increase):</strong>
+                            <br>• <span class="ad-growth">Increased consumption</span> due to higher real wages, consumer confidence, or wealth effects
+                            <br>• <span class="ad-growth">Increased investment</span> by firms due to lower interest rates or optimistic expectations
+                            <br>• <span class="ad-growth">Increased government spending</span> on infrastructure, education, or healthcare
+                            <br>• <span class="ad-growth">Increased net exports</span> due to currency depreciation or stronger foreign demand</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Supply-side causes (AS increase):</strong>
+                            <br>• <span class="as-growth">Increased quantity/quality of factors of production</span> (land, labor, capital, entrepreneurship)
+                            <br>• <span class="as-growth">Technological progress</span> improving productivity
+                            <br>• <span class="as-growth">Institutional improvements</span> (better property rights, reduced corruption, efficient markets)
+                            <br>• <span class="as-growth">Education and training</span> enhancing human capital</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Measurement challenges:</strong>
+                            <br>• <span class="highlight-term">Informal/hidden economy:</span> Unrecorded economic activity not captured in official GDP statistics
+                            <br>• <span class="highlight-term">Quality changes:</span> GDP measures quantity but may not capture quality improvements
+                            <br>• <span class="highlight-term">Environmental costs:</span> GDP growth may come at environmental expense not accounted for
+                            <br>• <span class="highlight-term">Distribution issues:</span> Average GDP per capita masks inequality in income distribution</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 (3 marks):</strong>
+                            <br>1. Correct definition of economic growth (1 mark)
+                            <br>2. Explanation of two causes (demand-side and/or supply-side) (1 mark each, max 2)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO2 (3 marks):</strong>
+                            <br>1. Analysis of how each cause increases economic growth (1 mark each)
+                            <br>2. Explanation of measurement issues (e.g., informal economy) (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (a) - Measurement Considerations (Interactive)</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>GDP as imperfect measure:</strong> As shown in the diagram, economic growth increases real GDP from Y₁ to Y₂. However, GDP fails to capture:
+                            <br>• <span class="highlight-term">Non-market production:</span> Household work, volunteer activities
+                            <br>• <span class="highlight-term">Leisure time:</span> Increased output may come from longer working hours
+                            <br>• <span class="highlight-term">Sustainability:</span> Resource depletion and environmental degradation</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Alternative measures:</strong>
+                            <br>• <span class="highlight-term">Human Development Index (HDI):</span> Combines income, education, and life expectancy
+                            <br>• <span class="highlight-term">Genuine Progress Indicator (GPI):</span> Adjusts GDP for environmental/social factors
+                            <br>• <span class="highlight-term">Happy Planet Index:</span> Measures sustainable well-being</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Practical measurement issues:</strong>
+                            <br>• <span class="highlight-term">Data collection lags:</span> GDP figures are revised as more data becomes available
+                            <br>• <span class="highlight-term">International comparisons:</span> Exchange rate fluctuations and purchasing power parity issues
+                            <br>• <span class="highlight-term">Inflation adjustment:</span> Accurate deflators needed for real GDP calculation</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (2 marks):</strong>
+                            <br>1. Evaluation of the extent to which growth impact can be measured (1 mark)
+                            <br>2. Consideration of limitations/qualifications (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Benefits of Economic Growth</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Benefits for people:</strong>
+                            <br>• <span class="highlight-term">Higher living standards:</span> Increased real GDP per capita allows consumption of more/better goods and services
+                            <br>• <span class="highlight-term">Reduced unemployment:</span> Growth creates jobs as firms expand production (Okun's Law)
+                            <br>• <span class="highlight-term">Improved public services:</span> Higher tax revenue funds better healthcare, education, infrastructure
+                            <br>• <span class="highlight-term">Poverty reduction:</span> Economic growth historically the most effective way to lift people out of poverty</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Benefits for government:</strong>
+                            <br>• <span class="highlight-term">Increased tax revenue:</span> Higher incomes and profits generate more revenue without raising tax rates (fiscal dividend)
+                            <br>• <span class="highlight-term">Reduced welfare spending:</span> Lower unemployment reduces expenditure on benefits
+                            <br>• <span class="highlight-term">Political stability:</span> Growing economies generally experience less social unrest
+                            <br>• <span class="highlight-term">Debt sustainability:</span> GDP growth makes existing debt more manageable as debt-to-GDP ratio falls</span>
+                        </div>
+                        
+                        <div class="comparison-table">
+                            <tr>
+                                <th>Stakeholder</th>
+                                <th class="benefits">Benefits of Growth</th>
+                                <th class="costs">Potential Costs</th>
+                            </tr>
+                            <tr>
+                                <td><strong>People (Consumers)</strong></td>
+                                <td class="benefits">Higher real incomes, more/better goods and services</td>
+                                <td class="costs">Inflation may erode purchasing power; longer working hours</td>
+                            </tr>
+                            <tr>
+                                <td><strong>People (Workers)</strong></td>
+                                <td class="benefits">More job opportunities, higher wages, better working conditions</td>
+                                <td class="costs">Structural unemployment if skills mismatch; job insecurity during restructuring</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Government</strong></td>
+                                <td class="benefits">Higher tax revenue, lower welfare spending, political popularity</td>
+                                <td class="costs">Increased spending on infrastructure/environment; inflationary pressures</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Environment</strong></td>
+                                <td class="benefits">Resources for environmental protection; technological solutions</td>
+                                <td class="costs">Resource depletion, pollution, habitat destruction, climate change</td>
+                            </tr>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation of Measurement</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Extent of measurement possible:</strong> While GDP provides a <span class="highlight-term">quantitative measure</span> of economic activity, it captures only <span class="highlight-term">market transactions</span>. The impact of growth on well-being, environmental sustainability, and income distribution is harder to quantify.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Context matters:</strong> In developed economies with robust statistical systems, growth measurement is relatively accurate. In developing economies with large informal sectors, measurement error can be significant (up to 30-40% of true GDP).</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Type of growth matters:</strong> Demand-led growth (AD shift) is easier to measure through consumption, investment, and trade data. Supply-side growth (AS shift) involving productivity improvements and quality changes is harder to quantify accurately.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> The <span class="highlight-term">quantitative impact</span> of economic growth on output can be measured reasonably well through GDP statistics, but the <span class="highlight-term">qualitative impact</span> on living standards, environmental sustainability, and social welfare requires supplementary indicators beyond GDP.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Balanced Evaluation of Economic Growth</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Distribution of benefits:</strong> Growth does not benefit all equally. <span class="highlight-term">Income inequality</span> may increase if gains accrue disproportionately to capital owners and high-skilled workers (Kuznets curve hypothesis). The Gini coefficient may rise even as average incomes increase.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Environmental trade-offs:</strong> Economic growth typically increases resource use and pollution (Environmental Kuznets Curve). While developed economies may eventually reduce environmental impact through technology and regulation, developing economies face the growth-environment dilemma.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Type and sustainability of growth:</strong>
+                            <br>• <span class="ad-growth">Demand-led growth</span> may cause inflation if economy near full capacity
+                            <br>• <span class="as-growth">Supply-side growth</span> is more sustainable but may involve short-term adjustment costs
+                            <br>• <span class="highlight-term">Inclusive growth</span> benefits wider population vs. <span class="highlight-term">exclusive growth</span> concentrated in few sectors</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Government perspective trade-offs:</strong> While governments benefit from growth through tax revenue, they also face:
+                            <br>• <span class="highlight-term">Increased expenditure needs:</span> Infrastructure, education, environmental protection
+                            <br>• <span class="highlight-term">Inflation management:</span> May require contractionary policies with political costs
+                            <br>• <span class="highlight-term">Regional disparities:</span> Growth may concentrate in urban areas, requiring redistribution</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>International evidence:</strong>
+                            <br>• <span class="highlight-term">East Asian "miracle":</span> Rapid growth with poverty reduction but increasing inequality
+                            <br>• <span class="highlight-term">Resource curse:</span> Some resource-rich countries experience growth without development
+                            <br>• <span class="highlight-term">Post-communist transitions:</span> Initial output decline followed by recovery with varied distributional outcomes</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            <span class="explanation"><strong>Alternative paradigms:</strong>
+                            <br>• <span class="highlight-term">Degrowth movement:</span> Questions pursuit of growth in developed economies
+                            <br>• <span class="highlight-term">Green growth:</span> Sustainable growth within environmental limits
+                            <br>• <span class="highlight-term">Happiness economics:</span> Focus on well-being rather than material output</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">7</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Economic growth is <span class="highlight-term">generally beneficial</span> but not always or equally so. Its net benefit depends on:
+                            <br>1. <span class="highlight-term">Type of growth</span> (inclusive vs. exclusive, sustainable vs. exploitative)
+                            <br>2. <span class="highlight-term">Distribution of gains</span> (whether benefits reach majority of population)
+                            <br>3. <span class="highlight-term">Management of negative externalities</span> (environmental/social costs)
+                            <br>4. <span class="highlight-term">Economic context</span> (developing vs. developed economy, phase of business cycle)</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 & AO2 (8 marks):</strong>
+                            <br>Level 3 (6-8 marks): Detailed analysis of benefits and costs, accurate use of concepts/theories
+                            <br>Level 2 (3-5 marks): Some analysis with limited development, some inaccuracies
+                            <br>Level 1 (1-2 marks): Assertive/descriptive, lacking explanations or relevance</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (4 marks):</strong>
+                            <br>Level 2 (3-4 marks): Developed, reasoned evaluative comments with justified conclusion
+                            <br>Level 1 (1-2 marks): Simple evaluative comments with little development/support
+                            <br>0 marks: One-sided response or no evaluation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Complete Model Answer [8 Marks]</div>
+                            
+                            <p>Economic growth refers to an increase in the <span class="highlight-term">real value of goods and services</span> produced in an economy over time, typically measured by the percentage change in real Gross Domestic Product (GDP). Two fundamental causes of economic growth are demand-side factors that increase aggregate demand (AD) and supply-side factors that increase aggregate supply (AS).</p>
+                            
+                            <p><span class="model-sub">Demand-side causes:</span> Economic growth can be driven by increases in any component of aggregate demand: consumption (C), investment (I), government spending (G), or net exports (X-M). For example, <span class="ad-growth">expansionary fiscal policy</span> such as tax cuts or increased government spending directly boosts AD, shifting the AD curve rightward as shown in the diagram. Similarly, <span class="ad-growth">expansionary monetary policy</span> (lower interest rates) stimulates investment and consumption. Export-led growth, driven by currency depreciation or stronger foreign demand, also increases AD. Such demand-led growth increases both output (from Y₁ to Y₂ in the diagram) and the price level in the short run, though long-term sustainability depends on whether productive capacity expands accordingly.</p>
+                            
+                            <p><span class="model-sub">Supply-side causes:</span> More sustainable growth originates from increases in the economy's productive potential, shifting the long-run aggregate supply (LRAS) curve rightward. This can result from <span class="as-growth">increases in the quantity or quality of factors of production</span>: more capital investment (physical and human), technological innovation, institutional improvements (better property rights, reduced regulation), or discovery of new resources. Supply-side policies like education reforms, infrastructure investment, or research and development subsidies enhance the economy's capacity to produce goods and services. Unlike demand-led growth, supply-side growth increases output without necessarily causing inflation, as shown when both SRAS and LRAS shift rightward in the diagram.</p>
+                            
+                            <p><span class="model-sub">Measurement challenges:</span> The impact of these growth causes can be measured to some extent but with significant limitations. GDP statistics provide a <span class="highlight-term">quantitative measure</span> of output changes, allowing economists to estimate contributions of different demand components through national accounts. However, measurement faces several challenges. First, the <span class="highlight-term">informal or hidden economy</span>, comprising unrecorded economic activities, may constitute 15-30% of GDP in developed economies and up to 40-60% in developing ones, meaning official statistics understate true output. Second, GDP measures <span class="highlight-term">market transactions</span> but excludes non-market production like household work and volunteer activities, potentially misrepresenting welfare changes. Third, <span class="highlight-term">quality improvements</span> in goods and services (e.g., better smartphones or healthcare) are poorly captured, as GDP primarily measures quantity. Fourth, <span class="highlight-term">environmental costs</span> of growth (pollution, resource depletion) are not deducted from GDP, creating a misleading picture of sustainable welfare.</p>
+                            
+                            <p><span class="model-sub">Extent of measurability:</span> In practical terms, demand-side impacts are more readily measurable through consumption surveys, investment data, trade statistics, and government budgets. Supply-side impacts, particularly from productivity improvements and human capital development, are harder to quantify and often appear with lags. While statistical agencies have developed sophisticated methodologies (e.g., hedonic pricing to account for quality changes, satellite accounts for environmental factors), fundamental limitations remain. The <span class="highlight-term">distinction between growth and development</span> is crucial: while GDP growth can be measured with reasonable accuracy in economies with robust statistical systems, broader development impacts on health, education, inequality, and environmental sustainability require supplementary indicators like the Human Development Index (HDI) or Genuine Progress Indicator (GPI).</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> The causes of economic growth can be <span class="highlight-term">partially measured</span> through GDP and component analysis, but the full impact on societal welfare requires looking beyond conventional economic statistics to consider distributional, environmental, and qualitative dimensions that escape easy quantification.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Complete Model Answer [12 Marks]</div>
+                            
+                            <p>Economic growth is generally considered beneficial for both people and governments, as it increases material living standards and provides resources for public goods. However, a nuanced assessment reveals that growth is not universally or unconditionally beneficial; its net impact depends on the type of growth, distribution of gains, management of externalities, and specific economic context.</p>
+                            
+                            <p><span class="model-sub">Benefits for people:</span> Economic growth typically raises living standards through multiple channels. First, increasing real GDP per capita allows consumption of more and better goods and services, from improved nutrition to advanced healthcare. Second, growth creates employment opportunities as expanding firms hire more workers, reducing unemployment and underemployment. Third, higher incomes enable greater access to education, leisure, and cultural activities, enhancing quality of life beyond material consumption. Fourth, historical evidence shows that sustained economic growth is the most effective mechanism for poverty reduction, as seen in East Asia where rapid growth lifted hundreds of millions out of poverty. Fifth, growth generates tax revenues that fund public services like healthcare, education, and infrastructure, creating positive feedback loops for human development.</p>
+                            
+                            <p><span class="model-sub">Benefits for government:</span> Governments directly benefit from economic growth through the <span class="highlight-term">fiscal dividend</span>: higher incomes and corporate profits increase tax revenues without raising tax rates, providing resources for public investment and social programs. Simultaneously, lower unemployment reduces expenditure on welfare benefits. Growth also enhances <span class="highlight-term">political stability</span>, as governments of growing economies typically enjoy greater legitimacy and face less social unrest. Furthermore, growth improves <span class="highlight-term">debt sustainability</span> by increasing the denominator (GDP) in debt-to-GDP ratios, providing fiscal space for countercyclical policies during downturns.</p>
+                            
+                            <p><span class="model-sub">Qualifications and costs:</span> Despite these benefits, economic growth imposes costs and may not benefit all stakeholders equally. First, the <span class="highlight-term">distribution of gains</span> is often unequal; according to Kuznets' hypothesis, inequality may increase during early stages of development as returns to capital and skilled labor outpace wages. Even in advanced economies, recent decades have seen growth disproportionately benefiting top income earners, potentially increasing social tensions. Second, growth typically involves <span class="highlight-term">environmental costs</span>: increased resource extraction, pollution, and greenhouse gas emissions contribute to climate change and biodiversity loss. While the Environmental Kuznets Curve suggests that developed economies may eventually reduce environmental impact, the global scale of current ecological challenges questions whether this pattern is sustainable.</p>
+                            
+                            <p><span class="model-sub">Type and quality of growth matters:</span> The net benefit of growth depends crucially on its character. <span class="ad-growth">Demand-led growth</span> driven by consumption or government spending may cause inflationary pressures if the economy operates near full capacity, potentially eroding purchasing power for fixed-income groups. <span class="as-growth">Supply-side growth</span> based on productivity improvements is more sustainable but may involve short-term adjustment costs like structural unemployment as workers transition between sectors. <span class="highlight-term">Inclusive growth</span> that broadly shares benefits across society differs fundamentally from <span class="highlight-term">exclusive growth</span> concentrated in specific regions or industries.</p>
+                            
+                            <p><span class="model-sub">Measurement versus welfare:</span> A fundamental critique questions whether GDP growth accurately reflects improvements in human welfare. The <span class="highlight-term">Easterlin Paradox</span> notes that beyond a certain income threshold, additional growth does not correlate with increased happiness. Non-market goods like leisure time, family relationships, and community cohesion may be compromised by growth-oriented economies emphasizing material production. Alternative measures like the Human Development Index (HDI) or Bhutan's Gross National Happiness index attempt to capture these broader dimensions of well-being.</p>
+                            
+                            <p><span class="model-sub">Contextual factors:</span> The impact of growth varies by economic context. For <span class="highlight-term">developing economies</span> with substantial poverty, growth is almost certainly beneficial as it addresses basic needs. For <span class="highlight-term">developed economies</span> already enjoying high material living standards, the marginal benefits may be smaller while environmental and social costs loom larger. The phase of the business cycle also matters: growth during recession clearly benefits unemployed workers, while growth at full employment may primarily cause inflation.</p>
+                            
+                            <p><span class="model-sub">Government role and policy choices:</span> Governments can influence whether growth proves beneficial through policy choices. Progressive taxation and social spending can mitigate inequality. Environmental regulations and green technologies can decouple growth from ecological harm. Investment in education and retraining can help workers adapt to structural changes. International cooperation can address transboundary issues like climate change that individual economies cannot solve alone.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> Economic growth is <span class="highlight-term">generally but not always beneficial</span> for people and governments. Its advantages in raising living standards, reducing poverty, and providing public resources are substantial, particularly for developing economies. However, these benefits are not automatic; they depend on inclusive distribution, environmental sustainability, and the preservation of non-material aspects of well-being. A balanced assessment recognizes growth as a means to human development rather than an end in itself, emphasizing the need for policies that ensure growth translates into broad-based improvements in welfare while managing its social and environmental costs. In an era of climate change and rising inequality, the challenge is to pursue <span class="highlight-term">qualitatively different growth</span> that is inclusive, sustainable, and aligned with broader human flourishing.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            // 初始均衡值
+            initialGDP: 1000,  // $ billions
+            initialPrice: 100, // Price index
+            initialUnemployment: 5.4, // Percentage
+            
+            // 增长类型参数
+            growthTypes: {
+                demand: {
+                    label: "Demand-led Growth",
+                    adShift: 1.5,  // AD向右移动系数
+                    asShift: 0.2,  // 轻微AS移动（通过信心效应）
+                    inflationEffect: 0.8, // 通货膨胀效应
+                    color: "#2980b9"
+                },
+                supply: {
+                    label: "Supply-side Growth",
+                    adShift: 0.3,  // 轻微AD移动（通过收入效应）
+                    asShift: 1.5,  // AS向右移动系数
+                    inflationEffect: -0.5, // 通货紧缩效应
+                    color: "#e67e22"
+                }
+            },
+            
+            // 当前设置
+            currentGrowthType: "demand",
+            growthMagnitude: 30, // 百分比 (0-100)
+            isExamMode: false
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            const tabIndex = tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3;
+            document.querySelector(`.tab:nth-child(${tabIndex})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 经济增长图表功能 ====================
+        const growthCanvas = document.getElementById('growthCanvas');
+        const growthCtx = growthCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeGrowthCanvas() {
+            if (!growthCanvas.parentElement) return;
+            
+            canvasWidth = growthCanvas.parentElement.clientWidth;
+            canvasHeight = growthCanvas.parentElement.clientHeight;
+            growthCanvas.width = canvasWidth;
+            growthCanvas.height = canvasHeight;
+            
+            drawGrowthChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeGrowthCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeGrowthCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeGrowthCanvas, 300);
+            setTimeout(resizeGrowthCanvas, 1000);
+        }
+        
+        // 设置增长类型
+        function setGrowthType(type) {
+            ECONOMIC_PARAMS.currentGrowthType = type;
+            
+            // 更新按钮状态
+            document.getElementById('demandBtn').classList.remove('active');
+            document.getElementById('supplyBtn').classList.remove('active');
+            document.getElementById(`${type}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateGrowthChart();
+        }
+        
+        // 更新图表（滑块变动时调用）
+        function updateGrowthChart() {
+            ECONOMIC_PARAMS.growthMagnitude = parseInt(document.getElementById('growthSlider').value);
+            ECONOMIC_PARAMS.isExamMode = false;
+            drawGrowthChart();
+            updateDataPanel();
+        }
+        
+        // 显示考试模式（增长权衡）
+        function showExamMode() {
+            ECONOMIC_PARAMS.isExamMode = true;
+            ECONOMIC_PARAMS.growthMagnitude = 60; // 高增长
+            document.getElementById('growthSlider').value = 60;
+            drawGrowthChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetGrowthChart() {
+            ECONOMIC_PARAMS.isExamMode = false;
+            ECONOMIC_PARAMS.growthMagnitude = 30;
+            document.getElementById('growthSlider').value = 30;
+            ECONOMIC_PARAMS.currentGrowthType = "demand";
+            document.getElementById('demandBtn').classList.add('active');
+            document.getElementById('supplyBtn').classList.remove('active');
+            drawGrowthChart();
+            updateDataPanel();
+        }
+        
+        // 绘制经济增长图表
+        function drawGrowthChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            growthCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            growthCtx.beginPath();
+            growthCtx.strokeStyle = '#333';
+            growthCtx.lineWidth = 2;
+            
+            // Y轴（价格水平）
+            growthCtx.moveTo(padding.left, padding.top);
+            growthCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（实际GDP/产出）
+            growthCtx.moveTo(padding.left, padding.top + graphHeight);
+            growthCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            growthCtx.stroke();
+            
+            // 坐标轴标签
+            growthCtx.font = 'bold 14px Arial';
+            growthCtx.fillStyle = '#333';
+            growthCtx.textAlign = 'center';
+            
+            // Y轴标签
+            growthCtx.save();
+            growthCtx.translate(20, padding.top + graphHeight / 2);
+            growthCtx.rotate(-Math.PI / 2);
+            growthCtx.fillText("Price Level (CPI)", 0, 0);
+            growthCtx.restore();
+            
+            // X轴标签
+            growthCtx.fillText("Real GDP / Output ($ billions)", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            growthCtx.strokeStyle = '#eee';
+            growthCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                growthCtx.beginPath();
+                growthCtx.moveTo(padding.left, y);
+                growthCtx.lineTo(padding.left + graphWidth, y);
+                growthCtx.stroke();
+                
+                // Y轴刻度标签
+                const price = (120 - (i * 20)).toFixed(0);
+                growthCtx.fillStyle = '#666';
+                growthCtx.font = '12px Arial';
+                growthCtx.textAlign = 'right';
+                growthCtx.fillText(price, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                growthCtx.beginPath();
+                growthCtx.moveTo(x, padding.top);
+                growthCtx.lineTo(x, padding.top + graphHeight);
+                growthCtx.stroke();
+                
+                // X轴刻度标签
+                const gdp = (800 + (i * 400));
+                growthCtx.fillStyle = '#666';
+                growthCtx.font = '12px Arial';
+                growthCtx.textAlign = 'center';
+                growthCtx.fillText(`$${gdp}`, x, padding.top + graphHeight + 20);
+            }
+            
+            // 当前增长参数
+            const growthType = ECONOMIC_PARAMS.growthTypes[ECONOMIC_PARAMS.currentGrowthType];
+            const growthFactor = ECONOMIC_PARAMS.growthMagnitude / 100;
+            
+            // 绘制初始长期总供给曲线 (LRAS) - 垂直
+            const initialLRASX = padding.left + graphWidth * 0.4;
+            growthCtx.beginPath();
+            growthCtx.strokeStyle = '#27ae60';
+            growthCtx.lineWidth = 3;
+            growthCtx.setLineDash([]);
+            
+            growthCtx.moveTo(initialLRASX, padding.top);
+            growthCtx.lineTo(initialLRASX, padding.top + graphHeight);
+            growthCtx.stroke();
+            
+            // LRAS标签
+            growthCtx.fillStyle = '#27ae60';
+            growthCtx.font = 'bold 14px Arial';
+            growthCtx.textAlign = 'right';
+            growthCtx.fillText("LRAS₁ (Initial)", initialLRASX - 10, padding.top + 30);
+            
+            // 绘制初始短期总供给曲线 (SRAS) - 向上倾斜
+            growthCtx.beginPath();
+            growthCtx.strokeStyle = '#e67e22';
+            growthCtx.lineWidth = 3;
+            
+            const srasStartY = padding.top + graphHeight * 0.8;
+            const srasEndY = padding.top;
+            const srasStartX = padding.left + graphWidth * 0.1;
+            const srasEndX = padding.left + graphWidth * 0.9;
+            
+            growthCtx.moveTo(srasStartX, srasStartY);
+            growthCtx.lineTo(srasEndX, srasEndY);
+            growthCtx.stroke();
+            
+            // SRAS标签
+            growthCtx.fillStyle = '#e67e22';
+            growthCtx.textAlign = 'left';
+            growthCtx.fillText("SRAS₁ (Initial)", srasStartX, srasStartY - 20);
+            
+            // 绘制初始总需求曲线 (AD) - 向下倾斜
+            growthCtx.beginPath();
+            growthCtx.strokeStyle = '#2980b9';
+            growthCtx.lineWidth = 3;
+            
+            const adStartY = padding.top;
+            const adEndY = padding.top + graphHeight;
+            const adStartX = padding.left + graphWidth * 0.1;
+            const adEndX = padding.left + graphWidth * 0.7;
+            
+            growthCtx.moveTo(adStartX, adStartY);
+            growthCtx.lineTo(adEndX, adEndY);
+            growthCtx.stroke();
+            
+            // AD标签
+            growthCtx.fillStyle = '#2980b9';
+            growthCtx.fillText("AD₁ (Initial)", adEndX - 100, adStartY + 30);
+            
+            // 计算初始均衡点 (AD₁和SRAS₁的交点)
+            // AD方程: P = a - bY (向下倾斜)
+            const adSlope = (adEndY - adStartY) / (adEndX - adStartX);
+            const adIntercept = adStartY - adSlope * adStartX;
+            
+            // SRAS方程: P = c + dY (向上倾斜)
+            const srasSlope = (srasEndY - srasStartY) / (srasEndX - srasStartX);
+            const srasIntercept = srasStartY - srasSlope * srasStartX;
+            
+            // 计算交点
+            const initialEqX = (srasIntercept - adIntercept) / (adSlope - srasSlope);
+            const initialEqY = adSlope * initialEqX + adIntercept;
+            
+            // 标记初始均衡点
+            growthCtx.beginPath();
+            growthCtx.arc(initialEqX, initialEqY, 6, 0, Math.PI * 2);
+            growthCtx.fillStyle = '#2ecc71';
+            growthCtx.fill();
+            growthCtx.strokeStyle = '#2c3e50';
+            growthCtx.lineWidth = 2;
+            growthCtx.stroke();
+            
+            growthCtx.fillStyle = '#2c3e50';
+            growthCtx.font = 'bold 12px Arial';
+            growthCtx.textAlign = 'right';
+            growthCtx.fillText("E₁ (Initial Equilibrium)", initialEqX - 10, initialEqY - 15);
+            
+            // 绘制从LRAS到均衡点的虚线，显示产出缺口（如果有）
+            if (initialEqX < initialLRASX) {
+                // 存在负产出缺口（经济低于潜在产出）
+                growthCtx.beginPath();
+                growthCtx.strokeStyle = '#e74c3c';
+                growthCtx.setLineDash([5, 5]);
+                growthCtx.lineWidth = 1;
+                
+                growthCtx.moveTo(initialEqX, initialEqY);
+                growthCtx.lineTo(initialLRASX, initialEqY);
+                growthCtx.lineTo(initialLRASX, padding.top + graphHeight);
+                growthCtx.stroke();
+                
+                growthCtx.setLineDash([]);
+                
+                growthCtx.fillStyle = '#e74c3c';
+                growthCtx.font = 'italic 12px Arial';
+                growthCtx.textAlign = 'center';
+                const gapX = initialEqX + (initialLRASX - initialEqX) / 2;
+                growthCtx.fillText("Negative Output Gap", gapX, initialEqY + 20);
+            }
+            
+            // 如果存在经济增长，绘制新的曲线
+            if (ECONOMIC_PARAMS.growthMagnitude > 0) {
+                // 计算移动距离
+                const shiftDistance = growthFactor * graphWidth * 0.4;
+                
+                // 根据增长类型确定曲线移动
+                let newADX, newSRASX, newLRASX;
+                
+                if (ECONOMIC_PARAMS.currentGrowthType === "demand") {
+                    // 需求拉动型增长：AD大幅右移，SRAS轻微右移（通过信心效应），LRAS轻微右移
+                    newADX = adEndX + shiftDistance * growthType.adShift;
+                    newSRASX = srasEndX + shiftDistance * growthType.asShift;
+                    newLRASX = initialLRASX + shiftDistance * growthType.asShift;
+                } else {
+                    // 供给推动型增长：SRAS和LRAS大幅右移，AD轻微右移（通过收入效应）
+                    newADX = adEndX + shiftDistance * growthType.adShift;
+                    newSRASX = srasEndX + shiftDistance * growthType.asShift;
+                    newLRASX = initialLRASX + shiftDistance * growthType.asShift;
+                }
+                
+                // 绘制新的总需求曲线 (AD₂)
+                growthCtx.beginPath();
+                growthCtx.strokeStyle = '#2980b9';
+                growthCtx.setLineDash([5, 5]);
+                growthCtx.lineWidth = 3;
+                
+                // 新AD曲线：平行右移
+                const newADStartX = adStartX + (newADX - adEndX);
+                const newADStartY = adStartY;
+                const newADEndX = newADX;
+                const newADEndY = adEndY;
+                
+                growthCtx.moveTo(newADStartX, newADStartY);
+                growthCtx.lineTo(newADEndX, newADEndY);
+                growthCtx.stroke();
+                
+                growthCtx.setLineDash([]);
+                
+                // AD₂标签
+                growthCtx.fillStyle = '#2980b9';
+                growthCtx.fillText("AD₂ (After Growth)", newADEndX - 100, newADStartY + 30);
+                
+                // 绘制新的短期总供给曲线 (SRAS₂)
+                growthCtx.beginPath();
+                growthCtx.strokeStyle = '#e67e22';
+                growthCtx.setLineDash([5, 5]);
+                growthCtx.lineWidth = 3;
+                
+                // 新SRAS曲线：平行右移
+                const newSRASStartX = srasStartX + (newSRASX - srasEndX);
+                const newSRASStartY = srasStartY;
+                const newSRASEndX = newSRASX;
+                const newSRASEndY = srasEndY;
+                
+                growthCtx.moveTo(newSRASStartX, newSRASStartY);
+                growthCtx.lineTo(newSRASEndX, newSRASEndY);
+                growthCtx.stroke();
+                
+                growthCtx.setLineDash([]);
+                
+                // SRAS₂标签
+                growthCtx.fillStyle = '#e67e22';
+                growthCtx.fillText("SRAS₂ (After Growth)", newSRASStartX, newSRASStartY - 20);
+                
+                // 绘制新的长期总供给曲线 (LRAS₂)
+                growthCtx.beginPath();
+                growthCtx.strokeStyle = '#27ae60';
+                growthCtx.setLineDash([5, 5]);
+                growthCtx.lineWidth = 3;
+                
+                growthCtx.moveTo(newLRASX, padding.top);
+                growthCtx.lineTo(newLRASX, padding.top + graphHeight);
+                growthCtx.stroke();
+                
+                growthCtx.setLineDash([]);
+                
+                // LRAS₂标签
+                growthCtx.fillStyle = '#27ae60';
+                growthCtx.textAlign = 'left';
+                growthCtx.fillText("LRAS₂ (After Growth)", newLRASX + 10, padding.top + 30);
+                
+                // 计算新均衡点 (AD₂和SRAS₂的交点)
+                const newADSlope = adSlope; // 平行移动，斜率不变
+                const newADIntercept = newADStartY - newADSlope * newADStartX;
+                
+                const newSRASSlope = srasSlope; // 平行移动，斜率不变
+                const newSRASIntercept = newSRASStartY - newSRASSlope * newSRASStartX;
+                
+                // 计算新交点
+                const newEqX = (newSRASIntercept - newADIntercept) / (newADSlope - newSRASSlope);
+                const newEqY = newADSlope * newEqX + newADIntercept;
+                
+                // 标记新均衡点
+                growthCtx.beginPath();
+                growthCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+                growthCtx.fillStyle = '#e74c3c';
+                growthCtx.fill();
+                growthCtx.strokeStyle = '#2c3e50';
+                growthCtx.lineWidth = 2;
+                growthCtx.stroke();
+                
+                growthCtx.fillStyle = '#2c3e50';
+                growthCtx.font = 'bold 12px Arial';
+                growthCtx.textAlign = 'left';
+                growthCtx.fillText("E₂ (New Equilibrium)", newEqX + 10, newEqY - 15);
+                
+                // 绘制箭头显示移动方向
+                drawArrow(growthCtx, initialEqX, initialEqY, newEqX, newEqY, '#7b61ff');
+                
+                // 显示增长类型和幅度
+                growthCtx.fillStyle = '#2c3e50';
+                growthCtx.font = 'bold 14px Arial';
+                growthCtx.textAlign = 'center';
+                growthCtx.fillText(`${growthType.label}: ${ECONOMIC_PARAMS.growthMagnitude}%`, canvasWidth / 2, padding.top - 20);
+                
+                // 显示对价格和产出的影响
+                const priceChange = ((newEqY - initialEqY) / initialEqY * 100).toFixed(1);
+                const outputChange = ((newEqX - initialEqX) / initialEqX * 100).toFixed(1);
+                
+                growthCtx.fillStyle = newEqY > initialEqY ? '#e74c3c' : '#27ae60';
+                growthCtx.fillText(`Price: ${priceChange}%, Output: +${outputChange}%`, canvasWidth / 2, padding.top - 5);
+                
+                // 如果处于考试模式，显示增长权衡注释
+                if (ECONOMIC_PARAMS.isExamMode) {
+                    growthCtx.fillStyle = '#e74c3c';
+                    growthCtx.font = 'italic 13px Arial';
+                    
+                    if (ECONOMIC_PARAMS.currentGrowthType === "demand") {
+                        growthCtx.fillText("Demand-led growth: Higher output but inflationary pressure", canvasWidth / 2, padding.top + graphHeight + 60);
+                    } else {
+                        growthCtx.fillText("Supply-side growth: Higher output with lower prices", canvasWidth / 2, padding.top + graphHeight + 60);
+                    }
+                }
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            growthCtx.fillStyle = '#2980b9';
+            growthCtx.fillRect(legendX, legendY, 15, 15);
+            growthCtx.fillStyle = '#333';
+            growthCtx.font = '12px Arial';
+            growthCtx.textAlign = 'left';
+            growthCtx.fillText("AD (Aggregate Demand)", legendX + 25, legendY + 12);
+            
+            growthCtx.fillStyle = '#e67e22';
+            growthCtx.fillRect(legendX, legendY + 25, 15, 15);
+            growthCtx.fillStyle = '#333';
+            growthCtx.fillText("SRAS (Short-run AS)", legendX + 25, legendY + 37);
+            
+            growthCtx.fillStyle = '#27ae60';
+            growthCtx.fillRect(legendX, legendY + 50, 15, 15);
+            growthCtx.fillStyle = '#333';
+            growthCtx.fillText("LRAS (Long-run AS)", legendX + 25, legendY + 62);
+            
+            growthCtx.fillStyle = '#2ecc71';
+            growthCtx.beginPath();
+            growthCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+            growthCtx.fill();
+            growthCtx.fillStyle = '#333';
+            growthCtx.fillText("Initial Equilibrium (E₁)", legendX + 25, legendY + 85);
+            
+            if (ECONOMIC_PARAMS.growthMagnitude > 0) {
+                growthCtx.fillStyle = '#e74c3c';
+                growthCtx.beginPath();
+                growthCtx.arc(legendX + 7, legendY + 105, 6, 0, Math.PI * 2);
+                growthCtx.fill();
+                growthCtx.fillStyle = '#333';
+                growthCtx.fillText("New Equilibrium (E₂)", legendX + 25, legendY + 110);
+            }
+        }
+        
+        // 绘制箭头函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 15;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            const growthType = ECONOMIC_PARAMS.growthTypes[ECONOMIC_PARAMS.currentGrowthType];
+            const growthFactor = ECONOMIC_PARAMS.growthMagnitude / 100;
+            
+            // 计算新值
+            const gdpGrowth = growthFactor * 5; // 每10%增长幅度对应0.5%GDP增长
+            const newGDP = ECONOMIC_PARAMS.initialGDP * (1 + gdpGrowth);
+            
+            // 价格变化取决于增长类型
+            let priceChange;
+            if (ECONOMIC_PARAMS.currentGrowthType === "demand") {
+                priceChange = growthFactor * growthType.inflationEffect; // 需求拉动型增长导致通胀
+            } else {
+                priceChange = growthFactor * growthType.inflationEffect; // 供给推动型增长可能导致通缩
+            }
+            const newPrice = ECONOMIC_PARAMS.initialPrice * (1 + priceChange);
+            
+            // 失业率变化：增长降低失业率（奥肯定律）
+            const unemploymentChange = -growthFactor * 2; // 每1%增长降低失业率约0.2%
+            const newUnemployment = Math.max(3, ECONOMIC_PARAMS.initialUnemployment + unemploymentChange);
+            
+            // 更新显示
+            document.getElementById('realGDP').textContent = `$${newGDP.toFixed(0)} bn`;
+            document.getElementById('priceLevel').textContent = newPrice.toFixed(1);
+            document.getElementById('unemployment').textContent = `${newUnemployment.toFixed(1)}%`;
+            document.getElementById('growthType').textContent = growthType.label;
+            document.getElementById('growthType').style.color = growthType.color;
+            document.getElementById('growthRate').textContent = `+${(gdpGrowth * 100).toFixed(1)}%`;
+            
+            const measurementElement = document.getElementById('measurement');
+            if (ECONOMIC_PARAMS.growthMagnitude === 0) {
+                measurementElement.textContent = "GDP excludes informal economy";
+                measurementElement.style.color = '#e67e22';
+            } else {
+                if (ECONOMIC_PARAMS.currentGrowthType === "demand") {
+                    measurementElement.textContent = "GDP growth may overstate welfare gains";
+                } else {
+                    measurementElement.textContent = "Quality improvements poorly measured in GDP";
+                }
+                measurementElement.style.color = '#e67e22';
+            }
+            
+            // 更新宏观指标显示
+            updateMacroIndicators(gdpGrowth * 100, priceChange * 100, newUnemployment);
+        }
+        
+        // 更新宏观指标显示
+        function updateMacroIndicators(gdpGrowth, inflation, unemployment) {
+            const indicators = document.querySelectorAll('.indicator-value');
+            if (indicators.length >= 4) {
+                // GDP增长
+                indicators[0].textContent = `+${gdpGrowth.toFixed(1)}%`;
+                indicators[0].className = gdpGrowth > 0 ? 'indicator-value positive' : 'indicator-value negative';
+                
+                // 通胀率
+                indicators[1].textContent = `${inflation.toFixed(1)}%`;
+                if (inflation > 3) {
+                    indicators[1].className = 'indicator-value negative';
+                } else if (inflation < 0) {
+                    indicators[1].className = 'indicator-value negative';
+                } else {
+                    indicators[1].className = 'indicator-value neutral';
+                }
+                
+                // 失业率
+                indicators[2].textContent = `${unemployment.toFixed(1)}%`;
+                indicators[2].className = unemployment > 6 ? 'indicator-value negative' : 
+                                         unemployment < 4 ? 'indicator-value positive' : 'indicator-value neutral';
+                
+                // 实际收入增长（近似值）
+                const realIncomeGrowth = gdpGrowth - inflation;
+                indicators[3].textContent = `${realIncomeGrowth >= 0 ? '+' : ''}${realIncomeGrowth.toFixed(1)}%`;
+                indicators[3].className = realIncomeGrowth > 0 ? 'indicator-value positive' : 'indicator-value negative';
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置增长类型
+            setGrowthType('demand');
+            
+            // 初始化增长图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 添加resize事件监听
+            window.addEventListener('resize', resizeGrowthCanvas);
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+    </script>
+</body>
+</html>

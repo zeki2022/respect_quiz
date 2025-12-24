@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Economics 9708/12 May/June 2025 - All Questions</title>
+    
+    <link rel="stylesheet" href="../../../../../common/css/style.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { padding-top: 60px; padding-bottom: 40px; background-color: #f4f7f6; max-width: none !important; }
+        .container {
+            width: 98%; max-width: none !important; margin: 0 auto;
+            display: grid; grid-template-columns: 200px 1fr; 
+            gap: 20px; align-items: start;
+        }
+        @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+
+        .back-arrow {
+            position: fixed; top: 15px; left: 15px; z-index: 9999;
+            width: 40px; height: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #333; font-size: 24px; font-weight: bold;
+            font-family: sans-serif; line-height: 1; cursor: pointer;
+        }
+        .nav-panel {
+            background: #fff; border-radius: 12px; padding: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: sticky; top: 80px; 
+            display: flex; flex-wrap: wrap; gap: 8px;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .nav-btn {
+            width: 40px; height: 40px; border-radius: 8px;
+            background: #f0f2f5; color: #555; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: all 0.2s; font-size: 14px;
+        }
+        .nav-btn:hover { background: #3498db; color: white; }
+        .question-card {
+            background: #fff; border-radius: 12px; padding: 25px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
+            scroll-margin-top: 80px; 
+        }
+        .q-header {
+            font-size: 16px; font-weight: bold; color: #2c3e50;
+            border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .q-content { font-size: 16px; color: #333; line-height: 1.6; }
+        .q-image {
+            max-width: 600px; height: auto; display: block; margin: 15px 0;
+            border: 1px solid #eee; border-radius: 4px;
+        }
+        .options-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;
+        }
+        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+        .option {
+            background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee;
+            font-family: "Times New Roman", serif; font-size: 16px; color: #444; cursor: default;
+            display: flex; align-items: center;
+        }
+        .option strong { margin-right: 10px; color: #2c3e50; font-family: sans-serif; font-weight:bold;}
+        
+        /* Table Styling [cite: 30] */
+        table { border-collapse: collapse; margin: 15px 0; width: auto; font-size: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+        
+        .answer-box {
+            display: none; margin-top: 15px; background: #f0f9ff; 
+            border-left: 4px solid #3498db; padding: 15px; border-radius: 4px;
+        }
+        .answer-box.show { display: block; animation: fadeIn 0.3s ease; }
+        .toggle-btn {
+            background: #e67e22; color: white; border: none; padding: 6px 12px;
+            border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;
+        }
+        .correct { color: #27ae60; font-weight: bold; font-size: 1.1em;}
+        .reasoning { margin-top: 10px; border-top: 1px solid #d0e4f5; padding-top: 10px; }
+        .highlight { color: #d35400; font-weight: bold; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-5px);} to { opacity:1; transform:translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()" class="back-arrow">‹</a>
+
+    <div class="container">
+        <div class="left-col">
+            <div class="nav-panel">
+                <div style="width:100%; margin-bottom:10px; font-weight:bold; color:#2c3e50;">Jump to:</div>
+                <script>
+                    for(let i=1; i<=30; i++) {
+                        document.write(`<a href="#q${i}" class="nav-btn">${i}</a>`);
+                    }
+                </script>
+            </div>
+        </div>
+
+        <div class="right-col">
+
+            <div id="q1" class="question-card">
+                <div class="q-header">
+                    <span>Question 1</span>
+                    <button class="toggle-btn" onclick="toggleAns('a1')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    What is the best definition of a positive economic statement? [cite: 140]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> A statement that is based on fact and can be tested. [cite: 142]</div>
+                        <div class="option"><strong>B</strong> A statement that attempts to influence economic decisions. [cite: 144]</div>
+                        <div class="option"><strong>C</strong> A statement that is subjective and cannot be confirmed. [cite: 145]</div>
+                        <div class="option"><strong>D</strong> An encouraging economic update in the opinion of the central bank. [cite: 146]</div>
+                    </div>
+                </div>
+                <div id="a1" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Positive economic statements are <b>objective</b> and deal with "what is." [cite: 142]<br>
+                        - <b>A1:</b> Unlike normative statements (subjective/value judgments), positive statements can be <span class="highlight">tested and verified</span> using evidence. [cite: 142]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q2" class="question-card">
+                <div class="q-header">
+                    <span>Question 2</span>
+                    <button class="toggle-btn" onclick="toggleAns('a2')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The diagram is from a chapter on 'The Fundamental Economic Problem' in an Economics textbook. [cite: 147]<br>
+                    It should contain the terms opportunity cost, scarcity and choice in the order that identifies the fundamental economic problem. [cite: 148]<br><br>
+                    $\text{Term 1} \xrightarrow{\text{leads to}} \text{Term 2} \xrightarrow{\text{leads to}} \text{Term 3}$ [cite: 149-160]<br><br>
+                    What is the correct order for the terms to appear in the diagram? [cite: 150]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> choice → opportunity cost → scarcity [cite: 151]</div>
+                        <div class="option"><strong>B</strong> choice → scarcity → opportunity cost [cite: 152]</div>
+                        <div class="option"><strong>C</strong> scarcity → choice → opportunity cost [cite: 154]</div>
+                        <div class="option"><strong>D</strong> scarcity → opportunity cost → choice [cite: 157]</div>
+                    </div>
+                </div>
+                <div id="a2" class="answer-box">
+                    <span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Scarcity arises because resources are finite but wants are infinite.<br>
+                        - <b>M2:</b> <span class="highlight">Scarcity forces a choice</span> between alternative uses of resources.<br>
+                        - <b>A1:</b> Every choice made involves an <b>opportunity cost</b> (the next best alternative foregone). [cite: 154]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q3" class="question-card">
+                <div class="q-header">
+                    <span>Question 3</span>
+                    <button class="toggle-btn" onclick="toggleAns('a3')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    What is a statement of the non-rivalrous nature of public goods? [cite: 159]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> It is not possible to stop a non-payer from using the product. [cite: 162]</div>
+                        <div class="option"><strong>B</strong> One person consuming the product does not reduce the amount of it available to others. [cite: 163]</div>
+                        <div class="option"><strong>C</strong> People consume too little of the product because they are unaware of its true benefits. [cite: 164]</div>
+                        <div class="option"><strong>D</strong> There is an unlimited supply of the product. [cite: 165]</div>
+                    </div>
+                </div>
+                <div id="a3" class="answer-box">
+                    <span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Non-rivalry means that consumption by one individual <span class="highlight">does not diminish the quantity or quality</span> available for others. [cite: 163]<br>
+                        - <b>Note:</b> Option A describes non-excludability, not non-rivalry.
+                    </div>
+                </div>
+            </div>
+
+            <div id="q4" class="question-card">
+                <div class="q-header">
+                    <span>Question 4</span>
+                    <button class="toggle-btn" onclick="toggleAns('a4')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    A country increases its spending on education and training. It pays for this by reducing unemployment benefit payments and increasing taxes on imports of machinery. [cite: 166]<br>
+                    What is the likely effect of these changes? [cite: 167]<br>
+                    <table>
+                        <tr><th></th><th>human capital</th><th>physical capital</th></tr>
+                        <tr><td><strong>A</strong></td><td>decreases</td><td>decreases</td></tr>
+                        <tr><td><strong>B</strong></td><td>decreases</td><td>increases</td></tr>
+                        <tr><td><strong>C</strong></td><td>increases</td><td>decreases</td></tr>
+                        <tr><td><strong>D</strong></td><td>increases</td><td>increases</td></tr>
+                    </table> [cite: 168]
+                </div>
+                <div id="a4" class="answer-box">
+                    <span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Spending on education and training directly <span class="highlight">increases human capital</span> (skills and knowledge).<br>
+                        - <b>A1:</b> Increasing taxes on imports of machinery raises the cost of capital equipment, likely <span class="highlight">decreasing physical capital</span> investment. [cite: 168]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q5" class="question-card">
+                <div id="q5_content" class="q-content">
+                    <div class="q-header">
+                        <span>Question 5</span>
+                        <button class="toggle-btn" onclick="toggleAns('a5')">Show Answer</button>
+                    </div>
+                    The diagram shows an outward shift of the production possibility curve from $PPC_{1}$ to $PPC_{2}$. [cite: 173]
+                    <img src="q5_orig.png" class="q-image" alt="PPC Shift" onerror="this.style.display='none'"> [cite: 13, 79]
+                    What could have caused this shift? [cite: 178]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> a decrease in mineral resources [cite: 180]</div>
+                        <div class="option"><strong>B</strong> a decrease in prices of consumer goods [cite: 182]</div>
+                        <div class="option"><strong>C</strong> an increase in employment [cite: 184]</div>
+                        <div class="option"><strong>D</strong> an increase in technology [cite: 186]</div>
+                    </div>
+                </div>
+                <div id="a5" class="answer-box">
+                    <span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> An outward shift of the $PPC$ represents an <span class="highlight">increase in the productive potential</span> of the economy.<br>
+                        - <b>A1:</b> This is caused by an increase in the quantity or <b>quality</b> (e.g., technology) of factors of production. [cite: 186]<br>
+                        - <b>Note:</b> An increase in employment (Option C) moves the economy from inside the $PPC$ toward the boundary, but doesn't shift the curve itself.
+                    </div>
+                </div>
+            </div>
+
+            <div id="q6" class="question-card">
+                <div class="q-header">
+                    <span>Question 6</span>
+                    <button class="toggle-btn" onclick="toggleAns('a6')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    $D_{1}$ and $S_{1}$ are the initial demand and supply curves in the market for new cars with an equilibrium at X. [cite: 188]
+                    <img src="q6_orig.png" class="q-image" alt="Demand and Supply Shift" onerror="this.style.display='none'"> [cite: 13, 79]
+                    What will cause the demand curve to shift to $D_{2}$ and the supply curve to shift to $S_{2}$? [cite: 196]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> a decrease in real incomes and a rise in the costs of new car production [cite: 198]</div>
+                        <div class="option"><strong>B</strong> a decrease in the price of petrol and a subsidy on new car production [cite: 200]</div>
+                        <div class="option"><strong>C</strong> an increase in the availability of loans for new car purchases and a specific tax on new cars [cite: 202]</div>
+                        <div class="option"><strong>D</strong> an increase in the price of train travel and an increase in the number of car producers [cite: 204]</div>
+                    </div>
+                </div>
+                <div id="a6" class="answer-box">
+                    <span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> The diagram shows an <b>increase in demand</b> ($D_1 \to D_2$) and a <b>decrease in supply</b> ($S_1 \to S_2$).<br>
+                        - <b>A1:</b> Loans availability <span class="highlight">increases demand</span>; a specific tax <span class="highlight">decreases supply</span> (shifts curve up/left). [cite: 202]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q7" class="question-card">
+                <div class="q-header">
+                    <span>Question 7</span>
+                    <button class="toggle-btn" onclick="toggleAns('a7')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    When can a product be said to have a negative income elasticity of demand? [cite: 210]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> When it is a luxury good. [cite: 211]</div>
+                        <div class="option"><strong>B</strong> When it is a necessity good. [cite: 212]</div>
+                        <div class="option"><strong>C</strong> When it is a normal good. [cite: 213]</div>
+                        <div class="option"><strong>D</strong> When it is an inferior good. [cite: 214]</div>
+                    </div>
+                </div>
+                <div id="a7" class="answer-box">
+                    <span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Income elasticity ($YED$) measures the responsiveness of quantity demanded to a change in income.<br>
+                        - <b>A1:</b> For <span class="highlight">inferior goods</span>, as income rises, demand falls, resulting in a negative $YED$. [cite: 214]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q8" class="question-card">
+                <div class="q-header">
+                    <span>Question 8</span>
+                    <button class="toggle-btn" onclick="toggleAns('a8')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The diagram shows the short-run supply curve $(S_{SR})$ and long-run supply curve $(S_{LR})$ for a bakery. [cite: 215]<br>
+                    The price of a loaf of bread increases from \$2.00 to \$2.20. [cite: 217]
+                    <img src="q8_orig.png" class="q-image" alt="PES Short Run vs Long Run" onerror="this.style.display='none'">
+                    What is the bakery's price elasticity of supply (PES) in the short run and in the long run when the price of a loaf of bread increases? [cite: 228]<br>
+                    <table>
+                        <tr><th></th><th>short run</th><th>long run</th></tr>
+                        <tr><td><strong>A</strong></td><td>0.5</td><td>2.0</td></tr>
+                        <tr><td><strong>B</strong></td><td>0.5</td><td>1.4</td></tr>
+                        <tr><td><strong>C</strong></td><td>2.0</td><td>0.7</td></tr>
+                        <tr><td><strong>D</strong></td><td>2.0</td><td>0.5</td></tr>
+                    </table> [cite: 229]
+                </div>
+                <div id="a8" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> $PES = \frac{\% \Delta Q_s}{\% \Delta P}$. Price change is $\frac{0.20}{2.00} = 10\%$.<br>
+                        - <b>M2:</b> Short run (SR): $Q_s$ rises from 100 to 105 ($5\%$ change). $PES_{SR} = 5/10 = <span class="highlight">0.5</span>$.<br>
+                        - <b>A1:</b> Long run (LR): $Q_s$ rises from 100 to 120 ($20\%$ change). $PES_{LR} = 20/10 = <span class="highlight">2.0</span>$. [cite: 229]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q9" class="question-card">
+                <div class="q-header">
+                    <span>Question 9</span>
+                    <button class="toggle-btn" onclick="toggleAns('a9')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    An increase in which variable will always lead to an increase in the consumer surplus? [cite: 231]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> cost of production [cite: 232]</div>
+                        <div class="option"><strong>B</strong> maximum price [cite: 233]</div>
+                        <div class="option"><strong>C</strong> minimum price [cite: 234]</div>
+                        <div class="option"><strong>D</strong> subsidy [cite: 235]</div>
+                    </div>
+                </div>
+                <div id="a9" class="answer-box">
+                    <span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Consumer surplus is the difference between what consumers are willing to pay and the market price.<br>
+                        - <b>A1:</b> A <span class="highlight">subsidy</span> reduces the cost of production, shifting the supply curve right and lowering the market price, which always increases consumer surplus. [cite: 235]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q10" class="question-card">
+                <div class="q-header">
+                    <span>Question 10</span>
+                    <button class="toggle-btn" onclick="toggleAns('a10')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Farmers want to extract wild honey from beehives. They find the beehives by following birds known as honeyguide birds who want the beeswax that is also found in the beehives. [cite: 239]<br>
+                    What does this suggest? [cite: 240]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> Farmers and honeyguide birds are rival consumers. [cite: 241]</div>
+                        <div class="option"><strong>B</strong> Wild honey and beeswax are free goods. [cite: 242]</div>
+                        <div class="option"><strong>C</strong> Wild honey and beeswax are in joint supply. [cite: 243]</div>
+                        <div class="option"><strong>D</strong> Wild honey is the opportunity cost of beeswax. [cite: 244]</div>
+                    </div>
+                </div>
+                <div id="a10" class="answer-box">
+                    <span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Joint supply occurs when the production of one good automatically produces another.<br>
+                        - <b>A1:</b> Since beehives contain both honey and beeswax, <span class="highlight">extracting one provides the other</span>, indicating joint supply. [cite: 243]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q11" class="question-card">
+                <div class="q-header">
+                    <span>Question 11</span>
+                    <button class="toggle-btn" onclick="toggleAns('a11')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    An indirect tax is imposed on good X. [cite: 245]<br>
+                    Which situation is most likely to result in producers bearing a higher burden of the tax? [cite: 246]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> price elasticity of demand is elastic [cite: 247]</div>
+                        <div class="option"><strong>B</strong> price elasticity of demand is inelastic [cite: 248]</div>
+                        <div class="option"><strong>C</strong> price elasticity of supply is elastic [cite: 249]</div>
+                        <div class="option"><strong>D</strong> price elasticity of supply is inelastic [cite: 250]</div>
+                    </div>
+                </div>
+                <div id="a11" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Tax incidence depends on the relative elasticities of $D$ and $S$.<br>
+                        - <b>A1:</b> If demand is <span class="highlight">elastic</span>, consumers are sensitive to price changes, so producers cannot easily pass the tax on and must bear more of the burden. [cite: 247]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q12" class="question-card">
+                <div class="q-header">
+                    <span>Question 12</span>
+                    <button class="toggle-btn" onclick="toggleAns('a12')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    What would not be included in the calculation of an individual's wealth? [cite: 251]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> the house owned by the individual [cite: 252]</div>
+                        <div class="option"><strong>B</strong> the savings in the individual's bank account [cite: 253]</div>
+                        <div class="option"><strong>C</strong> the stocks and shares owned by the individual [cite: 254]</div>
+                        <div class="option"><strong>D</strong> the wages earned by the individual [cite: 255]</div>
+                    </div>
+                </div>
+                <div id="a12" class="answer-box">
+                    <span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Wealth is a <b>stock</b> concept (assets owned at a point in time).<br>
+                        - <b>A1:</b> Wages are a <span class="highlight">flow</span> concept (income earned over a period), thus not part of wealth calculation. [cite: 255]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q13" class="question-card">
+                <div class="q-header">
+                    <span>Question 13</span>
+                    <button class="toggle-btn" onclick="toggleAns('a13')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Why might governments provide free education for children aged 4 to 16 years old? [cite: 256]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> Consumers are not fully aware of the benefits of education. [cite: 257]</div>
+                        <div class="option"><strong>B</strong> Education in a free market system would be over consumed. [cite: 258]</div>
+                        <div class="option"><strong>C</strong> Education is a public good and there would be many free riders. [cite: 259]</div>
+                        <div class="option"><strong>D</strong> The private costs of education exceed the private benefits in a free market. [cite: 260]</div>
+                    </div>
+                </div>
+                <div id="a13" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Education is a <b>merit good</b>.<br>
+                        - <b>A1:</b> Merit goods are under-consumed in a free market because of <span class="highlight">information failure</span>; consumers don't fully value the long-term benefits. [cite: 257]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q14" class="question-card">
+                <div class="q-header">
+                    <span>Question 14</span>
+                    <button class="toggle-btn" onclick="toggleAns('a14')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The diagram shows the demand and supply for rice. [cite: 265]<br>
+                    The market for rice is initially in equilibrium at a price of $P_{1}.$ The government introduces a maximum price of $P_{max}.$ At the same time the supply of rice increases. [cite: 266]
+                    <img src="q14_orig.png" class="q-image" alt="Price Ceiling and Supply Shift" onerror="this.style.display='none'">
+                    What is the impact of these changes on the market for rice? [cite: 274]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> A new market equilibrium will be established. [cite: 275]</div>
+                        <div class="option"><strong>B</strong> An illegal market for rice will develop. [cite: 276]</div>
+                        <div class="option"><strong>C</strong> There will be a shortage of rice. [cite: 277]</div>
+                        <div class="option"><strong>D</strong> There will be a surplus of rice. [cite: 278]</div>
+                    </div>
+                </div>
+                <div id="a14" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Initially, $P_{max}$ is below $P_1$ (effective).<br>
+                        - <b>A1:</b> However, the supply shift to $S_2$ causes the new equilibrium price to fall <span class="highlight">below the maximum price</span> ($P_{max}$), so the market clears at a new equilibrium. [cite: 275]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q15" class="question-card">
+                <div class="q-header">
+                    <span>Question 15</span>
+                    <button class="toggle-btn" onclick="toggleAns('a15')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    In the diagram, D is the demand curve of an agricultural commodity and S is the initial supply curve. [cite: 282]<br>
+                    The government promises to maintain farmers' incomes at least at this initial level. [cite: 283]<br>
+                    The harvests in four subsequent years are shown by supply curves $S_{1}-S_{4}.$ [cite: 284]
+                    <img src="q15_orig.png" class="q-image" alt="Agriculture Support Policy" onerror="this.style.display='none'">
+                    How much in total will the government need to pay to support farmers over the four subsequent years? [cite: 300]
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> \$0 [cite: 301]</div>
+                        <div class="option"><strong>B</strong> \$3000 [cite: 302]</div>
+                        <div class="option"><strong>C</strong> \$6000 [cite: 303]</div>
+                        <div class="option"><strong>D</strong> \$10000 [cite: 304]</div>
+                    </div>
+                </div>
+                <div id="a15" class="answer-box">
+                    <span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - <b>M1:</b> Initial income = Price (5) × Quantity (1,000) = $5,000.<br>
+                        - <b>M2:</b> At $S_1$, $P=4, Q=2 \implies 8k$. At $S_2$, $P=3, Q=3 \implies 9k$. At $S_3$, $P=2, Q=4 \implies 8k$. At $S_4$, $P=1, Q=5 \implies 5k$.<br>
+                        - <b>A1:</b> In every year, actual market income is <span class="highlight">greater than or equal to</span> the promised $5,000, so the government pays $0. [cite: 301]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q16" class="question-card">
+                <div class="q-header">
+                    <span>Question 16</span>
+                    <button class="toggle-btn" onclick="toggleAns('a16')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Price stability can be said to occur if the measured value of the consumer prices index (CPI) is unchanged during the year.<br>
+                    Which statement is correct?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> For price stability to occur, there must be no changes in prices of any products.</div>
+                        <div class="option"><strong>B</strong> For price stability to occur, the number of products whose prices rise must exactly match the number whose prices fall.</div>
+                        <div class="option"><strong>C</strong> If some prices rise and others fall, there cannot be price stability.</div>
+                        <div class="option"><strong>D</strong> Different weightings of items used in the calculation of CPI mean that price stability can occur in many ways.</div>
+                    </div>
+                </div>
+                <div id="a16" class="answer-box">
+                    [cite_start]<span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> The CPI is a <span class="highlight">weighted average</span> of a basket of goods. [cite: 310]<br>
+                        - [cite_start]<b>A1:</b> Because different goods have different weights, a large price drop in a highly weighted item can offset many small price rises in less significant items, maintaining price stability overall. [cite: 310]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q17" class="question-card">
+                <div class="q-header">
+                    <span>Question 17</span>
+                    <button class="toggle-btn" onclick="toggleAns('a17')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Based on the circular flow of income, which condition is necessary for an open economy to be in equilibrium?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> Government investment is equal to private investment.</div>
+                        <div class="option"><strong>B</strong> Planned injections are equal to planned withdrawals.</div>
+                        <div class="option"><strong>C</strong> Spending by households is equal to taxes collected by government.</div>
+                        <div class="option"><strong>D</strong> Value of export earnings is equal to expenditure on imports.</div>
+                    </div>
+                </div>
+                <div id="a17" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> In the circular flow of income, an economy is in equilibrium when the flow into the system equals the flow out. [cite: 313]<br>
+                        - [cite_start]<b>A1:</b> This requires <span class="highlight">Total Injections ($I+G+X$) = Total Withdrawals/Leakages ($S+T+M$)</span>. [cite: 313]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q18" class="question-card">
+                <div class="q-header">
+                    <span>Question 18</span>
+                    <button class="toggle-btn" onclick="toggleAns('a18')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The aggregate demand curve is typically downward sloping.<br>
+                    What is one possible explanation for this?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> A fall in the price level will lead to a rise in demand for imports.</div>
+                        <div class="option"><strong>B</strong> As the price level falls, improved productivity will reduce unit costs.</div>
+                        <div class="option"><strong>C</strong> If the price level is high, any interest rate changes will encourage consumption.</div>
+                        <div class="option"><strong>D</strong> The real value of assets increases as the price level falls.</div>
+                    </div>
+                </div>
+                <div id="a18" class="answer-box">
+                    [cite_start]<span class="correct">Answer: D</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> This describes the <b>Wealth Effect</b> (Real Balance Effect). [cite: 325]<br>
+                        - [cite_start]<b>A1:</b> When the price level falls, the <span class="highlight">purchasing power</span> of fixed-value assets increases, making consumers feel wealthier and encouraging them to spend more, leading to a rise in real GDP demanded. [cite: 325]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q19" class="question-card">
+                <div class="q-header">
+                    <span>Question 19</span>
+                    <button class="toggle-btn" onclick="toggleAns('a19')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    What is most likely to cause an unemployed worker to be classified as frictionally unemployed?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> lack of relevant skills for vacant jobs</div>
+                        <div class="option"><strong>B</strong> lack of up-to-date job vacancy information</div>
+                        <div class="option"><strong>C</strong> greater use of technology in the production process</div>
+                        <div class="option"><strong>D</strong> an increase in regional pay inequality</div>
+                    </div>
+                </div>
+                <div id="a19" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Frictional unemployment occurs when workers are <span class="highlight">between jobs</span>. [cite: 328]<br>
+                        - [cite_start]<b>A1:</b> A primary cause is <b>search costs</b> or information failure regarding where suitable jobs are located. [cite: 328]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q20" class="question-card">
+                <div class="q-header">
+                    <span>Question 20</span>
+                    <button class="toggle-btn" onclick="toggleAns('a20')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The table shows figures estimated at the end of a train drivers' strike.<br>
+                    <table>
+                        <tr><td>loss of ticket revenue for train companies</td><td>\$600 (000s)</td></tr>
+                        <tr><td>value placed on extra leisure time by strikers</td><td>\$20 (000s)</td></tr>
+                        <tr><td>loss of government tax revenue</td><td>\$40 (000s)</td></tr>
+                        <tr><td>overtime payments to police</td><td>\$30 (000s)</td></tr>
+                    </table><br>
+                    What was the reduction in the recorded level of national income resulting from the strike?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> \$570 000</div>
+                        <div class="option"><strong>B</strong> \$610 000</div>
+                        <div class="option"><strong>C</strong> \$640 000</div>
+                        <div class="option"><strong>D</strong> \$690 000</div>
+                    </div>
+                </div>
+                <div id="a20" class="answer-box">
+                    [cite_start]<span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Recorded national income focuses on output/expenditure in the formal market. [cite: 332]<br>
+                        - <b>A1:</b> Loss in output is the lost revenue ($600k$). [cite_start]However, the police overtime ($30k$) represents additional government spending on services that <i>is</i> recorded in national income. [cite: 332]<br>
+                        - [cite_start]<b>Calculation:</b> $\text{Net Loss} = 600 - 30 = <span class="highlight">570</span>$. [cite: 334]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q21" class="question-card">
+                <div class="q-header">
+                    <span>Question 21</span>
+                    <button class="toggle-btn" onclick="toggleAns('a21')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    What is likely to be an expansionary monetary policy?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> a decrease in the availability of credit</div>
+                        <div class="option"><strong>B</strong> a decrease in the exchange rate</div>
+                        <div class="option"><strong>C</strong> an increase in government spending</div>
+                        <div class="option"><strong>D</strong> an increase in subsidies for training</div>
+                    </div>
+                </div>
+                <div id="a21" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Monetary policy involves interest rates, money supply, and <span class="highlight">exchange rates</span>. [cite: 342]<br>
+                        - [cite_start]<b>A1:</b> A decrease in the exchange rate (depreciation) makes exports cheaper and imports dearer, increasing net demand ($X-M$) and stimulating the economy. [cite: 342]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q22" class="question-card">
+                <div class="q-header">
+                    <span>Question 22</span>
+                    <button class="toggle-btn" onclick="toggleAns('a22')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    A government increases direct taxation to reduce its budget deficit.<br>
+                    How is this likely to affect the government's ability to achieve its macroeconomic objectives?<br>
+                    <table>
+                        <tr><th></th><th>economic growth</th><th>low inflation</th><th>low unemployment</th></tr>
+                        <tr><td><strong>A</strong></td><td>less likely</td><td>less likely</td><td>less likely</td></tr>
+                        <tr><td><strong>B</strong></td><td>more likely</td><td>less likely</td><td>more likely</td></tr>
+                        <tr><td><strong>C</strong></td><td>less likely</td><td>more likely</td><td>less likely</td></tr>
+                        <tr><td><strong>D</strong></td><td>more likely</td><td>more likely</td><td>less likely</td></tr>
+                    </table>
+                </div>
+                <div id="a22" class="answer-box">
+                    [cite_start]<span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Higher direct tax reduces disposable income, shifting $AD$ to the left. [cite: 350]<br>
+                        - [cite_start]<b>A1:</b> Lower $AD$ makes growth <b>less likely</b>, unemployment <b>less likely</b> (i.e., it will rise), but low inflation <b>more likely</b> due to reduced demand pressure. [cite: 352]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q23" class="question-card">
+                <div class="q-header">
+                    <span>Question 23</span>
+                    <button class="toggle-btn" onclick="toggleAns('a23')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    An income tax has a tax-free allowance of \$10 000 and a single rate of 25%.<br>
+                    What type of tax is this?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> indirect</div>
+                        <div class="option"><strong>B</strong> progressive</div>
+                        <div class="option"><strong>C</strong> proportional</div>
+                        <div class="option"><strong>D</strong> regressive</div>
+                    </div>
+                </div>
+                <div id="a23" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> A tax is <b>progressive</b> if the average tax rate rises as income rises. [cite: 356]<br>
+                        - <b>A1:</b> Because of the <span class="highlight">tax-free allowance</span>, a person earning \$20k pays 12.5% effective tax, while someone earning \$100k pays 22.5%. [cite_start]Since the rate increases with income, it is progressive. [cite: 353]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q24" class="question-card">
+                <div class="q-header">
+                    <span>Question 24</span>
+                    <button class="toggle-btn" onclick="toggleAns('a24')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Which supply-side policy will encourage new entrepreneurs?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> an increase in government subsidy to small firms</div>
+                        <div class="option"><strong>B</strong> an increase in the national minimum wage</div>
+                        <div class="option"><strong>C</strong> an increase in the power of trade unions</div>
+                        <div class="option"><strong>D</strong> an increase in the tax on business profits</div>
+                    </div>
+                </div>
+                <div id="a24" class="answer-box">
+                    [cite_start]<span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Supply-side policies aim to increase productivity and incentivize production. [cite: 361]<br>
+                        - [cite_start]<b>A1:</b> <span class="highlight">Subsidies</span> reduce start-up and operational costs for small businesses, encouraging entrepreneurship. [cite: 361]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q25" class="question-card">
+                <div class="q-header">
+                    <span>Question 25</span>
+                    <button class="toggle-btn" onclick="toggleAns('a25')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The diagram shows aggregate demand (AD) and aggregate supply (AS) curves. The initial equilibrium is at X. A government decides to invest in an increase in infrastructure.<br>
+                    What will be the short-term effect of this policy on the equilibrium?
+                    <img src="q25_orig.png" class="q-image" alt="AD/AS Infrastructure Investment" onerror="this.style.display='none'">
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> Output moves to Point A</div>
+                        <div class="option"><strong>B</strong> Output moves to Point B</div>
+                        <div class="option"><strong>C</strong> Output moves to Point C</div>
+                        <div class="option"><strong>D</strong> Output moves to Point D</div>
+                    </div>
+                </div>
+                <div id="a25" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Infrastructure investment is a component of Government Spending ($G$), shifting <span class="highlight">$AD$ to $AD_1$</span>. [cite: 375]<br>
+                        - [cite_start]<b>A1:</b> In the <b>short term</b>, the equilibrium moves along the existing $AS$ curve to the intersection with $AD_1$, which is Point <b>B</b>. [cite: 379]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q26" class="question-card">
+                <div class="q-header">
+                    <span>Question 26</span>
+                    <button class="toggle-btn" onclick="toggleAns('a26')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Which statement is not a valid reason why a country may impose protectionist measures?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> to allow a newly developed domestic industry to grow to a viable size</div>
+                        <div class="option"><strong>B</strong> to enable a country to retain control of an industry it regards as being of strategic importance</div>
+                        <div class="option"><strong>C</strong> to give consumers a wider choice of goods and services</div>
+                        <div class="option"><strong>D</strong> to give time for workers in a declining domestic industry to find alternative employment</div>
+                    </div>
+                </div>
+                <div id="a26" class="answer-box">
+                    [cite_start]<span class="correct">Answer: C</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> Protectionism (tariffs, quotas) <span class="highlight">restricts</span> imports. [cite: 389]<br>
+                        - [cite_start]<b>A1:</b> Therefore, it <b>reduces</b> consumer choice rather than expanding it. [cite: 389]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q27" class="question-card">
+                <div id="q27_content" class="q-content">
+                    <div class="q-header">
+                        <span>Question 27</span>
+                        <button class="toggle-btn" onclick="toggleAns('a27')">Show Answer</button>
+                    </div>
+                    What is most likely to lead to a persistent surplus in a country's current account of its balance of payments?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> a low domestic savings rate</div>
+                        <div class="option"><strong>B</strong> an undervalued exchange rate</div>
+                        <div class="option"><strong>C</strong> highly protectionist policies by other countries</div>
+                        <div class="option"><strong>D</strong> low investment income from abroad</div>
+                    </div>
+                </div>
+                <div id="a27" class="answer-box">
+                    [cite_start]<span class="correct">Answer: B</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> An undervalued exchange rate makes <span class="highlight">exports cheap</span> and imports expensive. [cite: 394]<br>
+                        - [cite_start]<b>A1:</b> This typically results in a trade surplus, leading to a surplus in the current account. [cite: 394]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q28" class="question-card">
+                <div class="q-header">
+                    <span>Question 28</span>
+                    <button class="toggle-btn" onclick="toggleAns('a28')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    Which formula is used to calculate the terms of trade?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> the average price of exports divided by the average price of imports</div>
+                        <div class="option"><strong>B</strong> the average price of imports divided by the average price of exports</div>
+                        <div class="option"><strong>C</strong> the value of exports divided by the value of imports</div>
+                        <div class="option"><strong>D</strong> the value of imports divided by the value of exports</div>
+                    </div>
+                </div>
+                <div id="a28" class="answer-box">
+                    [cite_start]<span class="correct">Answer: A</span> [cite: 463]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>Formula:</b> $\text{Terms of Trade} = \frac{\text{Index of Export Prices}}{\text{Index of Import Prices}} \times 100$. [cite: 398]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q29" class="question-card">
+                <div class="q-header">
+                    <span>Question 29</span>
+                    <button class="toggle-btn" onclick="toggleAns('a29')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    A country is experiencing a deficit on the current account of its balance of payments.<br>
+                    Which policy decision could reduce the deficit?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> decrease in income tax rates</div>
+                        <div class="option"><strong>B</strong> increase in exchange rates</div>
+                        <div class="option"><strong>C</strong> increase in government spending</div>
+                        <div class="option"><strong>D</strong> increase in import tariffs</div>
+                    </div>
+                </div>
+                <div id="a29" class="answer-box">
+                    [cite_start]<span class="correct">Answer: D</span> [cite: 467]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> A current account deficit means spending on imports exceeds export earnings. [cite: 405]<br>
+                        - [cite_start]<b>A1:</b> <span class="highlight">Import tariffs</span> raise the price of imports, reducing demand for them and helping correct the deficit. [cite: 410]
+                    </div>
+                </div>
+            </div>
+
+            <div id="q30" class="question-card">
+                <div class="q-header">
+                    <span>Question 30</span>
+                    <button class="toggle-btn" onclick="toggleAns('a30')">Show Answer</button>
+                </div>
+                <div class="q-content">
+                    The Euro (€) is the main currency of the European Union. The diagram shows the exchange rate between the Euro and the US dollar.
+                    <img src="q30_orig.png" class="q-image" alt="Exchange Rate Euro/Dollar Shift" onerror="this.style.display='none'">
+                    What is likely to have caused this change in the value of the Euro?
+                    <div class="options-grid">
+                        <div class="option"><strong>A</strong> a decrease in European Union inflation</div>
+                        <div class="option"><strong>B</strong> a decrease in US interest rates</div>
+                        <div class="option"><strong>C</strong> an increase in European Union imports</div>
+                        <div class="option"><strong>D</strong> an increase in European Union unemployment</div>
+                    </div>
+                </div>
+                <div id="a30" class="answer-box">
+                    [cite_start]<span class="correct">Answer: C</span> [cite: 467]
+                    <div class="reasoning">
+                        <b>Reasoning:</b><br>
+                        - [cite_start]<b>M1:</b> The diagram shows an <b>increase in supply</b> of Euros ($S_1 \to S_2$), leading to a <b>depreciation</b> ($P_1 \to P_2$). [cite: 418]<br>
+                        - [cite_start]<b>A1:</b> An increase in <span class="highlight">EU imports</span> requires Euro holders to sell Euros to buy foreign currency, thus increasing the supply of Euros on the foreign exchange market. [cite: 429]
+                    </div>
+                </div>
+
+            </div>
+    </div>
+
+    <script>
+        function toggleAns(id) {
+            const box = document.getElementById(id);
+            box.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

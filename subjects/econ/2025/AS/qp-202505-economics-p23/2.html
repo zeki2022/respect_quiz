@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q2 - Semiconductor Supply Elasticity</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #f4f6ff;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #7b61ff;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #f0f4ff;
+            padding: 20px;
+            border-left: 4px solid #7b61ff;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #7b61ff;
+            color: white;
+            border-color: #7b61ff;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #7b61ff;
+        }
+        
+        .tab.active {
+            color: #7b61ff;
+            border-bottom-color: #7b61ff;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #7b61ff;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #7b61ff;
+            font-weight: bold;
+            background-color: #f0f4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #7b61ff;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #7b61ff;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: #7b61ff;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .elasticity-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .definition-box {
+            background: #fff8e1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ffb300;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section B / Question 2</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>2 Semi-conductors are widely used in the production of many types of electronic goods such as smartphones.</strong></p>
+                    
+                    <p>It has been estimated that the price elasticity of supply for semi-conductors is 0.2 in the short run and 0.8 in the long run.</p>
+                    
+                    <!-- 原图占位符 - 题目无原图 -->
+                    <div class="orig-img">
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            <em>Original diagram would appear here if provided in the question paper.</em>
+                        </div>
+                    </div>
+                    
+                    <p><strong>(a)</strong> Explain what these estimates mean for producers of smartphones that use semi-conductors and consider the significance of the long-run estimate. [8]</p>
+                    
+                    <div class="elasticity-info">
+                        <p><strong>Price Elasticity of Supply (PES) Formula:</strong> $$PES = \frac{\%\ \text{change in quantity supplied}}{\%\ \text{change in price}}$$</p>
+                        <p>A PES of 0.2 means that a 10% increase in price leads to only a 2% increase in quantity supplied in the short run.</p>
+                        <p>A PES of 0.8 means that a 10% increase in price leads to an 8% increase in quantity supplied in the long run.</p>
+                    </div>
+                    
+                    <p><strong>(b)</strong> Assess the likely effects on resource allocation of a continuing increase in demand for semi-conductors. [12]</p>
+                    
+                    <div class="definition-box">
+                        <p><strong>Resource allocation</strong> refers to how scarce resources (land, labor, capital) are distributed among competing uses in an economy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Semiconductor Market: Supply Elasticity & Demand Increase</h4>
+                <p>This interactive diagram shows how the price elasticity of supply (PES) affects market response to increasing demand for semiconductors.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="semiconductorCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● Demand (D)</div>
+                        <div style="color: #c0392b">● Short-run Supply (PES=0.2)</div>
+                        <div style="color: #27ae60">● Long-run Supply (PES=0.8)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Demand Increase:</span>
+                        <input type="range" id="demandSlider" min="0" max="100" value="0" style="flex: 1; cursor: pointer;" oninput="updateSemiconductorChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>0% (Initial)</span>
+                        <span>50% (Significant)</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <span style="font-weight: bold; font-size: 14px;">Time Period:</span>
+                        <button class="action-btn active" id="shortrunBtn" onclick="setTimePeriod('shortrun')">Short Run (PES=0.2)</button>
+                        <button class="action-btn" id="longrunBtn" onclick="setTimePeriod('longrun')">Long Run (PES=0.8)</button>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Resource Allocation Effects</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetSemiconductorChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Equilibrium Price:</span>
+                        <span id="eqPrice">$100</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Equilibrium Quantity:</span>
+                        <span id="eqQuantity">50M units</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Price Change:</span>
+                        <span id="priceChange">0%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Quantity Change:</span>
+                        <span id="quantityChange">0%</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Price Elasticity of Supply (PES):</span>
+                        <span id="currentPES" style="color: #7b61ff; font-weight: bold;">0.2</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Market Response:</span>
+                        <span id="marketResponse" style="color: #27ae60; font-weight: bold;">Initial Equilibrium</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Price Elasticity of Supply Explained</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Understanding PES values:</strong> A PES of <span class="highlight-term">0.2</span> means supply is <span class="highlight-term">price inelastic</span> in the short run. Quantity supplied is relatively unresponsive to price changes.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Short-run implications:</strong> If demand increases, price will rise substantially (as shown in the diagram) but quantity supplied increases only slightly. This creates a <span class="highlight-term">supply bottleneck</span> for smartphone producers.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Long-run PES (0.8):</strong> Supply becomes more elastic over time. Firms can expand production capacity, invest in new technology, and train workers, making quantity supplied more responsive to price changes.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Significance for smartphone producers:</strong>
+                            <br>• <span class="highlight-term">Short-run:</span> Face higher input costs and potential shortages
+                            <br>• <span class="highlight-term">Long-run:</span> Can expect more stable prices and reliable supply as semiconductor producers adjust</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 (3 marks):</strong>
+                            <br>1. Correct definition of PES (1 mark)
+                            <br>2. Explanation of PES=0.2 as inelastic (1 mark)
+                            <br>3. Understanding that higher PES in long run indicates greater responsiveness (1 mark)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO2 (3 marks):</strong>
+                            <br>1. Analysis of why PES differs between short and long run (e.g., time to adjust capacity) (1 mark)
+                            <br>2. Explanation of implications for smartphone producers in short run (1 mark)
+                            <br>3. Explanation of implications in long run (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Resource Allocation Effects (Interactive)</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Price mechanism functions:</strong> Continuing demand increase triggers the <span class="highlight-term">rationing function</span> (higher prices allocate semiconductors to highest-value uses) and <span class="highlight-term">incentive function</span> (higher prices encourage increased production).</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Signaling function:</strong> High semiconductor prices signal to other firms to enter the market or existing firms to reallocate resources toward semiconductor production.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Short-run vs. Long-run effects:</strong> As shown in the diagram, inelastic short-run supply leads to <span class="highlight-term">large price increases</span> but minimal quantity increase. Elastic long-run supply leads to <span class="highlight-term">smaller price increases</span> but larger quantity adjustments.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Opportunity cost concept:</strong> Resources allocated to semiconductor production have an opportunity cost - they cannot be used to produce other goods. The market mechanism determines this allocation based on relative prices.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>Production possibility frontier (PPC) perspective:</strong> The economy may shift its PPC outward over time through investment in semiconductor production capacity, or reallocate resources along the existing PPC toward semiconductors and away from other sectors.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Limitations of PES estimates:</strong> PES values are estimates and may vary across different types of semiconductors or under different economic conditions.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Significance for strategic planning:</strong> Smartphone producers must understand these elasticities for inventory management, pricing strategies, and supplier contracts.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Buffer stock considerations:</strong> Given inelastic short-run supply, producers may need to maintain larger inventories or develop alternative supply sources to mitigate disruption risks.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> The long-run PES estimate is particularly significant as it indicates that supply constraints are temporary. Smartphone producers should plan for short-term volatility but anticipate more stable conditions in the long run.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (2 marks):</strong>
+                            <br>1. Evaluation of the significance of the long-run estimate for producers' strategic decisions (1 mark)
+                            <br>2. Consideration of limitations or qualifications to the analysis (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Resource Allocation Evaluation</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Market efficiency perspective:</strong> The price mechanism generally allocates resources efficiently to their highest-value uses, but market failures may occur:
+                            <br>• <span class="highlight-term">Externalities:</span> Semiconductor production may have environmental costs not reflected in market prices
+                            <br>• <span class="highlight-term">Imperfect competition:</span> Oligopolistic market structure may distort resource allocation</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Time dimension critical:</strong> The adjustment process takes time. In the short run, resource allocation may be inefficient due to supply constraints, but improves in the long run as supply becomes more elastic.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Government intervention considerations:</strong> Governments may intervene to influence resource allocation through:
+                            <br>• Subsidies for semiconductor R&D
+                            <br>• Education policies to develop skilled workforce
+                            <br>• Infrastructure investment to support production</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>International dimension:</strong> Resource allocation occurs globally. Countries with comparative advantage in semiconductor production will specialize, affecting trade patterns and global supply chains.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>Dynamic effects:</strong> Continuing demand increase may trigger technological innovation and productivity improvements, potentially shifting the long-run supply curve further to the right than static analysis suggests.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Continuing demand for semiconductors will reallocate resources toward their production, but the efficiency of this allocation depends on market structure, government policies, time horizons, and potential market failures.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (4 marks):</strong>
+                            <br>1. Evaluation of how effectively the price mechanism allocates resources (1 mark)
+                            <br>2. Consideration of time dimension (short vs. long run) (1 mark)
+                            <br>3. Assessment of potential market failures or government role (1 mark)
+                            <br>4. Justified conclusion addressing the question (1 mark)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Complete Model Answer [8 Marks]</div>
+                            
+                            <p>The estimated price elasticity of supply (PES) values for semiconductors - 0.2 in the short run and 0.8 in the long run - have important implications for smartphone producers and reveal significant differences in supply responsiveness over different time horizons.</p>
+                            
+                            <p><span class="model-sub">Understanding the PES values:</span> Price elasticity of supply measures the responsiveness of quantity supplied to price changes, calculated as $$PES = \frac{\%\ \Delta Q_s}{\%\ \Delta P}$$. A PES of <span class="highlight-term">0.2 indicates highly inelastic short-run supply</span>, meaning a 10% price increase elicits only a 2% quantity increase. This inelasticity stems from production constraints: semiconductor fabrication plants (<span class="highlight-term">fabs</span>) require massive capital investment and take years to build, while the highly specialized workforce cannot be rapidly expanded. Consequently, smartphone producers face <span class="highlight-term">supply bottlenecks</span> when demand increases, leading to substantial price spikes for this critical input.</p>
+                            
+                            <p><span class="model-sub">Long-run significance:</span> The higher PES of <span class="highlight-term">0.8 in the long run</span> reflects greater supply responsiveness as constraints ease. Firms can build new fabs, develop more efficient production techniques, and train specialized engineers. For smartphone producers, this means short-term supply shortages and price volatility should gradually ease. They can plan for more stable input costs and reliable supply chains in their long-term strategic planning.</p>
+                            
+                            <p><span class="model-sub">Strategic implications:</span> Smartphone manufacturers must account for this elasticity pattern in several ways. In the short run, they may need to accept higher costs, potentially passing them to consumers or accepting lower margins. They might also diversify suppliers or develop <span class="highlight-term">buffer stocks</span>. The long-run elasticity suggests that building strong relationships with semiconductor suppliers could secure favorable terms as capacity expands. Additionally, forward-thinking producers might invest in semiconductor R&D partnerships to influence future supply conditions.</p>
+                            
+                            <p><span class="model-sub">Limitations and evaluation:</span> These PES estimates are averages and may vary across semiconductor types (memory chips vs. processors). Furthermore, <span class="highlight-term">geopolitical factors</span> like export controls or trade disputes could constrain supply regardless of price signals. The COVID-19 pandemic demonstrated how external shocks could disrupt semiconductor supply chains beyond what standard elasticity measures predict.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> The divergence between short-run and long-run PES estimates is highly significant for smartphone producers. It necessitates <span class="highlight-term">short-term contingency planning</span> for supply disruptions while allowing <span class="highlight-term">long-term optimism</span> about supply stability. Understanding these elasticities enables better pricing, inventory, and supplier relationship strategies.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Complete Model Answer [12 Marks]</div>
+                            
+                            <p>A continuing increase in demand for semiconductors will significantly reallocate economic resources through market mechanisms, though the efficiency and distribution of this reallocation depend on several factors including time horizon, market structure, and potential government intervention.</p>
+                            
+                            <p><span class="model-sub">Price mechanism and resource allocation:</span> The <span class="highlight-term">price mechanism</span> performs three key functions in allocating resources. First, the <span class="highlight-term">rationing function</span> allocates scarce semiconductors to buyers willing to pay the highest prices, typically those producing high-margin electronics like premium smartphones. Second, the <span class="highlight-term">incentive function</span> motivates semiconductor firms to increase production, as higher prices boost profit potential. Third, the <span class="highlight-term">signaling function</span> informs other firms about profitable opportunities, potentially attracting new entrants to the semiconductor industry.</p>
+                            
+                            <p><span class="model-sub">Short-run vs. long-run dynamics:</span> Due to inelastic short-run supply (PES=0.2), initial demand increases cause <span class="highlight-term">disproportionate price spikes</span> with minimal quantity response. Resources are reallocated mainly through higher prices rather than increased production. This creates windfall profits for existing producers but strains downstream industries like smartphone manufacturing. In the long run (PES=0.8), the same demand increase yields more quantity adjustment and less price inflation. Resources flow into semiconductor production through new investment, workforce training, and technological innovation.</p>
+                            
+                            <p><span class="model-sub">Opportunity cost and PPC analysis:</span> From a <span class="highlight-term">production possibility curve (PPC)</span> perspective, resources diverted to semiconductor production have opportunity costs in forgone alternative outputs. The market determines this trade-off based on relative prices. If semiconductor demand growth reflects genuine consumer preferences, this reallocation increases <span class="highlight-term">allocative efficiency</span>. However, if prices are distorted by subsidies, monopolistic practices, or speculative bubbles, resources may be misallocated.</p>
+                            
+                            <p><span class="model-sub">Market failures and government role:</span> Several factors may prevent optimal resource allocation. <span class="highlight-term">Positive externalities</span> from semiconductor innovation (spillover benefits to multiple industries) suggest private markets may underinvest relative to social optimum. <span class="highlight-term">Oligopolistic market structure</span> with few major producers (TSMC, Samsung, Intel) may restrict output to maintain high prices. <span class="highlight-term">Capital market imperfections</span> could impede the massive investments needed for new fabs. These potential failures justify selective government intervention through R&D subsidies, competition policy, or strategic investment in production capacity.</p>
+                            
+                            <p><span class="model-sub">Global resource allocation:</span> Semiconductor production involves complex <span class="highlight-term">global value chains</span>. Continuing demand increases will reinforce existing comparative advantages: East Asian economies with established semiconductor ecosystems will attract more investment, while other regions may struggle to compete. This specialization enhances global efficiency but creates <span class="highlight-term">strategic vulnerabilities</span> and distributional concerns as wealth concentrates in semiconductor-producing regions.</p>
+                            
+                            <p><span class="model-sub">Dynamic effects and innovation:</span> Sustained demand growth can trigger <span class="highlight-term">dynamic efficiency</span> gains beyond static resource reallocation. Higher profits fund R&D, leading to technological breakthroughs that lower production costs and create new applications. This virtuous cycle further attracts resources to the semiconductor sector and related fields like materials science and quantum computing.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> A continuing increase in semiconductor demand will reallocate substantial economic resources toward their production, primarily through price signals. This reallocation is likely efficient in the long run, though short-term disruptions and potential market failures warrant monitoring. The ultimate impact on overall economic welfare depends on whether resources flow from lower-value to higher-value uses, whether innovation offsets diminishing returns, and whether benefits are widely shared across the economy. Governments may play a role in ensuring efficient allocation while addressing strategic and distributional concerns arising from this sector's growing importance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            // 初始均衡
+            initialPrice: 100,
+            initialQuantity: 50,
+            
+            // 弹性参数
+            elasticities: {
+                shortrun: {
+                    pes: 0.2,  // 缺乏弹性
+                    slope: 5.0, // 供给曲线斜率 (陡峭)
+                    label: "Short Run (PES=0.2)"
+                },
+                longrun: {
+                    pes: 0.8,  // 较有弹性
+                    slope: 1.25, // 供给曲线斜率 (平缓)
+                    label: "Long Run (PES=0.8)"
+                }
+            },
+            
+            // 需求参数
+            demand: {
+                slope: -2.0, // 需求曲线斜率
+                intercept: 200 // 价格轴截距
+            },
+            
+            // 当前设置
+            currentPeriod: "shortrun",
+            demandIncrease: 0, // 百分比 (0-100)
+            isExamMode: false
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            const tabIndex = tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3;
+            document.querySelector(`.tab:nth-child(${tabIndex})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 半导体图表功能 ====================
+        const semiconductorCanvas = document.getElementById('semiconductorCanvas');
+        const semiconductorCtx = semiconductorCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeSemiconductorCanvas() {
+            if (!semiconductorCanvas.parentElement) return;
+            
+            canvasWidth = semiconductorCanvas.parentElement.clientWidth;
+            canvasHeight = semiconductorCanvas.parentElement.clientHeight;
+            semiconductorCanvas.width = canvasWidth;
+            semiconductorCanvas.height = canvasHeight;
+            
+            drawSemiconductorChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeSemiconductorCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeSemiconductorCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeSemiconductorCanvas, 300);
+            setTimeout(resizeSemiconductorCanvas, 1000);
+        }
+        
+        // 设置时间周期
+        function setTimePeriod(period) {
+            ECONOMIC_PARAMS.currentPeriod = period;
+            
+            // 更新按钮状态
+            document.getElementById('shortrunBtn').classList.remove('active');
+            document.getElementById('longrunBtn').classList.remove('active');
+            document.getElementById(`${period}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateSemiconductorChart();
+        }
+        
+        // 更新图表（滑块变动时调用）
+        function updateSemiconductorChart() {
+            ECONOMIC_PARAMS.demandIncrease = parseInt(document.getElementById('demandSlider').value);
+            ECONOMIC_PARAMS.isExamMode = false;
+            drawSemiconductorChart();
+            updateDataPanel();
+        }
+        
+        // 显示考试模式（资源分配效果）
+        function showExamMode() {
+            ECONOMIC_PARAMS.isExamMode = true;
+            ECONOMIC_PARAMS.demandIncrease = 40; // 显著需求增加
+            document.getElementById('demandSlider').value = 40;
+            drawSemiconductorChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetSemiconductorChart() {
+            ECONOMIC_PARAMS.isExamMode = false;
+            ECONOMIC_PARAMS.demandIncrease = 0;
+            document.getElementById('demandSlider').value = 0;
+            drawSemiconductorChart();
+            updateDataPanel();
+        }
+        
+        // 绘制半导体市场图表
+        function drawSemiconductorChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            semiconductorCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            semiconductorCtx.beginPath();
+            semiconductorCtx.strokeStyle = '#333';
+            semiconductorCtx.lineWidth = 2;
+            
+            // Y轴（价格）
+            semiconductorCtx.moveTo(padding.left, padding.top);
+            semiconductorCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量）
+            semiconductorCtx.moveTo(padding.left, padding.top + graphHeight);
+            semiconductorCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            semiconductorCtx.stroke();
+            
+            // 坐标轴标签
+            semiconductorCtx.font = 'bold 14px Arial';
+            semiconductorCtx.fillStyle = '#333';
+            semiconductorCtx.textAlign = 'center';
+            
+            // Y轴标签
+            semiconductorCtx.save();
+            semiconductorCtx.translate(20, padding.top + graphHeight / 2);
+            semiconductorCtx.rotate(-Math.PI / 2);
+            semiconductorCtx.fillText("Price ($ per unit)", 0, 0);
+            semiconductorCtx.restore();
+            
+            // X轴标签
+            semiconductorCtx.fillText("Quantity of Semiconductors (Million units)", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            semiconductorCtx.strokeStyle = '#eee';
+            semiconductorCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                semiconductorCtx.beginPath();
+                semiconductorCtx.moveTo(padding.left, y);
+                semiconductorCtx.lineTo(padding.left + graphWidth, y);
+                semiconductorCtx.stroke();
+                
+                // Y轴刻度标签
+                const price = (200 - (i * 40)).toFixed(0);
+                semiconductorCtx.fillStyle = '#666';
+                semiconductorCtx.font = '12px Arial';
+                semiconductorCtx.textAlign = 'right';
+                semiconductorCtx.fillText(`$${price}`, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                semiconductorCtx.beginPath();
+                semiconductorCtx.moveTo(x, padding.top);
+                semiconductorCtx.lineTo(x, padding.top + graphHeight);
+                semiconductorCtx.stroke();
+                
+                // X轴刻度标签
+                const qty = (i * 20) + '';
+                semiconductorCtx.fillStyle = '#666';
+                semiconductorCtx.font = '12px Arial';
+                semiconductorCtx.textAlign = 'center';
+                semiconductorCtx.fillText(qty, x, padding.top + graphHeight + 20);
+            }
+            
+            // 当前弹性参数
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentPeriod];
+            const demandIncreaseFactor = 1 + (ECONOMIC_PARAMS.demandIncrease / 100) * 0.5; // 最大增加50%
+            
+            // 绘制需求曲线
+            semiconductorCtx.beginPath();
+            semiconductorCtx.strokeStyle = '#2980b9';
+            semiconductorCtx.lineWidth = 3;
+            
+            // 需求曲线：向下倾斜，Q = a - bP
+            const demandStartY = padding.top; // 最高价格
+            const demandEndY = padding.top + graphHeight; // 最低价格
+            const demandStartX = padding.left; // 数量为0时
+            const demandEndX = padding.left + graphWidth; // 最大数量
+            
+            semiconductorCtx.moveTo(demandStartX, demandStartY);
+            semiconductorCtx.lineTo(demandEndX, demandEndY);
+            semiconductorCtx.stroke();
+            
+            // 需求曲线标签
+            semiconductorCtx.fillStyle = '#2980b9';
+            semiconductorCtx.font = 'bold 14px Arial';
+            semiconductorCtx.textAlign = 'left';
+            semiconductorCtx.fillText("D₀ (Initial Demand)", demandEndX - 150, demandStartY + 30);
+            
+            // 如果需求增加，绘制新需求曲线
+            if (ECONOMIC_PARAMS.demandIncrease > 0) {
+                // 需求曲线右移
+                const shiftAmount = (ECONOMIC_PARAMS.demandIncrease / 100) * graphWidth * 0.4;
+                const newDemandStartX = demandStartX + shiftAmount;
+                const newDemandEndX = demandEndX + shiftAmount;
+                
+                // 绘制新的需求曲线
+                semiconductorCtx.beginPath();
+                semiconductorCtx.strokeStyle = '#2980b9';
+                semiconductorCtx.setLineDash([5, 5]);
+                semiconductorCtx.lineWidth = 3;
+                
+                semiconductorCtx.moveTo(newDemandStartX, demandStartY);
+                semiconductorCtx.lineTo(newDemandEndX, demandEndY);
+                semiconductorCtx.stroke();
+                
+                // 恢复实线
+                semiconductorCtx.setLineDash([]);
+                
+                // 新需求曲线标签
+                semiconductorCtx.fillStyle = '#2980b9';
+                semiconductorCtx.fillText("D₁ (Increased Demand)", newDemandEndX - 150, demandStartY + 30);
+            }
+            
+            // 绘制短期供给曲线（陡峭，缺乏弹性）
+            semiconductorCtx.beginPath();
+            semiconductorCtx.strokeStyle = '#c0392b';
+            semiconductorCtx.lineWidth = 3;
+            
+            // 短期供给曲线：向上倾斜，陡峭
+            const shortrunSupplyStartY = padding.top + graphHeight * 0.6; // 较低价格时开始供给
+            const shortrunSupplyEndY = padding.top; // 较高价格
+            const shortrunSupplyStartX = padding.left + graphWidth * 0.1;
+            const shortrunSupplyEndX = padding.left + graphWidth * 0.6;
+            
+            semiconductorCtx.moveTo(shortrunSupplyStartX, shortrunSupplyStartY);
+            semiconductorCtx.lineTo(shortrunSupplyEndX, shortrunSupplyEndY);
+            semiconductorCtx.stroke();
+            
+            // 短期供给曲线标签
+            semiconductorCtx.fillStyle = '#c0392b';
+            semiconductorCtx.fillText("Sₛᵣ (Short-run, PES=0.2)", shortrunSupplyStartX, shortrunSupplyStartY - 20);
+            
+            // 绘制长期供给曲线（平缓，较有弹性）
+            semiconductorCtx.beginPath();
+            semiconductorCtx.strokeStyle = '#27ae60';
+            semiconductorCtx.lineWidth = 3;
+            
+            // 长期供给曲线：向上倾斜，平缓
+            const longrunSupplyStartY = padding.top + graphHeight * 0.8; // 更低价格时开始供给
+            const longrunSupplyEndY = padding.top; // 较高价格
+            const longrunSupplyStartX = padding.left + graphWidth * 0.05;
+            const longrunSupplyEndX = padding.left + graphWidth * 0.9;
+            
+            // 根据当前周期决定绘制哪条供给曲线
+            if (ECONOMIC_PARAMS.currentPeriod === 'shortrun') {
+                // 只显示短期供给曲线为实线，长期为虚线
+                semiconductorCtx.setLineDash([5, 5]);
+                semiconductorCtx.moveTo(longrunSupplyStartX, longrunSupplyStartY);
+                semiconductorCtx.lineTo(longrunSupplyEndX, longrunSupplyEndY);
+                semiconductorCtx.stroke();
+                semiconductorCtx.setLineDash([]);
+                
+                // 长期供给曲线标签
+                semiconductorCtx.fillStyle = '#27ae60';
+                semiconductorCtx.fillText("Sₗᵣ (Long-run, PES=0.8)", longrunSupplyEndX - 150, longrunSupplyEndY + 20);
+            } else {
+                // 只显示长期供给曲线为实线，短期为虚线
+                semiconductorCtx.setLineDash([5, 5]);
+                semiconductorCtx.moveTo(shortrunSupplyStartX, shortrunSupplyStartY);
+                semiconductorCtx.lineTo(shortrunSupplyEndX, shortrunSupplyEndY);
+                semiconductorCtx.stroke();
+                semiconductorCtx.setLineDash([]);
+                
+                // 短期供给曲线标签
+                semiconductorCtx.fillStyle = '#c0392b';
+                semiconductorCtx.fillText("Sₛᵣ (Short-run, PES=0.2)", shortrunSupplyStartX, shortrunSupplyStartY - 20);
+                
+                // 绘制实线长期供给曲线
+                semiconductorCtx.beginPath();
+                semiconductorCtx.strokeStyle = '#27ae60';
+                semiconductorCtx.lineWidth = 3;
+                semiconductorCtx.moveTo(longrunSupplyStartX, longrunSupplyStartY);
+                semiconductorCtx.lineTo(longrunSupplyEndX, longrunSupplyEndY);
+                semiconductorCtx.stroke();
+                
+                // 长期供给曲线标签
+                semiconductorCtx.fillStyle = '#27ae60';
+                semiconductorCtx.fillText("Sₗᵣ (Long-run, PES=0.8)", longrunSupplyEndX - 150, longrunSupplyEndY + 20);
+            }
+            
+            // 计算初始均衡点（需求曲线与当前供给曲线的交点）
+            let currentSupplyStartX, currentSupplyStartY, currentSupplyEndX, currentSupplyEndY;
+            
+            if (ECONOMIC_PARAMS.currentPeriod === 'shortrun') {
+                currentSupplyStartX = shortrunSupplyStartX;
+                currentSupplyStartY = shortrunSupplyStartY;
+                currentSupplyEndX = shortrunSupplyEndX;
+                currentSupplyEndY = shortrunSupplyEndY;
+            } else {
+                currentSupplyStartX = longrunSupplyStartX;
+                currentSupplyStartY = longrunSupplyStartY;
+                currentSupplyEndX = longrunSupplyEndX;
+                currentSupplyEndY = longrunSupplyEndY;
+            }
+            
+            // 需求曲线方程参数 (线性: P = a - bQ)
+            const demandSlope = (demandEndY - demandStartY) / (demandEndX - demandStartX);
+            const demandIntercept = demandStartY - demandSlope * demandStartX;
+            
+            // 供给曲线方程参数 (线性: P = c + dQ)
+            const supplySlope = (currentSupplyEndY - currentSupplyStartY) / (currentSupplyEndX - currentSupplyStartX);
+            const supplyIntercept = currentSupplyStartY - supplySlope * currentSupplyStartX;
+            
+            // 计算交点 (均衡点)
+            const eqX = (supplyIntercept - demandIntercept) / (demandSlope - supplySlope);
+            const eqY = demandSlope * eqX + demandIntercept;
+            
+            // 标记初始均衡点
+            semiconductorCtx.beginPath();
+            semiconductorCtx.arc(eqX, eqY, 6, 0, Math.PI * 2);
+            semiconductorCtx.fillStyle = '#27ae60';
+            semiconductorCtx.fill();
+            semiconductorCtx.strokeStyle = '#2c3e50';
+            semiconductorCtx.lineWidth = 2;
+            semiconductorCtx.stroke();
+            
+            semiconductorCtx.fillStyle = '#2c3e50';
+            semiconductorCtx.font = 'bold 12px Arial';
+            semiconductorCtx.textAlign = 'right';
+            semiconductorCtx.fillText("E₀ (Initial Equilibrium)", eqX - 10, eqY - 15);
+            
+            // 如果需求增加，计算新均衡点
+            if (ECONOMIC_PARAMS.demandIncrease > 0) {
+                // 新需求曲线参数 (右移)
+                const newDemandSlope = demandSlope; // 斜率不变
+                const newDemandIntercept = demandStartY - newDemandSlope * (demandStartX + (ECONOMIC_PARAMS.demandIncrease / 100) * graphWidth * 0.4);
+                
+                // 计算新交点
+                const newEqX = (supplyIntercept - newDemandIntercept) / (newDemandSlope - supplySlope);
+                const newEqY = newDemandSlope * newEqX + newDemandIntercept;
+                
+                // 标记新均衡点
+                semiconductorCtx.beginPath();
+                semiconductorCtx.arc(newEqX, newEqY, 6, 0, Math.PI * 2);
+                semiconductorCtx.fillStyle = '#e74c3c';
+                semiconductorCtx.fill();
+                semiconductorCtx.strokeStyle = '#2c3e50';
+                semiconductorCtx.lineWidth = 2;
+                semiconductorCtx.stroke();
+                
+                semiconductorCtx.fillStyle = '#2c3e50';
+                semiconductorCtx.font = 'bold 12px Arial';
+                semiconductorCtx.textAlign = 'left';
+                semiconductorCtx.fillText("E₁ (New Equilibrium)", newEqX + 10, newEqY - 15);
+                
+                // 绘制箭头显示移动方向
+                drawArrow(semiconductorCtx, eqX, eqY, newEqX, newEqY, '#7b61ff');
+                
+                // 显示需求增加百分比
+                semiconductorCtx.fillStyle = '#2c3e50';
+                semiconductorCtx.font = 'bold 14px Arial';
+                semiconductorCtx.textAlign = 'center';
+                semiconductorCtx.fillText(`Demand Increase: ${ECONOMIC_PARAMS.demandIncrease}%`, canvasWidth / 2, padding.top - 20);
+                
+                // 显示当前弹性情景
+                semiconductorCtx.fillStyle = ECONOMIC_PARAMS.currentPeriod === 'shortrun' ? '#c0392b' : '#27ae60';
+                semiconductorCtx.fillText(`${elasticity.label}`, canvasWidth / 2, padding.top - 5);
+                
+                // 如果处于考试模式，显示资源分配注释
+                if (ECONOMIC_PARAMS.isExamMode) {
+                    semiconductorCtx.fillStyle = '#e74c3c';
+                    semiconductorCtx.font = 'italic 13px Arial';
+                    semiconductorCtx.fillText("Resource allocation: Higher prices signal need for more production", canvasWidth / 2, padding.top + graphHeight + 60);
+                    
+                    // 绘制消费者剩余和生产者剩余区域（简化表示）
+                    semiconductorCtx.fillStyle = 'rgba(41, 128, 185, 0.1)';
+                    semiconductorCtx.beginPath();
+                    semiconductorCtx.moveTo(padding.left, eqY);
+                    semiconductorCtx.lineTo(eqX, eqY);
+                    semiconductorCtx.lineTo(eqX, padding.top + graphHeight);
+                    semiconductorCtx.lineTo(padding.left, padding.top + graphHeight);
+                    semiconductorCtx.closePath();
+                    semiconductorCtx.fill();
+                    
+                    semiconductorCtx.fillStyle = 'rgba(39, 174, 96, 0.1)';
+                    semiconductorCtx.beginPath();
+                    semiconductorCtx.moveTo(eqX, eqY);
+                    semiconductorCtx.lineTo(eqX, currentSupplyStartY);
+                    semiconductorCtx.lineTo(padding.left, currentSupplyStartY);
+                    semiconductorCtx.closePath();
+                    semiconductorCtx.fill();
+                }
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 200;
+            const legendY = padding.top + 30;
+            
+            semiconductorCtx.fillStyle = '#2980b9';
+            semiconductorCtx.fillRect(legendX, legendY, 15, 15);
+            semiconductorCtx.fillStyle = '#333';
+            semiconductorCtx.font = '12px Arial';
+            semiconductorCtx.textAlign = 'left';
+            semiconductorCtx.fillText("Demand", legendX + 25, legendY + 12);
+            
+            semiconductorCtx.fillStyle = '#c0392b';
+            semiconductorCtx.fillRect(legendX, legendY + 25, 15, 15);
+            semiconductorCtx.fillStyle = '#333';
+            semiconductorCtx.fillText("Short-run Supply (PES=0.2)", legendX + 25, legendY + 37);
+            
+            semiconductorCtx.fillStyle = '#27ae60';
+            semiconductorCtx.fillRect(legendX, legendY + 50, 15, 15);
+            semiconductorCtx.fillStyle = '#333';
+            semiconductorCtx.fillText("Long-run Supply (PES=0.8)", legendX + 25, legendY + 62);
+            
+            semiconductorCtx.fillStyle = '#27ae60';
+            semiconductorCtx.beginPath();
+            semiconductorCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+            semiconductorCtx.fill();
+            semiconductorCtx.fillStyle = '#333';
+            semiconductorCtx.fillText("Initial Equilibrium (E₀)", legendX + 25, legendY + 85);
+            
+            if (ECONOMIC_PARAMS.demandIncrease > 0) {
+                semiconductorCtx.fillStyle = '#e74c3c';
+                semiconductorCtx.beginPath();
+                semiconductorCtx.arc(legendX + 7, legendY + 105, 6, 0, Math.PI * 2);
+                semiconductorCtx.fill();
+                semiconductorCtx.fillStyle = '#333';
+                semiconductorCtx.fillText("New Equilibrium (E₁)", legendX + 25, legendY + 110);
+            }
+        }
+        
+        // 绘制箭头函数
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            const headLength = 15;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            // 绘制线条
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 绘制箭头头部
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), 
+                      toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), 
+                      toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            const elasticity = ECONOMIC_PARAMS.elasticities[ECONOMIC_PARAMS.currentPeriod];
+            
+            // 基于需求增加和弹性计算新均衡值
+            const demandIncreaseFactor = ECONOMIC_PARAMS.demandIncrease / 100;
+            
+            // 价格变化百分比 (取决于需求增加和弹性)
+            const priceChangePercent = (demandIncreaseFactor * 100) / (elasticity.pes * 2);
+            const quantityChangePercent = elasticity.pes * priceChangePercent;
+            
+            // 计算新价格和数量
+            const newPrice = (ECONOMIC_PARAMS.initialPrice * (1 + priceChangePercent / 100)).toFixed(0);
+            const newQuantity = (ECONOMIC_PARAMS.initialQuantity * (1 + quantityChangePercent / 100)).toFixed(1);
+            
+            // 更新显示
+            document.getElementById('eqPrice').textContent = `$${newPrice}`;
+            document.getElementById('eqQuantity').textContent = `${newQuantity}M units`;
+            document.getElementById('priceChange').textContent = `${priceChangePercent.toFixed(1)}%`;
+            document.getElementById('quantityChange').textContent = `${quantityChangePercent.toFixed(1)}%`;
+            document.getElementById('currentPES').textContent = elasticity.pes;
+            
+            const responseElement = document.getElementById('marketResponse');
+            
+            if (ECONOMIC_PARAMS.demandIncrease === 0) {
+                responseElement.textContent = "Initial Equilibrium";
+                responseElement.style.color = '#27ae60';
+            } else {
+                if (ECONOMIC_PARAMS.currentPeriod === 'shortrun') {
+                    responseElement.textContent = "Large price increase, small quantity increase";
+                    responseElement.style.color = '#c0392b';
+                } else {
+                    responseElement.textContent = "Small price increase, large quantity increase";
+                    responseElement.style.color = '#27ae60';
+                }
+                
+                if (ECONOMIC_PARAMS.isExamMode) {
+                    responseElement.textContent += " (Resource reallocation occurring)";
+                }
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置时间周期
+            setTimePeriod('shortrun');
+            
+            // 初始化半导体图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 添加resize事件监听
+            window.addEventListener('resize', resizeSemiconductorCanvas);
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+    </script>
+</body>
+</html>

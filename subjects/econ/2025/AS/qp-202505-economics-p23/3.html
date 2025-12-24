@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Q3 - Merit Goods & Healthcare Provision</title>
+    
+    <!-- MathJax for formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* 全屏水印 */
+        body::after {
+            content: "© Cambridge International 2025";
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1;
+            font-size: 24px;
+            color: #000;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* 禁用文本选择和复制 */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #fff8f8;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            max-width: none !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        /* 固定返回箭头 */
+        .back-arrow {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        /* 严格三区布局 */
+        .container {
+            width: 98%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        /* 题目区：左上 */
+        .question-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        /* 动画区：左下 */
+        .animation-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        /* 答案区：右侧 */
+        .answer-panel {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+        
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .question-panel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .animation-panel {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .answer-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            height: auto;
+        }
+        
+        .question-panel .card {
+            min-height: 500px;
+        }
+        
+        .question-panel h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        
+        .question-text {
+            background: #ffeaea;
+            padding: 20px;
+            border-left: 4px solid #e74c3c;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-text p {
+            margin-bottom: 12px;
+        }
+        
+        .orig-img {
+            max-width: 100%;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .animation-panel .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        
+        button.action-btn {
+            flex: 1;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        button.action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        button.action-btn.active {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        button.exam-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            flex: 2;
+        }
+        
+        button.exam-btn:hover {
+            background-color: #219653;
+        }
+        
+        .data-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-panel .card {
+            height: calc(100vh - 100px);
+            max-height: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #e74c3c;
+        }
+        
+        .tab.active {
+            color: #e74c3c;
+            border-bottom-color: #e74c3c;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #2c3e50;
+            border-left: 4px solid #e74c3c;
+            padding-left: 12px;
+            font-size: 17px;
+        }
+        
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #444;
+        }
+        
+        .highlight-term {
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: #ffeaea;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #e74c3c;
+        }
+        
+        .highlight-equation {
+            color: #d35400;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .model-answer {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.7;
+        }
+        
+        .model-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .model-section:last-child {
+            border-bottom: none;
+        }
+        
+        .model-header {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .model-sub {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+        
+        .marking-point {
+            background: #e8f8f5;
+            padding: 10px 15px;
+            border-left: 4px solid #1abc9c;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .marking-point p {
+            margin: 5px 0;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .merit-good-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .definition-box {
+            background: #fff8e1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ffb300;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .free-provided {
+            background-color: #e8f8f5;
+        }
+        
+        .user-charges {
+            background-color: #ffeaea;
+        }
+    </style>
+</head>
+<body>
+    <!-- 固定返回箭头 -->
+    <a href="javascript:history.back()" class="back-arrow">←</a>
+    
+    <div class="container">
+        <!-- 区域1：题目区（左上） -->
+        <div class="question-panel">
+            <div class="card">
+                <h3>9708 Economics / Paper 2 / Section B / Question 3</h3>
+                
+                <div class="question-text">
+                    <!-- 题目原文完整还原 -->
+                    <p><strong>3 (a)</strong> Explain what is meant by a merit good and why governments provide merit goods such as healthcare free of charge and consider why such provision may not always be successful. [8]</p>
+                    
+                    <!-- 原图占位符 - 题目无原图 -->
+                    <div class="orig-img">
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            <em>Original diagram would appear here if provided in the question paper.</em>
+                        </div>
+                    </div>
+                    
+                    <div class="merit-good-info">
+                        <p><strong>Key Concept: Merit Good</strong> - A merit good is a product or service that is considered beneficial for individuals and society but tends to be under-consumed in a free market due to information failure or positive externalities.</p>
+                        <p><strong>Characteristics:</strong></p>
+                        <ul>
+                            <li>Positive externalities (benefits to third parties)</li>
+                            <li>Information failure (consumers underestimate benefits)</li>
+                            <li>Government intervention often justified</li>
+                            <li>Examples: Healthcare, education, vaccinations</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>(b)</strong> Assess whether a charge made for healthcare at the point of use is likely to be more beneficial to consumers and providers than if healthcare is available to all free of charge. [12]</p>
+                    
+                    <div class="definition-box">
+                        <p><strong>Point-of-use charging</strong> refers to requiring patients to pay a fee when they use healthcare services, as opposed to completely free provision funded through taxation or insurance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域2：动画区（左下） -->
+        <div class="animation-panel">
+            <div class="card">
+                <h4>Healthcare Market: Merit Good Analysis</h4>
+                <p>This interactive diagram shows market failure in healthcare (a merit good) and compares free provision vs. point-of-use charging.</p>
+                
+                <div class="canvas-container">
+                    <canvas id="healthcareCanvas"></canvas>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); padding: 8px; border-radius: 4px; font-size: 12px; border: 1px solid #eee;">
+                        <div style="color: #2980b9">● MPB (Private Benefit)</div>
+                        <div style="color: #27ae60">● MSB (Social Benefit)</div>
+                        <div style="color: #c0392b">● MPC/MSC (Supply)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-row">
+                        <span style="font-weight: bold; font-size: 14px;">Positive Externality Size:</span>
+                        <input type="range" id="externalitySlider" min="0" max="100" value="40" style="flex: 1; cursor: pointer;" oninput="updateHealthcareChart()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: -8px;">
+                        <span>Small</span>
+                        <span>Large</span>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <span style="font-weight: bold; font-size: 14px;">Policy Scenario:</span>
+                        <button class="action-btn active" id="freeBtn" onclick="setPolicy('free')">Free Provision</button>
+                        <button class="action-btn" id="chargeBtn" onclick="setPolicy('charge')">Point-of-Use Charge</button>
+                    </div>
+                    
+                    <div class="control-row" style="margin-top: 10px;">
+                        <button class="action-btn exam-btn" onclick="showExamMode()">★ Show Market Failure & Solutions</button>
+                        <button class="action-btn" style="background: #95a5a6; color: white; flex: 0.3;" onclick="resetHealthcareChart()">Reset</button>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <div class="data-row">
+                        <span>Market Equilibrium Quantity:</span>
+                        <span id="marketQty">30</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Socially Optimal Quantity:</span>
+                        <span id="optimalQty">60</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Under-consumption:</span>
+                        <span id="underConsumption" style="color: #e74c3c; font-weight: bold;">30 units</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Welfare Loss (DWL):</span>
+                        <span id="welfareLoss" style="color: #e74c3c; font-weight: bold;">$450</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Policy Outcome:</span>
+                        <span id="policyOutcome" style="color: #27ae60; font-weight: bold;">Free: Q=60</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Government Cost/Revenue:</span>
+                        <span id="govFinance" style="color: #2980b9; font-weight: bold;">Subsidy: $1200</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域3：答案区（右侧） -->
+        <div class="answer-panel">
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+                    <div class="tab" onclick="switchTab('evaluation')">Evaluation</div>
+                    <div class="tab" onclick="switchTab('model')">Model Answer</div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analysis-tab" class="tab-content active">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Merit Goods and Healthcare Provision</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Definition of merit good:</strong> A <span class="highlight-term">merit good</span> is one whose consumption is considered intrinsically desirable but which tends to be <span class="highlight-term">under-consumed</span> in a free market due to <span class="highlight-term">information failure</span> (consumers underestimate benefits) and/or <span class="highlight-term">positive externalities</span> (benefits to third parties).</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Why governments provide healthcare free of charge:</strong>
+                            <br>• <span class="highlight-term">Correct market failure:</span> As shown in the diagram, the marginal social benefit (MSB) of healthcare exceeds marginal private benefit (MPB), leading to under-consumption at Qm rather than socially optimal Qopt.
+                            <br>• <span class="highlight-term">Equity considerations:</span> Free healthcare ensures access regardless of income, addressing inequality.
+                            <br>• <span class="highlight-term">Positive externalities:</span> Healthy population benefits society through higher productivity, reduced disease transmission, and lower social costs.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Why free provision may not always be successful:</strong>
+                            <br>• <span class="highlight-term">Moral hazard:</span> Free healthcare may lead to overuse of services for minor conditions.
+                            <br>• <span class="highlight-term">Government failure:</span> Inefficient public provision, long waiting times, and lack of competition may reduce quality.
+                            <br>• <span class="highlight-term">Fiscal burden:</span> High costs to taxpayers, potentially causing budget deficits or crowding out other public spending.
+                            <br>• <span class="highlight-term">Information failure persists:</span> Even when free, some may not use services due to lack of awareness or other barriers.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO1 (3 marks):</strong>
+                            <br>1. Correct definition of merit good (1 mark)
+                            <br>2. Explanation of under-consumption due to information failure/externalities (1 mark)
+                            <br>3. Understanding of government rationale for free provision (1 mark)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO2 (3 marks):</strong>
+                            <br>1. Analysis of how free provision addresses market failure (1 mark)
+                            <br>2. Explanation of why free provision may not succeed (e.g., government failure) (1 mark)
+                            <br>3. Further development of analysis points (1 mark)</p>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (2 marks):</strong>
+                            <br>1. Evaluation of the extent to which free provision addresses market failure (1 mark)
+                            <br>2. Consideration of limitations/qualifications (1 mark)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Point-of-Use Charging Analysis</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Benefits of charging for consumers:</strong>
+                            <br>• <span class="highlight-term">Reduced waiting times:</span> Charges may deter unnecessary use, freeing capacity for those with genuine need.
+                            <br>• <span class="highlight-term">Increased choice/quality:</span> Revenue from charges could be reinvested to improve services.
+                            <br>• <span class="highlight-term">Consumer sovereignty:</span> Users may value services more when they pay directly.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Benefits of charging for providers:</strong>
+                            <br>• <span class="highlight-term">Additional revenue:</span> Can fund service improvements, staff wages, or new equipment.
+                            <br>• <span class="highlight-term">Better resource allocation:</span> Charges signal which services are most valued by users.
+                            <br>• <span class="highlight-term">Reduced pressure:</span> Lower demand from minor cases allows focus on serious conditions.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Problems with charging for consumers:</strong>
+                            <br>• <span class="highlight-term">Inequity:</span> Low-income individuals may avoid necessary care due to cost.
+                            <br>• <span class="highlight-term">Under-consumption persists:</span> Charges exacerbate the existing market failure shown in the diagram.
+                            <br>• <span class="highlight-term">Administrative costs:</span> Billing systems add complexity and expense.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Problems with charging for providers:</strong>
+                            <br>• <span class="highlight-term">Deterrent effect:</span> Some patients delay treatment until conditions worsen, increasing treatment costs.
+                            <br>• <span class="highlight-term">Public opposition:</span> Charging may be politically unpopular, especially for essential services.
+                            <br>• <span class="highlight-term">Collection costs:</span> Revenue may be offset by administrative expenses of billing and collection.</span>
+                        </div>
+                        
+                        <div class="comparison-table">
+                            <tr>
+                                <th>Aspect</th>
+                                <th class="free-provided">Free Provision</th>
+                                <th class="user-charges">Point-of-Use Charges</th>
+                            </tr>
+                            <tr>
+                                <td><strong>Accessibility</strong></td>
+                                <td class="free-provided">High access for all income groups</td>
+                                <td class="user-charges">May deter low-income users</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Efficiency</strong></td>
+                                <td class="free-provided">Risk of overuse/moral hazard</td>
+                                <td class="user-charges">Reduces unnecessary demand</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Quality</strong></td>
+                                <td class="free-provided">May suffer due to budget constraints</td>
+                                <td class="user-charges">Additional revenue for improvements</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Equity</strong></td>
+                                <td class="free-provided">Progressive (funded by taxation)</td>
+                                <td class="user-charges">Regressive (flat charges affect poor more)</td>
+                            </tr>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-content">
+                    <div class="analysis-section">
+                        <h4>Part (a) - Critical Evaluation</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Effectiveness depends on implementation:</strong> Free provision succeeds when combined with public education about healthcare benefits and efficient delivery systems. Some countries (e.g., UK NHS) show success, while others struggle with inefficiency.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Alternative approaches:</strong> Instead of fully free provision, governments could use:
+                            <br>• <span class="highlight-term">Targeted subsidies</span> for low-income groups
+                            <br>• <span class="highlight-term">Social health insurance</span> with mandatory contributions
+                            <br>• <span class="highlight-term">Public-private partnerships</span> to combine equity with efficiency</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Cultural and contextual factors:</strong> Success varies by country based on:
+                            <br>• Public attitudes toward taxation and state provision
+                            <br>• Existing healthcare infrastructure
+                            <br>• Level of economic development and government capacity</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Free provision of healthcare <span class="highlight-term">can be successful</span> in addressing merit good market failure, but requires careful design to avoid government failure, ensure adequate funding, and maintain service quality.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h4>Part (b) - Balanced Evaluation of Healthcare Charging</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="explanation"><strong>Magnitude of charges matters:</strong> Small co-payments may deter unnecessary use without creating significant access barriers, while large charges risk excluding those in genuine need.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="explanation"><strong>Type of healthcare service:</strong> Charging may be more appropriate for:
+                            <br>• <span class="highlight-term">Non-essential or elective procedures</span>
+                            <br>• <span class="highlight-term">Services with lower positive externalities</span>
+                            <br>While remaining free for:
+                            <br>• <span class="highlight-term">Preventive care</span> (high positive externalities)
+                            <br>• <span class="highlight-term">Emergency and chronic condition treatment</span></span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="explanation"><strong>Exemption mechanisms:</strong> The negative equity effects of charging can be mitigated by:
+                            <br>• <span class="highlight-term">Income-based exemptions</span> for low-income groups
+                            <br>• <span class="highlight-term">Caps on total payments</span> to prevent catastrophic expenses
+                            <br>• <span class="highlight-term">Differential charges</span> based on ability to pay</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="explanation"><strong>Empirical evidence:</strong> Research shows mixed results:
+                            <br>• The <span class="highlight-term">RAND Health Insurance Experiment</span> found charges reduced both necessary and unnecessary care
+                            <br>• Some countries with charges (e.g., France, Germany) achieve good outcomes, but with extensive safety nets
+                            <br>• Systems relying heavily on out-of-pocket payments (e.g., USA) have highest costs but not necessarily best outcomes</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="explanation"><strong>Long-term vs. short-term effects:</strong> While charges may improve efficiency in the short term by reducing demand, they may increase long-term costs if preventive care is avoided, leading to more expensive emergency treatments later.</span>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            <span class="explanation"><strong>Conclusion:</strong> Point-of-use charges <span class="highlight-term">may be more beneficial</span> than completely free provision if carefully designed with exemptions, limited to appropriate services, and complemented by other policies. However, they risk exacerbating inequality and under-consumption of healthcare with positive externalities. A hybrid system combining free essential care with modest charges for non-essential services, coupled with robust safety nets, may offer the best balance.</span>
+                        </div>
+                        
+                        <div class="marking-point">
+                            <p><strong>Mark Scheme AO3 (4 marks):</strong>
+                            <br>1. Evaluation of benefits vs. drawbacks for consumers and providers (1 mark)
+                            <br>2. Consideration of equity-efficiency trade-off (1 mark)
+                            <br>3. Assessment of alternative policy designs or contextual factors (1 mark)
+                            <br>4. Justified conclusion addressing the question (1 mark)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Answer Tab -->
+                <div id="model-tab" class="tab-content">
+                    <div class="model-answer">
+                        <div class="model-section">
+                            <div class="model-header">Part (a) - Complete Model Answer [8 Marks]</div>
+                            
+                            <p>A <span class="highlight-term">merit good</span> is a product or service whose consumption is considered intrinsically desirable for individuals and society but which tends to be <span class="highlight-term">under-consumed</span> in a free market. This under-consumption arises from two main market failures: <span class="highlight-term">information failure</span> (where consumers underestimate the private benefits due to imperfect information) and <span class="highlight-term">positive externalities</span> (where consumption generates benefits for third parties not reflected in market prices). Healthcare exemplifies a merit good as it improves individual health while also benefiting society through reduced disease transmission, higher productivity, and lower social costs of illness.</p>
+                            
+                            <p>Governments provide healthcare free of charge primarily to <span class="highlight-term">correct these market failures</span>. As the diagram illustrates, the marginal social benefit (MSB) of healthcare exceeds the marginal private benefit (MPB), creating a divergence between private and social optimum. In a free market, equilibrium occurs where MPB equals marginal cost at quantity Qm, which is below the socially optimal quantity Qopt where MSB equals marginal cost. Free provision moves consumption toward Qopt by eliminating price barriers. Additionally, free healthcare addresses <span class="highlight-term">equity concerns</span>, ensuring access regardless of income—a principle aligned with concepts of distributive justice and the right to health.</p>
+                            
+                            <p>However, free provision may not always succeed due to several limitations. First, <span class="highlight-term">government failure</span> can manifest as inefficient public monopolies lacking competition, leading to long waiting times, bureaucratic inefficiencies, and stagnant innovation. Second, <span class="highlight-term">moral hazard</span> may emerge where individuals overuse "free" services for minor conditions, straining resources. Third, the <span class="highlight-term">fiscal burden</span> of funding universal free healthcare can be substantial, potentially requiring high taxation that distorts economic incentives or crowds out other public spending. Fourth, <span class="highlight-term">information failure may persist</span> even with free access if individuals remain unaware of healthcare benefits or face non-financial barriers like transportation costs or cultural factors.</p>
+                            
+                            <p>The success of free healthcare provision thus depends critically on implementation. Systems like the UK's National Health Service demonstrate that free provision <span class="highlight-term">can work effectively</span> when supported by adequate funding, efficient management, and complementary policies like public health education. Conversely, in contexts with weak institutions or limited resources, free provision may deliver poor quality or unsustainable services. Alternative approaches such as social health insurance (Germany) or targeted subsidies may sometimes achieve similar equity and efficiency goals with different trade-offs.</p>
+                            
+                            <p>In conclusion, while free provision of healthcare addresses the under-consumption of a merit good and promotes equity, its success is contingent upon avoiding government failure, managing moral hazard, and securing sustainable financing. A nuanced evaluation recognizes that free provision is a means to an end—better health outcomes—rather than an end in itself, and its effectiveness varies across different economic and institutional contexts.</p>
+                        </div>
+                        
+                        <div class="model-section">
+                            <div class="model-header">Part (b) - Complete Model Answer [12 Marks]</div>
+                            
+                            <p>Assessing whether point-of-use healthcare charges are more beneficial than free provision requires analyzing the impacts on both consumers and providers through lenses of efficiency, equity, and quality. The answer is not categorical but depends on charge design, healthcare service type, and societal values.</p>
+                            
+                            <p><span class="model-sub">Potential benefits of charging for consumers:</span> Point-of-use charges may improve consumer welfare in several ways. By deterring unnecessary or marginal use, charges can <span class="highlight-term">reduce waiting times</span> for those with genuine need, enhancing access to timely care. Charges also provide <span class="highlight-term">price signals</span> that encourage consumers to consider the cost of their healthcare decisions, potentially fostering more responsible use. Furthermore, revenue from charges could be reinvested to improve service quality, indirectly benefiting consumers through better facilities, shorter waiting times, or more advanced treatments. Some argue that consumers <span class="highlight-term">value services more</span> when they contribute directly, potentially increasing engagement with their healthcare.</p>
+                            
+                            <p><span class="model-sub">Potential benefits of charging for providers:</span> For healthcare providers, charges generate <span class="highlight-term">additional revenue streams</span> that can supplement tax funding, allowing for service expansion, equipment upgrades, or staff salary improvements. This financial flexibility may enhance <span class="highlight-term">provider autonomy</span> and responsiveness to patient preferences. Charges also help <span class="highlight-term">manage demand</span>, allowing providers to prioritize serious cases and reduce pressure on overwhelmed services. In systems where providers compete for patients, the ability to generate and retain charge revenue can incentivize quality improvements and innovation.</p>
+                            
+                            <p><span class="model-sub">Drawbacks for consumers:</span> However, charges create significant <span class="highlight-term">equity concerns</span>. Low-income individuals may forego necessary care due to cost, exacerbating health inequalities and potentially increasing long-term costs if conditions worsen. Charges particularly disadvantage those with chronic conditions requiring frequent care. Moreover, by reintroducing price barriers, charges may <span class="highlight-term">perpetuate the under-consumption</span> inherent in merit goods, moving consumption away from the socially optimal quantity shown in the diagram. Administrative costs of billing and collection may also divert resources from direct care.</p>
+                            
+                            <p><span class="model-sub">Drawbacks for providers:</span> For providers, charging creates <span class="highlight-term">administrative burdens</span> and costs associated with billing, collection, and managing exemptions. The deterrent effect of charges may lead some patients to delay treatment until conditions become more severe and expensive to treat, potentially increasing overall system costs. Furthermore, charging for healthcare can be <span class="highlight-term">politically unpopular</span>, creating pressure on providers to justify fees and potentially damaging public trust in the healthcare system.</p>
+                            
+                            <p><span class="model-sub">Critical evaluation factors:</span> The net benefit of charges depends on several factors. The <span class="highlight-term">magnitude of charges</span> is crucial: small co-payments may deter frivolous use without creating significant access barriers, while substantial fees risk exclusion. <span class="highlight-term">Service differentiation</span> matters—charges may be more appropriate for elective procedures with limited externalities than for preventive care with high social benefits. <span class="highlight-term">Exemption mechanisms</span> for vulnerable groups can mitigate equity concerns but add complexity. Empirical evidence, such as the RAND Health Insurance Experiment, suggests charges reduce both necessary and unnecessary care, with ambiguous net welfare effects.</p>
+                            
+                            <p><span class="model-sub">International comparisons:</span> Examining different healthcare systems reveals varied approaches. The UK's largely free NHS prioritizes equity but faces efficiency challenges. France and Germany employ moderate co-payments with extensive insurance coverage, balancing equity and efficiency. The US system, with high out-of-pocket costs, achieves neither equity nor cost-effectiveness, spending more per capita for worse population health outcomes than many peer nations.</p>
+                            
+                            <p><span class="model-sub">Alternative perspectives:</span> Rather than a binary choice between free provision and point-of-use charges, hybrid models may offer superior outcomes. These could include free preventive and primary care (high externalities) with charges for elective procedures, or income-related charges that maintain access while encouraging responsible use. Singapore's system combines mandatory health savings accounts with catastrophic insurance and government subsidies, demonstrating another innovative approach.</p>
+                            
+                            <p><span class="model-sub">Conclusion:</span> Point-of-use charges are <span class="highlight-term">not unequivocally more beneficial</span> than free provision for consumers and providers. While they offer potential efficiency gains and revenue generation, these come at the cost of reduced equity and risk exacerbating the under-consumption of healthcare as a merit good. A carefully designed system incorporating modest charges for non-essential services, robust exemptions for vulnerable groups, and maintained free access for high-externality care may optimize the trade-offs. Ultimately, the "best" approach depends on societal values regarding equity versus efficiency, the specific healthcare context, and the capacity to implement sophisticated charging and exemption systems effectively.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量和参数管理 ====================
+        const ECONOMIC_PARAMS = {
+            // 初始市场参数
+            initialMPB: { slope: -1.5, intercept: 150 },  // 边际私人效益
+            initialMSC: { slope: 1.0, intercept: 20 },    // 边际社会成本 (= MPC)
+            
+            // 正外部性大小 (MSB在MPB之上)
+            externalitySize: 40, // 0-100 scale
+            
+            // 政策选项
+            policies: {
+                free: {
+                    subsidy: 100, // 免费提供相当于100%补贴
+                    label: "Free Provision",
+                    color: "#27ae60"
+                },
+                charge: {
+                    subsidy: 30,  // 使用点收费相当于部分补贴
+                    chargeAmount: 25, // 收费金额
+                    label: "Point-of-Use Charge",
+                    color: "#e74c3c"
+                }
+            },
+            
+            // 当前设置
+            currentPolicy: "free",
+            isExamMode: false
+        };
+        
+        // ==================== 标签切换功能 ====================
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            const tabIndex = tabName === 'analysis' ? 1 : tabName === 'evaluation' ? 2 : 3;
+            document.querySelector(`.tab:nth-child(${tabIndex})`).classList.add('active');
+            
+            // 显示对应的内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // ==================== 医疗保健图表功能 ====================
+        const healthcareCanvas = document.getElementById('healthcareCanvas');
+        const healthcareCtx = healthcareCanvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 响应式重绘机制
+        function resizeHealthcareCanvas() {
+            if (!healthcareCanvas.parentElement) return;
+            
+            canvasWidth = healthcareCanvas.parentElement.clientWidth;
+            canvasHeight = healthcareCanvas.parentElement.clientHeight;
+            healthcareCanvas.width = canvasWidth;
+            healthcareCanvas.height = canvasHeight;
+            
+            drawHealthcareChart();
+        }
+        
+        // 三重重绘保障
+        function ensureRedraw() {
+            // 1. 立即重绘
+            resizeHealthcareCanvas();
+            
+            // 2. 页面加载后重绘
+            window.addEventListener('load', resizeHealthcareCanvas);
+            
+            // 3. 延迟重绘
+            setTimeout(resizeHealthcareCanvas, 300);
+            setTimeout(resizeHealthcareCanvas, 1000);
+        }
+        
+        // 设置外部性大小
+        function updateExternality() {
+            ECONOMIC_PARAMS.externalitySize = parseInt(document.getElementById('externalitySlider').value);
+            drawHealthcareChart();
+            updateDataPanel();
+        }
+        
+        // 设置政策
+        function setPolicy(policy) {
+            ECONOMIC_PARAMS.currentPolicy = policy;
+            
+            // 更新按钮状态
+            document.getElementById('freeBtn').classList.remove('active');
+            document.getElementById('chargeBtn').classList.remove('active');
+            document.getElementById(`${policy}Btn`).classList.add('active');
+            
+            // 重绘图
+            updateHealthcareChart();
+        }
+        
+        // 更新图表（外部性或政策变动时调用）
+        function updateHealthcareChart() {
+            updateExternality();
+        }
+        
+        // 显示考试模式（市场失灵与解决方案）
+        function showExamMode() {
+            ECONOMIC_PARAMS.isExamMode = true;
+            ECONOMIC_PARAMS.externalitySize = 60; // 较大的外部性
+            document.getElementById('externalitySlider').value = 60;
+            ECONOMIC_PARAMS.currentPolicy = "free";
+            document.getElementById('freeBtn').classList.add('active');
+            document.getElementById('chargeBtn').classList.remove('active');
+            drawHealthcareChart();
+            updateDataPanel();
+        }
+        
+        // 重置图表
+        function resetHealthcareChart() {
+            ECONOMIC_PARAMS.isExamMode = false;
+            ECONOMIC_PARAMS.externalitySize = 40;
+            document.getElementById('externalitySlider').value = 40;
+            ECONOMIC_PARAMS.currentPolicy = "free";
+            document.getElementById('freeBtn').classList.add('active');
+            document.getElementById('chargeBtn').classList.remove('active');
+            drawHealthcareChart();
+            updateDataPanel();
+        }
+        
+        // 绘制医疗保健市场图表
+        function drawHealthcareChart() {
+            if (!canvasWidth || !canvasHeight) return;
+            
+            // 清除画布
+            healthcareCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 设置边距
+            const padding = { top: 50, right: 60, bottom: 70, left: 70 };
+            const graphWidth = canvasWidth - padding.left - padding.right;
+            const graphHeight = canvasHeight - padding.top - padding.bottom;
+            
+            // 绘制坐标轴
+            healthcareCtx.beginPath();
+            healthcareCtx.strokeStyle = '#333';
+            healthcareCtx.lineWidth = 2;
+            
+            // Y轴（价格/效益）
+            healthcareCtx.moveTo(padding.left, padding.top);
+            healthcareCtx.lineTo(padding.left, padding.top + graphHeight);
+            
+            // X轴（数量）
+            healthcareCtx.moveTo(padding.left, padding.top + graphHeight);
+            healthcareCtx.lineTo(padding.left + graphWidth, padding.top + graphHeight);
+            healthcareCtx.stroke();
+            
+            // 坐标轴标签
+            healthcareCtx.font = 'bold 14px Arial';
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.textAlign = 'center';
+            
+            // Y轴标签
+            healthcareCtx.save();
+            healthcareCtx.translate(20, padding.top + graphHeight / 2);
+            healthcareCtx.rotate(-Math.PI / 2);
+            healthcareCtx.fillText("Price / Benefit ($)", 0, 0);
+            healthcareCtx.restore();
+            
+            // X轴标签
+            healthcareCtx.fillText("Quantity of Healthcare Services", padding.left + graphWidth / 2, padding.top + graphHeight + 45);
+            
+            // 绘制网格线
+            healthcareCtx.strokeStyle = '#eee';
+            healthcareCtx.lineWidth = 1;
+            
+            // 水平网格线
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * graphHeight;
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(padding.left, y);
+                healthcareCtx.lineTo(padding.left + graphWidth, y);
+                healthcareCtx.stroke();
+                
+                // Y轴刻度标签
+                const value = (150 - (i * 30)).toFixed(0);
+                healthcareCtx.fillStyle = '#666';
+                healthcareCtx.font = '12px Arial';
+                healthcareCtx.textAlign = 'right';
+                healthcareCtx.fillText(`$${value}`, padding.left - 10, y + 4);
+            }
+            
+            // 垂直网格线
+            for (let i = 0; i <= 5; i++) {
+                const x = padding.left + (i / 5) * graphWidth;
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(x, padding.top);
+                healthcareCtx.lineTo(x, padding.top + graphHeight);
+                healthcareCtx.stroke();
+                
+                // X轴刻度标签
+                const qty = (i * 20) + '';
+                healthcareCtx.fillStyle = '#666';
+                healthcareCtx.font = '12px Arial';
+                healthcareCtx.textAlign = 'center';
+                healthcareCtx.fillText(qty, x, padding.top + graphHeight + 20);
+            }
+            
+            // 计算曲线参数
+            const externalityFactor = ECONOMIC_PARAMS.externalitySize / 100; // 0-1 scale
+            const maxExternality = 60; // 最大外部性值（美元）
+            
+            // 边际私人效益 (MPB) 曲线: P = a - bQ
+            const mpbSlope = ECONOMIC_PARAMS.initialMPB.slope;
+            const mpbIntercept = ECONOMIC_PARAMS.initialMPB.intercept;
+            
+            // 边际社会效益 (MSB) 曲线: 在MPB之上，反映正外部性
+            const externalityValue = maxExternality * externalityFactor;
+            const msbIntercept = mpbIntercept + externalityValue;
+            const msbSlope = mpbSlope; // 假设平行移动
+            
+            // 边际社会成本 (MSC) 曲线 (= MPC): P = c + dQ
+            const mscSlope = ECONOMIC_PARAMS.initialMSC.slope;
+            const mscIntercept = ECONOMIC_PARAMS.initialMSC.intercept;
+            
+            // 绘制边际私人效益 (MPB) 曲线
+            healthcareCtx.beginPath();
+            healthcareCtx.strokeStyle = '#2980b9';
+            healthcareCtx.lineWidth = 3;
+            
+            const mpbStartY = padding.top; // Q=0时的价格
+            const mpbEndY = padding.top + graphHeight; // Q最大时的价格
+            const mpbStartX = padding.left;
+            const mpbEndX = padding.left + (mpbIntercept / -mpbSlope) * (graphWidth / 100); // 当P=0时的Q
+            
+            healthcareCtx.moveTo(mpbStartX, mpbStartY);
+            healthcareCtx.lineTo(mpbEndX, mpbEndY);
+            healthcareCtx.stroke();
+            
+            // MPB标签
+            healthcareCtx.fillStyle = '#2980b9';
+            healthcareCtx.font = 'bold 14px Arial';
+            healthcareCtx.textAlign = 'left';
+            healthcareCtx.fillText("MPB (Private Benefit)", mpbEndX - 120, mpbStartY + 30);
+            
+            // 绘制边际社会效益 (MSB) 曲线
+            healthcareCtx.beginPath();
+            healthcareCtx.strokeStyle = '#27ae60';
+            healthcareCtx.lineWidth = 3;
+            
+            const msbStartY = padding.top; // Q=0时的价格
+            const msbEndY = padding.top + graphHeight; // Q最大时的价格
+            const msbStartX = padding.left;
+            const msbEndX = padding.left + (msbIntercept / -msbSlope) * (graphWidth / 100); // 当P=0时的Q
+            
+            healthcareCtx.moveTo(msbStartX, msbStartY);
+            healthcareCtx.lineTo(msbEndX, msbEndY);
+            healthcareCtx.stroke();
+            
+            // MSB标签
+            healthcareCtx.fillStyle = '#27ae60';
+            healthcareCtx.fillText("MSB (Social Benefit)", msbEndX - 120, msbStartY + 50);
+            
+            // 绘制边际社会成本 (MSC) 曲线
+            healthcareCtx.beginPath();
+            healthcareCtx.strokeStyle = '#c0392b';
+            healthcareCtx.lineWidth = 3;
+            
+            const mscStartY = padding.top + graphHeight; // Q=0时的价格
+            const mscEndY = padding.top; // Q最大时的价格
+            const mscStartX = padding.left;
+            const mscEndX = padding.left + graphWidth;
+            
+            healthcareCtx.moveTo(mscStartX, mscStartY);
+            healthcareCtx.lineTo(mscEndX, mscEndY);
+            healthcareCtx.stroke();
+            
+            // MSC标签
+            healthcareCtx.fillStyle = '#c0392b';
+            healthcareCtx.fillText("MSC (= MPC, Supply)", mscStartX, mscStartY - 20);
+            
+            // 计算市场均衡 (MPB = MSC)
+            const marketEqX = padding.left + ((mpbIntercept - mscIntercept) / (mscSlope - mpbSlope)) * (graphWidth / 100);
+            const marketEqY = mscIntercept + mscSlope * ((marketEqX - padding.left) / (graphWidth / 100));
+            
+            // 计算社会最优均衡 (MSB = MSC)
+            const optimalEqX = padding.left + ((msbIntercept - mscIntercept) / (mscSlope - msbSlope)) * (graphWidth / 100);
+            const optimalEqY = mscIntercept + mscSlope * ((optimalEqX - padding.left) / (graphWidth / 100));
+            
+            // 标记市场均衡点
+            healthcareCtx.beginPath();
+            healthcareCtx.arc(marketEqX, marketEqY, 6, 0, Math.PI * 2);
+            healthcareCtx.fillStyle = '#e74c3c';
+            healthcareCtx.fill();
+            healthcareCtx.strokeStyle = '#2c3e50';
+            healthcareCtx.lineWidth = 2;
+            healthcareCtx.stroke();
+            
+            healthcareCtx.fillStyle = '#2c3e50';
+            healthcareCtx.font = 'bold 12px Arial';
+            healthcareCtx.textAlign = 'right';
+            healthcareCtx.fillText("Eₘ (Market Equilibrium)", marketEqX - 10, marketEqY - 15);
+            
+            // 标记社会最优点
+            healthcareCtx.beginPath();
+            healthcareCtx.arc(optimalEqX, optimalEqY, 6, 0, Math.PI * 2);
+            healthcareCtx.fillStyle = '#27ae60';
+            healthcareCtx.fill();
+            healthcareCtx.strokeStyle = '#2c3e50';
+            healthcareCtx.lineWidth = 2;
+            healthcareCtx.stroke();
+            
+            healthcareCtx.fillStyle = '#2c3e50';
+            healthcareCtx.font = 'bold 12px Arial';
+            healthcareCtx.textAlign = 'left';
+            healthcareCtx.fillText("Eₛ (Socially Optimal)", optimalEqX + 10, optimalEqY - 15);
+            
+            // 绘制无谓损失区域 (如果存在)
+            if (marketEqX < optimalEqX) {
+                healthcareCtx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(marketEqX, marketEqY);
+                
+                // 沿MSB曲线到最优数量
+                for (let x = marketEqX; x <= optimalEqX; x++) {
+                    const q = (x - padding.left) / (graphWidth / 100);
+                    const msbPrice = msbIntercept + msbSlope * q;
+                    const mscPrice = mscIntercept + mscSlope * q;
+                    const y = padding.top + graphHeight - (msbPrice - mscIntercept) * (graphHeight / 150);
+                    healthcareCtx.lineTo(x, y);
+                }
+                
+                // 沿MSC曲线回到市场均衡
+                for (let x = optimalEqX; x >= marketEqX; x--) {
+                    const q = (x - padding.left) / (graphWidth / 100);
+                    const mscPrice = mscIntercept + mscSlope * q;
+                    const y = padding.top + graphHeight - (mscPrice - mscIntercept) * (graphHeight / 150);
+                    healthcareCtx.lineTo(x, y);
+                }
+                
+                healthcareCtx.closePath();
+                healthcareCtx.fill();
+                
+                // 无谓损失标签
+                healthcareCtx.fillStyle = '#e74c3c';
+                healthcareCtx.font = 'bold 12px Arial';
+                healthcareCtx.textAlign = 'center';
+                const dwlX = marketEqX + (optimalEqX - marketEqX) / 2;
+                const dwlY = (marketEqY + optimalEqY) / 2;
+                healthcareCtx.fillText("Deadweight Loss", dwlX, dwlY);
+            }
+            
+            // 根据当前政策绘制结果
+            const policy = ECONOMIC_PARAMS.policies[ECONOMIC_PARAMS.currentPolicy];
+            
+            if (policy.subsidy === 100) {
+                // 免费提供：补贴使有效价格降为0，消费达到社会最优
+                healthcareCtx.beginPath();
+                healthcareCtx.strokeStyle = policy.color;
+                healthcareCtx.setLineDash([5, 5]);
+                healthcareCtx.lineWidth = 2;
+                
+                // 水平线在P=0处（实际上在图表底部）
+                const zeroPriceY = padding.top + graphHeight;
+                healthcareCtx.moveTo(padding.left, zeroPriceY);
+                healthcareCtx.lineTo(optimalEqX, zeroPriceY);
+                healthcareCtx.lineTo(optimalEqX, optimalEqY);
+                healthcareCtx.stroke();
+                
+                healthcareCtx.setLineDash([]);
+                
+                // 标记政策结果点
+                healthcareCtx.beginPath();
+                healthcareCtx.arc(optimalEqX, zeroPriceY, 6, 0, Math.PI * 2);
+                healthcareCtx.fillStyle = policy.color;
+                healthcareCtx.fill();
+                healthcareCtx.strokeStyle = '#2c3e50';
+                healthcareCtx.lineWidth = 2;
+                healthcareCtx.stroke();
+                
+                healthcareCtx.fillStyle = '#2c3e50';
+                healthcareCtx.font = 'bold 12px Arial';
+                healthcareCtx.textAlign = 'left';
+                healthcareCtx.fillText(`Free: Q=${Math.round((optimalEqX - padding.left) / (graphWidth / 100))}`, optimalEqX + 10, zeroPriceY - 15);
+                
+                // 显示政府成本区域
+                healthcareCtx.fillStyle = 'rgba(41, 128, 185, 0.2)';
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(padding.left, zeroPriceY);
+                healthcareCtx.lineTo(optimalEqX, zeroPriceY);
+                healthcareCtx.lineTo(optimalEqX, optimalEqY);
+                healthcareCtx.lineTo(padding.left, marketEqY);
+                healthcareCtx.closePath();
+                healthcareCtx.fill();
+                
+            } else {
+                // 使用点收费：部分补贴，消费介于市场均衡和社会最优之间
+                const subsidyFactor = policy.subsidy / 100;
+                const effectivePrice = optimalEqY * (1 - subsidyFactor);
+                const effectiveY = padding.top + graphHeight - (effectivePrice - mscIntercept) * (graphHeight / 150);
+                
+                // 找到MSB曲线上对应此价格的数量
+                const effectiveQ = (effectivePrice - msbIntercept) / msbSlope;
+                const effectiveX = padding.left + effectiveQ * (graphWidth / 100);
+                
+                healthcareCtx.beginPath();
+                healthcareCtx.strokeStyle = policy.color;
+                healthcareCtx.setLineDash([5, 5]);
+                healthcareCtx.lineWidth = 2;
+                
+                // 水平线在有效价格处
+                healthcareCtx.moveTo(padding.left, effectiveY);
+                healthcareCtx.lineTo(effectiveX, effectiveY);
+                healthcareCtx.lineTo(effectiveX, padding.top + graphHeight);
+                healthcareCtx.stroke();
+                
+                healthcareCtx.setLineDash([]);
+                
+                // 标记政策结果点
+                healthcareCtx.beginPath();
+                healthcareCtx.arc(effectiveX, effectiveY, 6, 0, Math.PI * 2);
+                healthcareCtx.fillStyle = policy.color;
+                healthcareCtx.fill();
+                healthcareCtx.strokeStyle = '#2c3e50';
+                healthcareCtx.lineWidth = 2;
+                healthcareCtx.stroke();
+                
+                healthcareCtx.fillStyle = '#2c3e50';
+                healthcareCtx.font = 'bold 12px Arial';
+                healthcareCtx.textAlign = 'left';
+                healthcareCtx.fillText(`Charge: Q=${Math.round(effectiveQ)}`, effectiveX + 10, effectiveY - 15);
+                
+                // 显示政府补贴和用户支付
+                healthcareCtx.fillStyle = 'rgba(41, 128, 185, 0.2)';
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(padding.left, effectiveY);
+                healthcareCtx.lineTo(effectiveX, effectiveY);
+                healthcareCtx.lineTo(effectiveX, optimalEqY);
+                healthcareCtx.lineTo(padding.left, marketEqY);
+                healthcareCtx.closePath();
+                healthcareCtx.fill();
+                
+                healthcareCtx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+                healthcareCtx.beginPath();
+                healthcareCtx.moveTo(effectiveX, effectiveY);
+                healthcareCtx.lineTo(effectiveX, padding.top + graphHeight);
+                healthcareCtx.lineTo(padding.left, padding.top + graphHeight);
+                healthcareCtx.lineTo(padding.left, effectiveY);
+                healthcareCtx.closePath();
+                healthcareCtx.fill();
+            }
+            
+            // 显示外部性大小
+            healthcareCtx.fillStyle = '#2c3e50';
+            healthcareCtx.font = 'bold 14px Arial';
+            healthcareCtx.textAlign = 'center';
+            healthcareCtx.fillText(`Positive Externality: ${ECONOMIC_PARAMS.externalitySize}%`, canvasWidth / 2, padding.top - 20);
+            
+            // 显示当前政策
+            healthcareCtx.fillStyle = policy.color;
+            healthcareCtx.fillText(`${policy.label}`, canvasWidth / 2, padding.top - 5);
+            
+            // 如果处于考试模式，显示市场失灵注释
+            if (ECONOMIC_PARAMS.isExamMode) {
+                healthcareCtx.fillStyle = '#e74c3c';
+                healthcareCtx.font = 'italic 13px Arial';
+                healthcareCtx.fillText("Market Failure: Under-consumption due to positive externalities", canvasWidth / 2, padding.top + graphHeight + 60);
+            }
+            
+            // 图例
+            const legendX = canvasWidth - 180;
+            const legendY = padding.top + 30;
+            
+            healthcareCtx.fillStyle = '#2980b9';
+            healthcareCtx.fillRect(legendX, legendY, 15, 15);
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.font = '12px Arial';
+            healthcareCtx.textAlign = 'left';
+            healthcareCtx.fillText("MPB (Private Benefit)", legendX + 25, legendY + 12);
+            
+            healthcareCtx.fillStyle = '#27ae60';
+            healthcareCtx.fillRect(legendX, legendY + 25, 15, 15);
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.fillText("MSB (Social Benefit)", legendX + 25, legendY + 37);
+            
+            healthcareCtx.fillStyle = '#c0392b';
+            healthcareCtx.fillRect(legendX, legendY + 50, 15, 15);
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.fillText("MSC/MPC (Supply)", legendX + 25, legendY + 62);
+            
+            healthcareCtx.fillStyle = '#e74c3c';
+            healthcareCtx.beginPath();
+            healthcareCtx.arc(legendX + 7, legendY + 80, 6, 0, Math.PI * 2);
+            healthcareCtx.fill();
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.fillText("Market Equilibrium (Eₘ)", legendX + 25, legendY + 85);
+            
+            healthcareCtx.fillStyle = '#27ae60';
+            healthcareCtx.beginPath();
+            healthcareCtx.arc(legendX + 7, legendY + 105, 6, 0, Math.PI * 2);
+            healthcareCtx.fill();
+            healthcareCtx.fillStyle = '#333';
+            healthcareCtx.fillText("Social Optimum (Eₛ)", legendX + 25, legendY + 110);
+            
+            if (ECONOMIC_PARAMS.currentPolicy === "free") {
+                healthcareCtx.fillStyle = '#27ae60';
+                healthcareCtx.beginPath();
+                healthcareCtx.arc(legendX + 7, legendY + 130, 6, 0, Math.PI * 2);
+                healthcareCtx.fill();
+                healthcareCtx.fillStyle = '#333';
+                healthcareCtx.fillText("Free Provision Outcome", legendX + 25, legendY + 135);
+            } else {
+                healthcareCtx.fillStyle = '#e74c3c';
+                healthcareCtx.beginPath();
+                healthcareCtx.arc(legendX + 7, legendY + 130, 6, 0, Math.PI * 2);
+                healthcareCtx.fill();
+                healthcareCtx.fillStyle = '#333';
+                healthcareCtx.fillText("Charging Outcome", legendX + 25, legendY + 135);
+            }
+        }
+        
+        // 更新数据面板
+        function updateDataPanel() {
+            // 计算曲线参数
+            const externalityFactor = ECONOMIC_PARAMS.externalitySize / 100;
+            const maxExternality = 60;
+            
+            const mpbSlope = ECONOMIC_PARAMS.initialMPB.slope;
+            const mpbIntercept = ECONOMIC_PARAMS.initialMPB.intercept;
+            const externalityValue = maxExternality * externalityFactor;
+            const msbIntercept = mpbIntercept + externalityValue;
+            const msbSlope = mpbSlope;
+            const mscSlope = ECONOMIC_PARAMS.initialMSC.slope;
+            const mscIntercept = ECONOMIC_PARAMS.initialMSC.intercept;
+            
+            // 计算市场均衡 (MPB = MSC)
+            const marketQ = (mpbIntercept - mscIntercept) / (mscSlope - mpbSlope);
+            const marketP = mscIntercept + mscSlope * marketQ;
+            
+            // 计算社会最优均衡 (MSB = MSC)
+            const optimalQ = (msbIntercept - mscIntercept) / (mscSlope - msbSlope);
+            const optimalP = mscIntercept + mscSlope * optimalQ;
+            
+            // 计算无谓损失 (三角形面积)
+            const dwl = 0.5 * (optimalQ - marketQ) * (optimalP - marketP);
+            
+            // 根据政策计算结果
+            const policy = ECONOMIC_PARAMS.policies[ECONOMIC_PARAMS.currentPolicy];
+            let policyQ, govFinance;
+            
+            if (policy.subsidy === 100) {
+                policyQ = optimalQ;
+                govFinance = 0.5 * (optimalP + mscIntercept) * optimalQ; // 近似政府成本
+            } else {
+                const subsidyFactor = policy.subsidy / 100;
+                const effectivePrice = optimalP * (1 - subsidyFactor);
+                policyQ = (effectivePrice - msbIntercept) / msbSlope;
+                govFinance = (optimalP - effectivePrice) * policyQ; // 政府补贴部分
+            }
+            
+            // 更新显示
+            document.getElementById('marketQty').textContent = Math.round(marketQ);
+            document.getElementById('optimalQty').textContent = Math.round(optimalQ);
+            document.getElementById('underConsumption').textContent = `${Math.round(optimalQ - marketQ)} units`;
+            document.getElementById('welfareLoss').textContent = `$${Math.round(dwl)}`;
+            
+            const outcomeElement = document.getElementById('policyOutcome');
+            if (ECONOMIC_PARAMS.currentPolicy === "free") {
+                outcomeElement.textContent = `Free: Q=${Math.round(policyQ)}`;
+                outcomeElement.style.color = '#27ae60';
+            } else {
+                outcomeElement.textContent = `Charge: Q=${Math.round(policyQ)}`;
+                outcomeElement.style.color = '#e74c3c';
+            }
+            
+            const financeElement = document.getElementById('govFinance');
+            if (ECONOMIC_PARAMS.currentPolicy === "free") {
+                financeElement.textContent = `Subsidy: $${Math.round(govFinance)}`;
+                financeElement.style.color = '#2980b9';
+            } else {
+                const userPayment = policy.chargeAmount * policyQ;
+                financeElement.textContent = `Subsidy: $${Math.round(govFinance)}, User Pays: $${Math.round(userPayment)}`;
+                financeElement.style.color = '#2980b9';
+            }
+        }
+        
+        // ==================== 初始化函数 ====================
+        function initializePage() {
+            // 初始化标签页
+            switchTab('analysis');
+            
+            // 设置政策
+            setPolicy('free');
+            
+            // 初始化医疗保健图表
+            ensureRedraw();
+            
+            // 更新数据面板
+            updateDataPanel();
+            
+            // 禁用右键菜单和文本选择
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 添加resize事件监听
+            window.addEventListener('resize', resizeHealthcareCanvas);
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+    </script>
+</body>
+</html>
